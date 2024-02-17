@@ -1,5 +1,6 @@
 package hades.user.service;
 
+import dobby.session.Session;
 import hades.user.User;
 import thot.connector.Connector;
 
@@ -46,5 +47,24 @@ public class UserService {
 
     public boolean update(User user) {
         return Connector.write(USER_BUCKET, user.getId().toString(), user);
+    }
+
+
+    public boolean isLoggedIn(Session session) {
+        final String sessionUserId = session.get("userId");
+
+        if (sessionUserId == null) {
+            return false;
+        }
+
+        final UUID userId;
+
+        try {
+            userId = UUID.fromString(sessionUserId);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+
+        return find(userId) != null;
     }
 }
