@@ -25,28 +25,25 @@ public class AuthorizedRoutesService {
         authorizedRoutes.add(route);
     }
 
-    public boolean isAuthorizedOnly(String route) {
-        if (authorizedRoutes.contains(route)) {
-            return true;
-        }
-        return containsMatching(route);
-    }
-
     /**
      * Copied from dobby.RouteManager
      * <br>
      * TODO rewrite after update
      */
-    private boolean containsMatching(String route) {
+    public String getMatching(String route) {
+        if (authorizedRoutes.contains(route)) {
+            return route;
+        }
+
         List<String> patternPaths = authorizedRoutes.stream().filter(p -> p.contains("*")).collect(Collectors.toList());
 
         for (String p : patternPaths) {
             final Pattern pattern = prepareRoutePattern(p);
             if (pattern.matcher(route).matches()) {
-                return true;
+                return p;
             }
         }
-        return false;
+        return null;
     }
 
     /**

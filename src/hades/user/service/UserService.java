@@ -46,7 +46,7 @@ public class UserService {
     }
 
     public boolean update(User user) {
-        return Connector.write(USER_BUCKET, user.getId().toString(), user);
+        return Connector.write(USER_BUCKET, user.getKey(), user);
     }
 
 

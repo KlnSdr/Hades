@@ -5,6 +5,7 @@ import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import hades.authorized.service.AuthorizedRoutesService;
+import hades.authorized.service.PermissionService;
 import hades.user.service.UserService;
 
 public class AutorizedRoutePreFilter implements Filter {
@@ -26,9 +27,18 @@ public class AutorizedRoutePreFilter implements Filter {
     @Override
     public boolean run(HttpContext httpContext) {
         final String path = httpContext.getRequest().getPath();
-        final boolean isAuthorizedOnly = AuthorizedRoutesService.getInstance().isAuthorizedOnly(path);
+        final String matchingRoute = AuthorizedRoutesService.getInstance().getMatching(path);
 
-        if (isAuthorizedOnly && !UserService.getInstance().isLoggedIn(httpContext.getSession())) {
+        if (matchingRoute == null) {
+            return true;
+        }
+
+        if (!UserService.getInstance().isLoggedIn(httpContext.getSession())) {
+            httpContext.getResponse().setCode(ResponseCodes.FORBIDDEN);
+            return false;
+        }
+
+        if (!PermissionService.getInstance().hasPermission(null, matchingRoute, httpContext.getRequest().getType())) {
             httpContext.getResponse().setCode(ResponseCodes.FORBIDDEN);
             return false;
         }

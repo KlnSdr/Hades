@@ -52,4 +52,9 @@ public class User implements DataClass {
 
         return json;
     }
+
+    @Override
+    public String getKey() {
+        return getId().toString();
+    }
 }
