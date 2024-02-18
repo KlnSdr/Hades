@@ -9,8 +9,13 @@ import java.util.UUID;
 public class PermissionService {
     private static final String PERMISSION_BUCKET = "hades_permissions";
     private static PermissionService instance;
+    private boolean isEnabled;
     private PermissionService() {
 
+    }
+
+    public void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 
     public static PermissionService getInstance() {
@@ -37,6 +42,10 @@ public class PermissionService {
     }
 
     public boolean hasPermission(UUID userId, String route, RequestTypes requestMethod) {
+        if (!isEnabled) {
+            return true;
+        }
+
         final Permission permission = Connector.read(PERMISSION_BUCKET, userId + "_" + route, Permission.class);
 
         if (permission == null) {
