@@ -2,9 +2,12 @@ package hades.user;
 
 import dobby.util.Json;
 import hades.common.DataClass;
+import hades.user.service.UserService;
+import thot.annotations.Bucket;
 
 import java.util.UUID;
 
+@Bucket(UserService.USER_BUCKET)
 public class User implements DataClass {
     private final UUID id;
     private String displayName;

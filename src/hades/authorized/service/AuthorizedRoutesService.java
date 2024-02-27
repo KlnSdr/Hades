@@ -1,5 +1,7 @@
 package hades.authorized.service;
 
+import dobby.util.RouteHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,11 +27,6 @@ public class AuthorizedRoutesService {
         authorizedRoutes.add(route);
     }
 
-    /**
-     * Copied from dobby.RouteManager
-     * <br>
-     * TODO rewrite after update
-     */
     public String getMatching(String route) {
         if (authorizedRoutes.contains(route)) {
             return route;
@@ -38,21 +35,10 @@ public class AuthorizedRoutesService {
         List<String> patternPaths = authorizedRoutes.stream().filter(p -> p.contains("*")).collect(Collectors.toList());
 
         for (String p : patternPaths) {
-            final Pattern pattern = prepareRoutePattern(p);
-            if (pattern.matcher(route).matches()) {
+            if (RouteHelper.matches(route, p)) {
                 return p;
             }
         }
         return null;
-    }
-
-    /**
-     * Copied from dobby.RouteManager
-     * <br>
-     * TODO rewrite after update
-     */
-    private Pattern prepareRoutePattern(String path) {
-        path = path.replace("*", "[^/]*");
-        return Pattern.compile(path);
     }
 }

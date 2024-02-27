@@ -7,7 +7,7 @@ import thot.connector.Connector;
 import java.util.UUID;
 
 public class PermissionService {
-    private static final String PERMISSION_BUCKET = "hades_permissions";
+    public static final String PERMISSION_BUCKET = "hades_permissions";
     private static PermissionService instance;
     private boolean isEnabled;
     private PermissionService() {

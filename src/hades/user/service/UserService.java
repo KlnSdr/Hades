@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class UserService {
-    private static final String USER_BUCKET = "hades_users";
+    public static final String USER_BUCKET = "hades_users";
     private static UserService instance;
 
     private UserService() {

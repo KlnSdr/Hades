@@ -7,6 +7,7 @@ import dobby.annotations.Put;
 import dobby.io.HttpContext;
 import dobby.routes.RouteManager;
 import dobby.util.Classloader;
+import dobby.util.RouteHelper;
 import dobby.util.Tupel;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
@@ -49,7 +50,11 @@ public class AuthorizedRoutesDiscoverer extends Classloader<Object> {
 
             if (method.isAnnotationPresent(AuthorizedOnly.class)) {
                 final String route = getRoute(method);
-                final String processedRoute = getProcessedRoute(route);
+                if (route == null) {
+                    LOGGER.error("Route not found for method: " + method.getName());
+                    continue;
+                }
+                final String processedRoute = RouteHelper.extractPathParams(route)._1();
 
                 if (processedRoute != null) {
                     AuthorizedRoutesService.getInstance().addAuthorizedRoute(processedRoute);
@@ -76,28 +81,6 @@ public class AuthorizedRoutesDiscoverer extends Classloader<Object> {
     private boolean isValidHttpHandler(Method method) {
         Type[] types = method.getParameterTypes();
         return types.length == 1 && types[0].equals(HttpContext.class);
-    }
-
-    /**
-     * Workaround to get the actual registered path by opening the private method extractPathParams of RouteManager.
-     * <br>
-     * TODO rewrite when method is opened or the info is available in other ways
-     *
-     * @param route The route which should be processed.
-     * @return The processed route with replaced path params.
-     */
-    private String getProcessedRoute(String route) {
-        try {
-            Method method = RouteManager.class.getDeclaredMethod("extractPathParams", String.class);
-            method.setAccessible(true);
-            Tupel<String, List<String>> result =
-                    (Tupel<String, List<String>>) method.invoke(RouteManager.getInstance(), route);
-            return result._1();
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            LOGGER.error("failed to make method 'RouteManager$extractPathParams' accessible");
-            LOGGER.trace(e);
-            return null;
-        }
     }
 
     @Override

@@ -2,10 +2,13 @@ package hades.authorized;
 
 import dobby.io.request.RequestTypes;
 import dobby.util.Json;
+import hades.authorized.service.PermissionService;
 import hades.common.DataClass;
+import thot.annotations.Bucket;
 
 import java.util.UUID;
 
+@Bucket(PermissionService.PERMISSION_BUCKET)
 public class Permission implements DataClass {
     private UUID owner;
     private String route;
