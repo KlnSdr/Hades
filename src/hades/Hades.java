@@ -2,6 +2,7 @@ package hades;
 
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
+import dobby.util.StaticContentDir;
 import dobby.util.logging.Logger;
 import hades.annotations.DisabePermissionCheck;
 import hades.authorized.AuthorizedRoutesDiscoverer;
@@ -10,6 +11,7 @@ import thot.connector.Connector;
 
 public class Hades implements DobbyEntryPoint {
     private static final Logger LOGGER = new Logger(Hades.class);
+
     public static void main(String[] args) {
         new Hades().startApplication(Hades.class);
     }
@@ -34,6 +36,7 @@ public class Hades implements DobbyEntryPoint {
     @Override
     public void preStart() {
         ensureThotIsRunning();
+        registerStaticContentRoot();
 
         if (Dobby.getMainClass().isAnnotationPresent(DisabePermissionCheck.class)) {
             PermissionService.getInstance().setEnabled(false);
@@ -41,6 +44,10 @@ public class Hades implements DobbyEntryPoint {
         }
 
         AuthorizedRoutesDiscoverer.discoverRoutes("");
+    }
+
+    private void registerStaticContentRoot() {
+        StaticContentDir.appendToContentDir(Hades.class, "static");
     }
 
     @Override
