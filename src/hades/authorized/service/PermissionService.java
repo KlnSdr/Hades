@@ -33,6 +33,10 @@ public class PermissionService {
         return Connector.readPattern(PERMISSION_BUCKET, userId.toString() + "_.*", Permission.class);
     }
 
+    public boolean delete(UUID userId, String route) {
+        return delete(userId + "_" + route);
+    }
+
     public boolean delete(String key) {
         return Connector.delete(PERMISSION_BUCKET, key);
     }

@@ -1,0 +1,26 @@
+#containerOutUsers {
+    overflow: scroll;
+    max-height: 25vh;
+}
+
+tr:nth-child(even) {
+    background-color: darkgray;
+}
+
+tr:hover {
+    background-color: darkred;
+    color: white;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        background-color: white;
+    }
+    50% {
+        background-color: green;
+    }
+}
+
+.pulseGreen {
+    animation: pulse 0.5s ease-in-out;
+}

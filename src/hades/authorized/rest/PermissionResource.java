@@ -1,5 +1,6 @@
 package hades.authorized.rest;
 
+import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
@@ -8,6 +9,8 @@ import dobby.util.Json;
 import hades.authorized.service.PermissionService;
 import hades.authorized.Permission;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +57,34 @@ public class PermissionResource {
         permission.setPermissionPUT(body.getInt("put").equals(1));
         permission.setPermissionDELETE(body.getInt("delete").equals(1));
 
-        PermissionService.getInstance().update(permission);
+        final boolean success = PermissionService.getInstance().update(permission);
+
+        if (!success) {
+            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
+            Json response = new Json();
+            response.setString("msg", "Could not add permission");
+            context.getResponse().setBody(response);
+        }
+    }
+
+    @Delete(BASE_PATH + "/user/{userId}/route/{route}")
+    public void deletePermission(HttpContext context) {
+        final UUID userId = uuidFromString(context.getRequest().getParam("userId"), context);
+
+        if (userId == null) {
+            return;
+        }
+
+        final String route = URLDecoder.decode(context.getRequest().getParam("route"), StandardCharsets.UTF_8);
+
+        final boolean success = PermissionService.getInstance().delete(userId, route);
+
+        if (!success) {
+            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
+            Json response = new Json();
+            response.setString("msg", "Could not delete permission");
+            context.getResponse().setBody(response);
+        }
     }
 
     private UUID uuidFromString(String idString, HttpContext context) {
