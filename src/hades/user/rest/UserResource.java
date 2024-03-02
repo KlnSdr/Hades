@@ -9,11 +9,15 @@ import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
 import dobby.session.service.SessionService;
+import dobby.util.Json;
 import dobby.util.logging.Logger;
+import hades.annotations.AuthorizedOnly;
 import hades.common.Security;
 import hades.user.User;
 import hades.user.service.UserService;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class UserResource {
@@ -109,7 +113,7 @@ public class UserResource {
         session.destroy();
     }
 
-    @Get(ROUTE_PREFIX + "/{id}")
+    @Get(ROUTE_PREFIX + "/id/{id}")
     public void getUserById(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
         LOGGER.info("Getting hades.user with id '" + idString + "'");
@@ -130,7 +134,8 @@ public class UserResource {
         context.getResponse().setBody(user.toJson());
     }
 
-    @Delete(ROUTE_PREFIX + "/{id}")
+    @AuthorizedOnly
+    @Delete(ROUTE_PREFIX + "/id/{id}")
     public void deleteUser(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
         LOGGER.info("Deleting hades.user with id '" + idString + "'");
@@ -172,6 +177,16 @@ public class UserResource {
         }
 
         context.getResponse().setBody(user.toJson());
+    }
+
+    @Get(ROUTE_PREFIX + "/all")
+    public void getAllUsers(HttpContext context) {
+        final User[] users = UserService.getInstance().findAll();
+
+        Json response = new Json();
+        response.setList("users", List.of(Arrays.stream(users).map(User::toJson).toArray()));
+
+        context.getResponse().setBody(response);
     }
 
     private UUID uuidFromString(String idString, HttpContext context) {

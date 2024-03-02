@@ -41,6 +41,10 @@ public class UserService {
         return usersWithName.toArray(new User[0]);
     }
 
+    public User[] findAll() {
+        return Connector.readPattern(USER_BUCKET, ".*", User.class);
+    }
+
     public boolean delete(UUID id) {
         return Connector.delete(USER_BUCKET, id.toString());
     }
