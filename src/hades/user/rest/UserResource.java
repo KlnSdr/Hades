@@ -103,6 +103,7 @@ public class UserResource {
         context.setSession(session);
     }
 
+    @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/logout")
     public void doLogout(HttpContext context) {
         final Session session = context.getSession();
@@ -113,6 +114,7 @@ public class UserResource {
         session.destroy();
     }
 
+    @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/id/{id}")
     public void getUserById(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -179,6 +181,7 @@ public class UserResource {
         context.getResponse().setBody(user.toJson());
     }
 
+    @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/all")
     public void getAllUsers(HttpContext context) {
         final User[] users = UserService.getInstance().findAll();
