@@ -2,17 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hades - Login</title>
+    <link rel="stylesheet" href="style.css">
     <script src="index.js"></script>
 </head>
 <body>
 <h1>Login</h1>
-<label for="inputUsername">Username:</label>
-<input type="text" id="inputUsername">
-<br>
-<label for="inputPassword">Password:</label>
-<input type="password" id="inputPassword">
-<br>
-<button id="buttonLogin" onclick="doLogin()">Login</button>
+<div class="container-wrapper">
+    <div class="container">
+        <table>
+            <tr>
+                <td>
+                    <label for="inputUsername">Username:</label>
+                </td>
+                <td>
+                    <input type="text" id="inputUsername">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="inputPassword">Password:</label>
+                </td>
+                <td>
+                    <input type="password" id="inputPassword">
+                </td>
+            </tr>
+        </table>
+        <button id="buttonLogin" onclick="doLogin()">Login</button>
+    </div>
+</div>
 </body>
 </html>

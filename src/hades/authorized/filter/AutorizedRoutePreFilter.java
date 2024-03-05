@@ -4,9 +4,12 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
+import dobby.util.Json;
 import hades.authorized.service.AuthorizedRoutesService;
 import hades.authorized.service.PermissionService;
 import hades.user.service.UserService;
+
+import java.util.UUID;
 
 public class AutorizedRoutePreFilter implements Filter {
     @Override
@@ -38,7 +41,21 @@ public class AutorizedRoutePreFilter implements Filter {
             return false;
         }
 
-        if (!PermissionService.getInstance().hasPermission(null, matchingRoute, httpContext.getRequest().getType())) {
+        final UUID userId;
+
+        try {
+            userId = UUID.fromString(httpContext.getSession().get("userId"));
+        } catch (Exception e) {
+            httpContext.getResponse().setCode(ResponseCodes.BAD_REQUEST);
+
+            final Json payload = new Json();
+            payload.setString("error", "Invalid user id");
+            httpContext.getResponse().setBody(payload.toString());
+
+            return false;
+        }
+
+        if (!PermissionService.getInstance().hasPermission(userId, matchingRoute, httpContext.getRequest().getType())) {
             httpContext.getResponse().setCode(ResponseCodes.FORBIDDEN);
             return false;
         }

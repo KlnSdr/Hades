@@ -9,7 +9,7 @@ import java.util.UUID;
 public class PermissionService {
     public static final String PERMISSION_BUCKET = "hades_permissions";
     private static PermissionService instance;
-    private boolean isEnabled;
+    private boolean isEnabled = true;
     private PermissionService() {
 
     }
