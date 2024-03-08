@@ -8,8 +8,9 @@ import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
-import hades.authorized.service.PermissionService;
 import hades.authorized.Permission;
+import hades.authorized.service.PermissionCheckService;
+import hades.authorized.service.PermissionService;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +20,14 @@ import java.util.UUID;
 
 public class PermissionResource {
     private static final String BASE_PATH = "/rest/permission";
+
+    @AuthorizedOnly
+    @Get(BASE_PATH + "/checked-routes")
+    public void getAllPermissionCheckedRoutes(HttpContext context) {
+        Json response = new Json();
+        response.setList("routes", PermissionCheckService.getInstance().getPermissionCheckRoutes());
+        context.getResponse().setBody(response);
+    }
 
     @PermissionCheck
     @AuthorizedOnly

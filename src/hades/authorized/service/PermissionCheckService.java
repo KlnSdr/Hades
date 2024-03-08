@@ -2,13 +2,13 @@ package hades.authorized.service;
 
 import dobby.util.RouteHelper;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PermissionCheckService {
     private static PermissionCheckService instance;
-    private final List<String> permissionCheckRoutes = new ArrayList<>();
+    private final HashSet<String> permissionCheckRoutes = new HashSet<>();
 
     private PermissionCheckService() {
 
@@ -31,7 +31,8 @@ public class PermissionCheckService {
             return route;
         }
 
-        List<String> patternPaths = permissionCheckRoutes.stream().filter(p -> p.contains("*")).collect(Collectors.toList());
+        List<String> patternPaths =
+                permissionCheckRoutes.stream().filter(p -> p.contains("*")).collect(Collectors.toList());
 
         for (String p : patternPaths) {
             if (RouteHelper.matches(route, p)) {
@@ -39,5 +40,9 @@ public class PermissionCheckService {
             }
         }
         return null;
+    }
+
+    public List<Object> getPermissionCheckRoutes() {
+        return List.of(permissionCheckRoutes.toArray());
     }
 }

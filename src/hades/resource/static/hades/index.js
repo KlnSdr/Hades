@@ -51,8 +51,10 @@ function openUserDetails(userId) {
     output.appendChild(containerUserInfo);
     output.appendChild(containerPermissions);
 
-    loadUserInfo(userId, containerUserInfo).then(() => {});
-    loadUserPermissions(userId, containerPermissions).then(() => {});
+    loadUserInfo(userId, containerUserInfo).then(() => {
+    });
+    loadUserPermissions(userId, containerPermissions).then(() => {
+    });
 }
 
 async function loadUserInfo(userId, outputContainer) {
@@ -166,13 +168,13 @@ function permissionToTableRow(userId, permission) {
     const td1 = document.createElement("td");
     td1.appendChild(document.createTextNode(permission["route"]));
     const td2 = document.createElement("td");
-    td2.appendChild(createCheckboxForPermission(userId,permission["GET"]));
+    td2.appendChild(createCheckboxForPermission(userId, permission["GET"]));
     const td3 = document.createElement("td");
-    td3.appendChild(createCheckboxForPermission(userId,permission["POST"]));
+    td3.appendChild(createCheckboxForPermission(userId, permission["POST"]));
     const td4 = document.createElement("td");
-    td4.appendChild(createCheckboxForPermission(userId,permission["PUT"]));
+    td4.appendChild(createCheckboxForPermission(userId, permission["PUT"]));
     const td5 = document.createElement("td");
-    td5.appendChild(createCheckboxForPermission(userId,permission["DELETE"]));
+    td5.appendChild(createCheckboxForPermission(userId, permission["DELETE"]));
     tr.appendChild(td1);
     tr.appendChild(td2);
     tr.appendChild(td3);
@@ -226,11 +228,7 @@ function updatePermission(userId, sender) {
     const del = row.children[4].children[0].checked ? 1 : 0;
 
     const permission = {
-        route: route,
-        get: get,
-        post: post,
-        put: put,
-        delete: del
+        route: route, get: get, post: post, put: put, delete: del
     };
 
     savePermission(userId, permission, () => {
@@ -244,14 +242,34 @@ function updatePermission(userId, sender) {
     });
 }
 
+function generateRouteSelect() {
+    const select = document.createElement("select");
+    fetch("/rest/permission/checked-routes", {
+        method: "GET", headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(response => response.json())
+        .then(data => {
+            data["routes"].forEach(route => {
+                const option = document.createElement("option");
+                option.value = route;
+                option.appendChild(document.createTextNode(route));
+                select.appendChild(option);
+            });
+        });
+    return select;
+}
+
 function openAddPermission(userId) {
     const output = document.getElementById("outAddNewPermission");
     output.innerHTML = "";
 
-    const inputRoute = document.createElement("input");
-    inputRoute.type = "text";
-    inputRoute.placeholder = "Route";
-    output.appendChild(inputRoute);
+    const lblRoute = document.createElement("label");
+    lblRoute.appendChild(document.createTextNode("Route:"));
+    output.appendChild(lblRoute);
+
+    const selectRoute = generateRouteSelect();
+    output.appendChild(selectRoute);
 
     const ul = document.createElement("ul");
     output.appendChild(ul);
@@ -270,7 +288,7 @@ function openAddPermission(userId) {
 
     const bttn = document.createElement("button");
     bttn.appendChild(document.createTextNode("add"));
-    bttn.onclick = () => addPermission(userId, inputRoute.value, ul);
+    bttn.onclick = () => addPermission(userId, selectRoute.value, ul);
     output.appendChild(bttn);
 }
 
@@ -290,7 +308,9 @@ function addPermission(userId, route, ul) {
     });
 }
 
-function savePermission(userId, permission, onSuccess = () => {}, onError = (error) => {}) {
+function savePermission(userId, permission, onSuccess = () => {
+}, onError = (error) => {
+}) {
     fetch(`/rest/permission/user/${userId}`, {
         method: "POST", headers: {
             "Content-Type": "application/json"
