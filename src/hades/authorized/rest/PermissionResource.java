@@ -7,6 +7,7 @@ import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
 import hades.annotations.AuthorizedOnly;
+import hades.annotations.PermissionCheck;
 import hades.authorized.service.PermissionService;
 import hades.authorized.Permission;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class PermissionResource {
     private static final String BASE_PATH = "/rest/permission";
 
+    @PermissionCheck
     @AuthorizedOnly
     @Get(BASE_PATH + "/user/{userId}")
     public void getPermissionsByUserId(HttpContext context) {
@@ -35,6 +37,7 @@ public class PermissionResource {
         context.getResponse().setBody(response);
     }
 
+    @PermissionCheck
     @AuthorizedOnly
     @Post(BASE_PATH + "/user/{userId}")
     public void addPermissionToUser(HttpContext context) {
@@ -70,6 +73,7 @@ public class PermissionResource {
         }
     }
 
+    @PermissionCheck
     @AuthorizedOnly
     @Delete(BASE_PATH + "/user/{userId}/route/{route}")
     public void deletePermission(HttpContext context) {

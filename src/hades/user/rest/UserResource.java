@@ -12,6 +12,7 @@ import dobby.session.service.SessionService;
 import dobby.util.Json;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
+import hades.annotations.PermissionCheck;
 import hades.common.Security;
 import hades.user.User;
 import hades.user.service.UserService;
@@ -114,6 +115,7 @@ public class UserResource {
         session.destroy();
     }
 
+    @PermissionCheck
     @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/id/{id}")
     public void getUserById(HttpContext context) {
@@ -136,6 +138,7 @@ public class UserResource {
         context.getResponse().setBody(user.toJson());
     }
 
+    @PermissionCheck
     @AuthorizedOnly
     @Delete(ROUTE_PREFIX + "/id/{id}")
     public void deleteUser(HttpContext context) {
@@ -181,6 +184,7 @@ public class UserResource {
         context.getResponse().setBody(user.toJson());
     }
 
+    @PermissionCheck
     @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/all")
     public void getAllUsers(HttpContext context) {

@@ -6,6 +6,7 @@ import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
 import hades.authorized.service.AuthorizedRoutesService;
+import hades.authorized.service.PermissionCheckService;
 import hades.authorized.service.PermissionService;
 import hades.user.service.UserService;
 
@@ -53,6 +54,10 @@ public class AutorizedRoutePreFilter implements Filter {
             httpContext.getResponse().setBody(payload.toString());
 
             return false;
+        }
+
+        if (PermissionCheckService.getInstance().getMatching(matchingRoute) == null) {
+            return true;
         }
 
         if (!PermissionService.getInstance().hasPermission(userId, matchingRoute, httpContext.getRequest().getType())) {

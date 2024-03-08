@@ -5,7 +5,7 @@ import dobby.DobbyEntryPoint;
 import dobby.util.StaticContentDir;
 import dobby.util.logging.Logger;
 import hades.annotations.DisabePermissionCheck;
-import hades.authorized.AuthorizedRoutesDiscoverer;
+import hades.authorized.HadesAnnotationDiscoverer;
 import hades.authorized.service.PermissionService;
 import thot.connector.Connector;
 
@@ -43,7 +43,7 @@ public class Hades implements DobbyEntryPoint {
             LOGGER.info("Permission check is disabled.");
         }
 
-        AuthorizedRoutesDiscoverer.discoverRoutes("");
+        HadesAnnotationDiscoverer.discoverRoutes("");
     }
 
     private void registerStaticContentRoot() {

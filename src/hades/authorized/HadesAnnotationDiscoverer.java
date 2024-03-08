@@ -5,23 +5,21 @@ import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.annotations.Put;
 import dobby.io.HttpContext;
-import dobby.routes.RouteManager;
 import dobby.util.Classloader;
 import dobby.util.RouteHelper;
-import dobby.util.Tupel;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
+import hades.annotations.PermissionCheck;
 import hades.authorized.service.AuthorizedRoutesService;
+import hades.authorized.service.PermissionCheckService;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.List;
 
-public class AuthorizedRoutesDiscoverer extends Classloader<Object> {
-    private static final Logger LOGGER = new Logger(AuthorizedRoutesDiscoverer.class);
+public class HadesAnnotationDiscoverer extends Classloader<Object> {
+    private static final Logger LOGGER = new Logger(HadesAnnotationDiscoverer.class);
 
-    private AuthorizedRoutesDiscoverer(String packageName) {
+    private HadesAnnotationDiscoverer(String packageName) {
         this.packageName = packageName;
     }
 
@@ -34,10 +32,10 @@ public class AuthorizedRoutesDiscoverer extends Classloader<Object> {
         if (rootPackage.startsWith(".")) {
             rootPackage = rootPackage.substring(1);
         }
-        AuthorizedRoutesDiscoverer discoverer = new AuthorizedRoutesDiscoverer(rootPackage);
+        HadesAnnotationDiscoverer discoverer = new HadesAnnotationDiscoverer(rootPackage);
         discoverer.loadClasses().forEach(discoverer::analyzeClassAndMethods);
         String finalRootPackage = rootPackage;
-        discoverer.getPackages().forEach(subpackage -> AuthorizedRoutesDiscoverer.discoverRoutes(finalRootPackage +
+        discoverer.getPackages().forEach(subpackage -> HadesAnnotationDiscoverer.discoverRoutes(finalRootPackage +
                 "." + subpackage));
     }
 
@@ -59,6 +57,19 @@ public class AuthorizedRoutesDiscoverer extends Classloader<Object> {
                 if (processedRoute != null) {
                     AuthorizedRoutesService.getInstance().addAuthorizedRoute(processedRoute);
                     LOGGER.debug("Added route to authorized only: " + processedRoute);
+                }
+            }
+            if (method.isAnnotationPresent(PermissionCheck.class)) {
+                final String route = getRoute(method);
+                if (route == null) {
+                    LOGGER.error("Route not found for method: " + method.getName());
+                    continue;
+                }
+                final String processedRoute = RouteHelper.extractPathParams(route)._1();
+
+                if (processedRoute != null) {
+                    PermissionCheckService.getInstance().addPermissionCheckRoute(processedRoute);
+                    LOGGER.debug("Added route to permission check: " + processedRoute);
                 }
             }
         }
