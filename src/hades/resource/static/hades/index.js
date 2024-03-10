@@ -42,6 +42,8 @@ function openUserDetails(userId) {
     const output = document.getElementById("outUserDetails");
     output.innerHTML = "";
 
+    populateActionBar(userId);
+
     const containerUserInfo = document.createElement("div");
     containerUserInfo.innerText = "Loading user info...";
 
@@ -55,6 +57,21 @@ function openUserDetails(userId) {
     });
     loadUserPermissions(userId, containerPermissions).then(() => {
     });
+}
+
+function populateActionBar(userId) {
+    const container = document.getElementById("outUserActions");
+    container.innerHTML = "";
+
+    const actionBar = document.createElement("div");
+    actionBar.classList.add("actionBar");
+
+    const bttnAddNew = document.createElement("button");
+    bttnAddNew.appendChild(document.createTextNode("add Permission"));
+    bttnAddNew.onclick = () => openAddPermission(userId);
+    actionBar.appendChild(bttnAddNew);
+
+    container.appendChild(actionBar);
 }
 
 async function loadUserInfo(userId, outputContainer) {
@@ -79,27 +96,39 @@ async function loadUserInfo(userId, outputContainer) {
 
             const tr1 = document.createElement("tr");
             const td1 = document.createElement("td");
-            td1.appendChild(document.createTextNode("ID"));
+            const txtID = document.createElement("p");
+            txtID.innerText = "ID";
+            td1.appendChild(txtID);
             const td2 = document.createElement("td");
-            td2.appendChild(document.createTextNode(id));
+            const txtIdData = document.createElement("p");
+            txtIdData.innerText = id;
+            td2.appendChild(txtIdData);
             tr1.appendChild(td1);
             tr1.appendChild(td2);
             table.appendChild(tr1);
 
             const tr2 = document.createElement("tr");
             const td3 = document.createElement("td");
-            td3.appendChild(document.createTextNode("Mail"));
+            const txtMail = document.createElement("p");
+            txtMail.innerText = "Mail";
             const td4 = document.createElement("td");
-            td4.appendChild(document.createTextNode(mail));
+            const txtMailData = document.createElement("p");
+            txtMailData.innerText = mail;
+            td4.appendChild(txtMailData);
+            td3.appendChild(txtMail);
             tr2.appendChild(td3);
             tr2.appendChild(td4);
             table.appendChild(tr2);
 
             const tr3 = document.createElement("tr");
             const td5 = document.createElement("td");
-            td5.appendChild(document.createTextNode("Display Name"));
+            const txtDisplayName = document.createElement("p");
+            txtDisplayName.innerText = "Display Name";
+            td5.appendChild(txtDisplayName);
             const td6 = document.createElement("td");
-            td6.appendChild(document.createTextNode(displayName));
+            const txtDisplayNameData = document.createElement("p");
+            txtDisplayNameData.innerText = displayName;
+            td6.appendChild(txtDisplayNameData);
             tr3.appendChild(td5);
             tr3.appendChild(td6);
             table.appendChild(tr3);
@@ -152,11 +181,6 @@ async function loadUserPermissions(userId, outputContainer) {
             permissions.forEach(permission => table.appendChild(permissionToTableRow(userId, permission)));
 
             outputContainer.appendChild(table);
-
-            const bttnAddNew = document.createElement("button");
-            bttnAddNew.appendChild(document.createTextNode("+"));
-            bttnAddNew.onclick = () => openAddPermission(userId);
-            outputContainer.appendChild(bttnAddNew);
         }).catch(error => {
         outputContainer.innerHTML = "";
         outputContainer.appendChild(document.createTextNode(error.message));
@@ -166,7 +190,9 @@ async function loadUserPermissions(userId, outputContainer) {
 function permissionToTableRow(userId, permission) {
     const tr = document.createElement("tr");
     const td1 = document.createElement("td");
-    td1.appendChild(document.createTextNode(permission["route"]));
+    const txtRoute = document.createElement("p");
+    txtRoute.innerText = permission["route"];
+    td1.appendChild(txtRoute);
     const td2 = document.createElement("td");
     td2.appendChild(createCheckboxForPermission(userId, permission["GET"]));
     const td3 = document.createElement("td");
@@ -188,7 +214,7 @@ function permissionToTableRow(userId, permission) {
 function createDeleteButton(userId) {
     const td = document.createElement("td");
     const bttn = document.createElement("button");
-    bttn.appendChild(document.createTextNode("delete"));
+    bttn.appendChild(document.createTextNode("X"));
     bttn.onclick = () => deletePermission(bttn, userId);
     td.appendChild(bttn);
     return td;
@@ -261,8 +287,7 @@ function generateRouteSelect() {
 }
 
 function openAddPermission(userId) {
-    const output = document.getElementById("outAddNewPermission");
-    output.innerHTML = "";
+    const output = document.createElement("div");
 
     const lblRoute = document.createElement("label");
     lblRoute.appendChild(document.createTextNode("Route:"));
@@ -271,34 +296,24 @@ function openAddPermission(userId) {
     const selectRoute = generateRouteSelect();
     output.appendChild(selectRoute);
 
-    const ul = document.createElement("ul");
-    output.appendChild(ul);
-
-    const methods = ["GET", "POST", "PUT", "DELETE"];
-    methods.forEach(method => {
-        const li = document.createElement("li");
-        const label = document.createElement("label");
-        label.appendChild(document.createTextNode(method));
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        label.appendChild(checkbox);
-        li.appendChild(label);
-        ul.appendChild(li);
-    });
-
     const bttn = document.createElement("button");
     bttn.appendChild(document.createTextNode("add"));
-    bttn.onclick = () => addPermission(userId, selectRoute.value, ul);
+    bttn.onclick = () => {
+        addPermission(userId, selectRoute.value);
+        closePopup(bttn);
+    };
     output.appendChild(bttn);
+
+    openPopup(output);
 }
 
-function addPermission(userId, route, ul) {
+function addPermission(userId, route) {
     const permission = {
         route: route,
-        get: ul.children[0].children[0].children[0].checked ? 1 : 0,
-        post: ul.children[1].children[0].children[0].checked ? 1 : 0,
-        put: ul.children[2].children[0].children[0].checked ? 1 : 0,
-        delete: ul.children[3].children[0].children[0].checked ? 1 : 0
+        get: 0,
+        post: 0,
+        put: 0,
+        delete: 0
     };
     savePermission(userId, permission, () => {
         document.getElementById("outAddNewPermission").innerHTML = "";
@@ -323,4 +338,38 @@ function savePermission(userId, permission, onSuccess = () => {
     }).catch(error => {
         onError(error);
     });
+}
+
+function openPopup(contentBody) {
+    const background = document.createElement("div");
+    background.setAttribute("X-Type", "popupBackground");
+    background.classList.add("popupBackground");
+
+    const popup = document.createElement("div");
+    popup.classList.add("popup");
+
+    const close = document.createElement("button");
+    close.appendChild(document.createTextNode("X"));
+    close.onclick = () => background.remove();
+    popup.appendChild(close);
+
+    const content = document.createElement("div");
+    content.appendChild(contentBody);
+    popup.appendChild(content);
+
+    background.appendChild(popup);
+    document.body.appendChild(background);
+}
+
+function closePopup(self) {
+    if (self === document.body || self === null || self === undefined) {
+        return;
+    }
+
+    if (self.getAttribute("X-Type") === "popupBackground") {
+        self.remove();
+    } else {
+        closePopup(self.parentElement);
+    }
+
 }
