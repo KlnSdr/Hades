@@ -7,6 +7,7 @@ import dobby.util.logging.Logger;
 import hades.annotations.DisabePermissionCheck;
 import hades.authorized.HadesAnnotationDiscoverer;
 import hades.authorized.service.PermissionService;
+import hades.update.service.UpdateService;
 import thot.connector.Connector;
 
 public class Hades implements DobbyEntryPoint {
@@ -43,7 +44,11 @@ public class Hades implements DobbyEntryPoint {
             LOGGER.info("Permission check is disabled.");
         }
 
+        LOGGER.info("discovering protected routes...");
         HadesAnnotationDiscoverer.discoverRoutes("");
+
+        LOGGER.info("running updates...");
+        UpdateService.getInstance().runUpdates();
     }
 
     private void registerStaticContentRoot() {
