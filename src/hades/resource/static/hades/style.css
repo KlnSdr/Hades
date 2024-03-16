@@ -80,3 +80,9 @@ table {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 99;
 }
+
+.ulGroups, h3 {
+    width: 50%;
+    margin: auto;
+    text-align: left;
+}

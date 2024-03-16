@@ -47,14 +47,19 @@ function openUserDetails(userId) {
     const containerUserInfo = document.createElement("div");
     containerUserInfo.innerText = "Loading user info...";
 
+    const containerUserGroups = document.createElement("div");
+    containerUserGroups.innerText = "Loading user info...";
+
     const containerPermissions = document.createElement("div");
     containerPermissions.innerText = "Loading permissions...";
 
     output.appendChild(containerUserInfo);
+    output.appendChild(containerUserGroups);
     output.appendChild(containerPermissions);
 
     loadUserInfo(userId, containerUserInfo).then(() => {
     });
+    loadUserGroups(userId, containerUserGroups).then(() => {});
     loadUserPermissions(userId, containerPermissions).then(() => {
     });
 }
@@ -70,6 +75,11 @@ function populateActionBar(userId) {
     bttnAddNew.appendChild(document.createTextNode("add Permission"));
     bttnAddNew.onclick = () => openAddPermission(userId);
     actionBar.appendChild(bttnAddNew);
+
+    const bttnAdd2Group = document.createElement("button");
+    bttnAdd2Group.appendChild(document.createTextNode("add to Group"));
+    bttnAdd2Group.onclick = () => openAddToGroup(userId);
+    actionBar.appendChild(bttnAdd2Group);
 
     container.appendChild(actionBar);
 }
@@ -140,6 +150,38 @@ async function loadUserInfo(userId, outputContainer) {
     });
 }
 
+async function loadUserGroups(userId, outputContainer) {
+    fetch(`/rest/groups/user/${userId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error, status = " + response.status);
+        }
+        return response.json();
+    }).then(data => {
+        outputContainer.innerHTML = "";
+        const header = document.createElement("h3");
+        header.appendChild(document.createTextNode("Groups"));
+        outputContainer.appendChild(header);
+
+        const ul = document.createElement("ul");
+        ul.classList.add("ulGroups");
+        outputContainer.appendChild(ul);
+
+        data["groups"].forEach(group => {
+            const li = document.createElement("li");
+            li.appendChild(document.createTextNode(group["name"]));
+            ul.appendChild(li);
+        });
+    }).catch(error => {
+        outputContainer.innerHTML = "";
+        outputContainer.appendChild(document.createTextNode(error.message));
+    });
+}
+
 async function loadUserPermissions(userId, outputContainer) {
     fetch(`/rest/permission/user/${userId}`, {
         method: "GET", headers: {
@@ -154,6 +196,11 @@ async function loadUserPermissions(userId, outputContainer) {
         })
         .then(data => {
             outputContainer.innerHTML = "";
+
+            const header = document.createElement("h3");
+            header.appendChild(document.createTextNode("Permissions"));
+            outputContainer.appendChild(header);
+
             const permissions = data["permissions"];
 
             const table = document.createElement("table");
@@ -286,6 +333,25 @@ function generateRouteSelect() {
     return select;
 }
 
+function generateGroupSelect() {
+    const select = document.createElement("select");
+    fetch("/rest/groups/all", {
+        method: "GET", headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(response => response.json())
+        .then(data => {
+            data["groups"].forEach(group => {
+                const option = document.createElement("option");
+                option.value = group["id"];
+                option.appendChild(document.createTextNode(group["name"]));
+                select.appendChild(option);
+            });
+        });
+    return select;
+}
+
+
 function openAddPermission(userId) {
     const output = document.createElement("div");
 
@@ -305,6 +371,42 @@ function openAddPermission(userId) {
     output.appendChild(bttn);
 
     openPopup(output);
+}
+
+function openAddToGroup(userId) {
+    const output = document.createElement("div");
+
+    const lblGroup = document.createElement("label");
+    lblGroup.appendChild(document.createTextNode("Group:"));
+    output.appendChild(lblGroup);
+
+    const selectGroup = generateGroupSelect();
+    output.appendChild(selectGroup);
+
+    const bttn = document.createElement("button");
+    bttn.appendChild(document.createTextNode("add"));
+    bttn.onclick = () => {
+        addToGroup(userId, selectGroup.value);
+        closePopup(bttn);
+    };
+    output.appendChild(bttn);
+
+    openPopup(output);
+}
+
+function addToGroup(userId, group) {
+    fetch(`/rest/groups/user/${userId}/group/${group}`, {
+        method: "POST", headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error, status = " + response.status);
+        }
+        openUserDetails(userId);
+    }).catch(error => {
+        alert(error.message);
+    });
 }
 
 function addPermission(userId, route) {

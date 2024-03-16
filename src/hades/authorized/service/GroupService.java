@@ -4,6 +4,7 @@ import hades.authorized.Group;
 import hades.authorized.UserGroupAssociation;
 import thot.connector.Connector;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class GroupService {
@@ -35,6 +36,17 @@ public class GroupService {
 
     public Group[] findAll() {
         return Connector.readPattern(GROUP_BUCKET, ".*", Group.class);
+    }
+
+    public Group findByName(String name) {
+        final Group[] groups = findAll();
+
+        for (Group group : groups) {
+            if (group.getName().equals(name)) {
+                return group;
+            }
+        }
+        return null;
     }
 
     public boolean addUserToGroup(String userId, String groupId) {
