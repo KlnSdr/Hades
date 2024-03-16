@@ -3,9 +3,13 @@ package hades.authorized.filter;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
+import dobby.io.request.RequestTypes;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
+import hades.authorized.Group;
+import hades.authorized.Permission;
 import hades.authorized.service.AuthorizedRoutesService;
+import hades.authorized.service.GroupService;
 import hades.authorized.service.PermissionCheckService;
 import hades.authorized.service.PermissionService;
 import hades.user.service.UserService;
@@ -60,7 +64,21 @@ public class AutorizedRoutePreFilter implements Filter {
             return true;
         }
 
-        if (!PermissionService.getInstance().hasPermission(userId, matchingRoute, httpContext.getRequest().getType())) {
+
+        final RequestTypes requestMethod = httpContext.getRequest().getType();
+
+        final Group[] groups = GroupService.getInstance().findGroupsByUser(userId);
+        for (Group group : groups) {
+            for (Permission permission : group.getPermissions()) {
+                if (permission.getRoute().equalsIgnoreCase(matchingRoute)) {
+                    if (permission.hasPermission(requestMethod)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        if (!PermissionService.getInstance().hasPermission(userId, matchingRoute, requestMethod)) {
             httpContext.getResponse().setCode(ResponseCodes.FORBIDDEN);
             return false;
         }
