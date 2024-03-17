@@ -46,6 +46,11 @@ function openGroupsTab() {
     outGroups.id = "outGroups";
     containerOutGroups.appendChild(outGroups);
 
+    const bttnNewGroup = document.createElement("button");
+    bttnNewGroup.appendChild(document.createTextNode("+"));
+    bttnNewGroup.onclick = () => createNewGroup();
+    containerOutGroups.appendChild(bttnNewGroup);
+
     const hr = document.createElement("hr");
     centerContainer.appendChild(hr);
 
@@ -60,19 +65,58 @@ function openGroupsTab() {
     loadAllGroups();
 }
 
+function createNewGroup() {
+    const container = document.createElement("div");
+
+    const lableName = document.createElement("label");
+    lableName.innerText = "Name:";
+    container.appendChild(lableName);
+
+    const inputName = document.createElement("input");
+    container.appendChild(inputName);
+
+    const bttnSave = document.createElement("button");
+    bttnSave.innerText = "save";
+    bttnSave.onclick = () => {
+        saveNewGroup(inputName.value);
+        closePopup(bttnSave);
+    };
+    container.appendChild(bttnSave);
+
+    openPopup(container);
+}
+
+function saveNewGroup(groupName) {
+    fetch("/rest/groups", {
+        method: "POST", headers: {
+            "Content-Type": "application/json",
+        }, body: JSON.stringify({name: groupName}),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            loadAllGroups();
+        })
+        .catch((error) => {
+            alert(error.message);
+        });
+}
+
 function loadAllGroups() {
     fetch("/rest/groups/all", {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => response.json())
-        .then(data => {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
             const groups = data["groups"].sort((a, b) => a["name"].localeCompare(b["name"]));
 
             const ulist = document.getElementById("outGroups");
             ulist.innerHTML = "";
 
-            groups.forEach(group => {
+            groups.forEach((group) => {
                 const li = document.createElement("li");
                 li.appendChild(document.createTextNode(group["name"]));
                 const bttn = document.createElement("button");
@@ -123,11 +167,7 @@ function openAddPermissionGroup(groupId) {
 
 function addPermissionGroup(groupId, route) {
     const permission = {
-        route: route,
-        get: 0,
-        post: 0,
-        put: 0,
-        delete: 0
+        route: route, get: 0, post: 0, put: 0, delete: 0,
     };
     saveGroupPermission(groupId, permission, () => {
         openGroupDetails(groupId);
@@ -143,11 +183,11 @@ function openGroupDetails(groupId) {
 
     fetch(`/rest/groups/id/${groupId}`, {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+        },
     })
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
             container.innerHTML = "";
             populateGroupActionBar(data["id"]);
 
@@ -208,7 +248,7 @@ function displayGroupPermissions(groupId, permissions, outputContainer) {
     trh.appendChild(th6);
     table.appendChild(trh);
 
-    permissions.forEach(permission => table.appendChild(groupPermissionToTableRow(groupId, permission)));
+    permissions.forEach((permission) => table.appendChild(groupPermissionToTableRow(groupId, permission)));
 
     outputContainer.appendChild(table);
 }
@@ -255,7 +295,7 @@ function updateGroupPermission(groupId, sender) {
     const del = row.children[4].children[0].checked ? 1 : 0;
 
     const permission = {
-        route: route, get: get, post: post, put: put, delete: del
+        route: route, get: get, post: post, put: put, delete: del,
     };
 
     saveGroupPermission(groupId, permission, () => {
@@ -269,19 +309,23 @@ function updateGroupPermission(groupId, sender) {
     });
 }
 
-function saveGroupPermission(groupId, permission, onSuccess = () => {}, onError = (error) => {}) {
+function saveGroupPermission(groupId, permission, onSuccess = () => {
+}, onError = (error) => {
+}) {
     fetch(`/rest/groups/id/${groupId}/permission`, {
         method: "PUT", headers: {
-            "Content-Type": "application/json"
-        }, body: JSON.stringify(permission)
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("HTTP error, status = " + response.status);
-        }
-        onSuccess();
-    }).catch(error => {
-        onError(error);
-    });
+            "Content-Type": "application/json",
+        }, body: JSON.stringify(permission),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            onSuccess();
+        })
+        .catch((error) => {
+            onError(error);
+        });
 }
 
 function createDeleteGroupPermissionButton(groupId) {
@@ -297,22 +341,24 @@ function deleteGroupPermission(sender, groupId) {
     const route = sender.parentElement.parentElement.children[0].innerText;
     fetch(`/rest/groups/group/${groupId}/permission/${encodeURIComponent(route)}`, {
         method: "DELETE", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("HTTP error, status = " + response.status);
-        }
-        openGroupDetails(groupId);
-    }).catch(error => {
-        alert(error.message);
-    });
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            openGroupDetails(groupId);
+        })
+        .catch((error) => {
+            alert(error.message);
+        });
 }
 
 function doLogout() {
     fetch("/rest/users/logout", {
-        method: "GET"
-    }).then(response => {
+        method: "GET",
+    }).then((response) => {
         if (response.status === 200) {
             location.assign("/hades/login/");
         } else {
@@ -324,15 +370,16 @@ function doLogout() {
 function loadUsers() {
     fetch("/rest/users/all", {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => response.json())
-        .then(data => {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
             const users = data["users"].sort((a, b) => a["displayName"].localeCompare(b["displayName"]));
             const ulist = document.getElementById("outUsers");
             ulist.innerHTML = "";
 
-            users.forEach(user => {
+            users.forEach((user) => {
                 const li = document.createElement("li");
                 li.appendChild(document.createTextNode(user["displayName"]));
                 const bttn = document.createElement("button");
@@ -366,7 +413,8 @@ function openUserDetails(userId) {
 
     loadUserInfo(userId, containerUserInfo).then(() => {
     });
-    loadUserGroups(userId, containerUserGroups).then(() => {});
+    loadUserGroups(userId, containerUserGroups).then(() => {
+    });
     loadUserPermissions(userId, containerPermissions).then(() => {
     });
 }
@@ -394,16 +442,16 @@ function populateActionBar(userId) {
 async function loadUserInfo(userId, outputContainer) {
     fetch(`/rest/users/id/${userId}`, {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+        },
     })
-        .then(response => {
+        .then((response) => {
             if (!response.ok) {
                 throw new Error("HTTP error, status = " + response.status);
             }
             return response.json();
         })
-        .then(data => {
+        .then((data) => {
             outputContainer.innerHTML = "";
             const mail = data["mail"];
             const displayName = data["displayName"];
@@ -451,57 +499,62 @@ async function loadUserInfo(userId, outputContainer) {
             table.appendChild(tr3);
 
             outputContainer.appendChild(table);
-        }).catch(error => {
-        outputContainer.innerHTML = "";
-        outputContainer.appendChild(document.createTextNode(error.message));
-    });
+        })
+        .catch((error) => {
+            outputContainer.innerHTML = "";
+            outputContainer.appendChild(document.createTextNode(error.message));
+        });
 }
 
 async function loadUserGroups(userId, outputContainer) {
     fetch(`/rest/groups/user/${userId}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("HTTP error, status = " + response.status);
-        }
-        return response.json();
-    }).then(data => {
-        outputContainer.innerHTML = "";
-        const header = document.createElement("h3");
-        header.appendChild(document.createTextNode("Groups"));
-        outputContainer.appendChild(header);
-
-        const ul = document.createElement("ul");
-        ul.classList.add("ulGroups");
-        outputContainer.appendChild(ul);
-
-        data["groups"].sort((a, b) => a["name"].localeCompare(b["name"])).forEach(group => {
-            const li = document.createElement("li");
-            li.appendChild(document.createTextNode(group["name"]));
-            ul.appendChild(li);
-        });
-    }).catch(error => {
-        outputContainer.innerHTML = "";
-        outputContainer.appendChild(document.createTextNode(error.message));
-    });
-}
-
-async function loadUserPermissions(userId, outputContainer) {
-    fetch(`/rest/permission/user/${userId}`, {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+        },
     })
-        .then(response => {
+        .then((response) => {
             if (!response.ok) {
                 throw new Error("HTTP error, status = " + response.status);
             }
             return response.json();
         })
-        .then(data => {
+        .then((data) => {
+            outputContainer.innerHTML = "";
+            const header = document.createElement("h3");
+            header.appendChild(document.createTextNode("Groups"));
+            outputContainer.appendChild(header);
+
+            const ul = document.createElement("ul");
+            ul.classList.add("ulGroups");
+            outputContainer.appendChild(ul);
+
+            data["groups"]
+                .sort((a, b) => a["name"].localeCompare(b["name"]))
+                .forEach((group) => {
+                    const li = document.createElement("li");
+                    li.appendChild(document.createTextNode(group["name"]));
+                    ul.appendChild(li);
+                });
+        })
+        .catch((error) => {
+            outputContainer.innerHTML = "";
+            outputContainer.appendChild(document.createTextNode(error.message));
+        });
+}
+
+async function loadUserPermissions(userId, outputContainer) {
+    fetch(`/rest/permission/user/${userId}`, {
+        method: "GET", headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            return response.json();
+        })
+        .then((data) => {
             outputContainer.innerHTML = "";
 
             const header = document.createElement("h3");
@@ -532,13 +585,16 @@ async function loadUserPermissions(userId, outputContainer) {
             trh.appendChild(th6);
             table.appendChild(trh);
 
-            permissions.sort((a, b) => a["route"].localeCompare(b["route"])).forEach(permission => table.appendChild(permissionToTableRow(userId, permission)));
+            permissions
+                .sort((a, b) => a["route"].localeCompare(b["route"]))
+                .forEach((permission) => table.appendChild(permissionToTableRow(userId, permission)));
 
             outputContainer.appendChild(table);
-        }).catch(error => {
-        outputContainer.innerHTML = "";
-        outputContainer.appendChild(document.createTextNode(error.message));
-    });
+        })
+        .catch((error) => {
+            outputContainer.innerHTML = "";
+            outputContainer.appendChild(document.createTextNode(error.message));
+        });
 }
 
 function permissionToTableRow(userId, permission) {
@@ -578,16 +634,18 @@ function deletePermission(sender, userId) {
     const route = sender.parentElement.parentElement.children[0].innerText;
     fetch(`/rest/permission/user/${userId}/route/${encodeURIComponent(route)}`, {
         method: "DELETE", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("HTTP error, status = " + response.status);
-        }
-        openUserDetails(userId);
-    }).catch(error => {
-        alert(error.message);
-    });
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            openUserDetails(userId);
+        })
+        .catch((error) => {
+            alert(error.message);
+        });
 }
 
 function createCheckboxForPermission(userId, permissionValue) {
@@ -608,7 +666,7 @@ function updatePermission(userId, sender) {
     const del = row.children[4].children[0].checked ? 1 : 0;
 
     const permission = {
-        route: route, get: get, post: post, put: put, delete: del
+        route: route, get: get, post: post, put: put, delete: del,
     };
 
     savePermission(userId, permission, () => {
@@ -626,16 +684,19 @@ function generateRouteSelect() {
     const select = document.createElement("select");
     fetch("/rest/permission/checked-routes", {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => response.json())
-        .then(data => {
-            data["routes"].sort((a, b) => a.localeCompare(b)).forEach(route => {
-                const option = document.createElement("option");
-                option.value = route;
-                option.appendChild(document.createTextNode(route));
-                select.appendChild(option);
-            });
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            data["routes"]
+                .sort((a, b) => a.localeCompare(b))
+                .forEach((route) => {
+                    const option = document.createElement("option");
+                    option.value = route;
+                    option.appendChild(document.createTextNode(route));
+                    select.appendChild(option);
+                });
         });
     return select;
 }
@@ -644,20 +705,22 @@ function generateGroupSelect() {
     const select = document.createElement("select");
     fetch("/rest/groups/all", {
         method: "GET", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => response.json())
-        .then(data => {
-            data["groups"].sort((a, b) => a["name"].localeCompare(b["name"])).forEach(group => {
-                const option = document.createElement("option");
-                option.value = group["id"];
-                option.appendChild(document.createTextNode(group["name"]));
-                select.appendChild(option);
-            });
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            data["groups"]
+                .sort((a, b) => a["name"].localeCompare(b["name"]))
+                .forEach((group) => {
+                    const option = document.createElement("option");
+                    option.value = group["id"];
+                    option.appendChild(document.createTextNode(group["name"]));
+                    select.appendChild(option);
+                });
         });
     return select;
 }
-
 
 function openAddPermission(userId) {
     const output = document.createElement("div");
@@ -704,25 +767,23 @@ function openAddToGroup(userId) {
 function addToGroup(userId, group) {
     fetch(`/rest/groups/user/${userId}/group/${group}`, {
         method: "POST", headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("HTTP error, status = " + response.status);
-        }
-        openUserDetails(userId);
-    }).catch(error => {
-        alert(error.message);
-    });
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            openUserDetails(userId);
+        })
+        .catch((error) => {
+            alert(error.message);
+        });
 }
 
 function addPermission(userId, route) {
     const permission = {
-        route: route,
-        get: 0,
-        post: 0,
-        put: 0,
-        delete: 0
+        route: route, get: 0, post: 0, put: 0, delete: 0,
     };
     savePermission(userId, permission, () => {
         openUserDetails(userId);
@@ -736,16 +797,18 @@ function savePermission(userId, permission, onSuccess = () => {
 }) {
     fetch(`/rest/permission/user/${userId}`, {
         method: "POST", headers: {
-            "Content-Type": "application/json"
-        }, body: JSON.stringify(permission)
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("HTTP error, status = " + response.status);
-        }
-        onSuccess();
-    }).catch(error => {
-        onError(error);
-    });
+            "Content-Type": "application/json",
+        }, body: JSON.stringify(permission),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            onSuccess();
+        })
+        .catch((error) => {
+            onError(error);
+        });
 }
 
 function openPopup(contentBody) {
@@ -779,5 +842,4 @@ function closePopup(self) {
     } else {
         closePopup(self.parentElement);
     }
-
 }
