@@ -16,6 +16,8 @@ import hades.authorized.service.PermissionService;
 import hades.user.User;
 import hades.user.service.UserService;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -119,24 +121,33 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
-    @Put(BASE_PATH + "/id/{groupId}/permission/{permissionId}")
+    @Put(BASE_PATH + "/id/{groupId}/permission")
     public void addPermissionToGroup(HttpContext context) {
+        if (!validateAddPermissionToGroupRequest(context.getRequest().getBody())) {
+            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
+            Json response = new Json();
+            response.setString("msg", "Invalid request");
+            context.getResponse().setBody(response);
+            return;
+        }
+
         final GroupService groupService = GroupService.getInstance();
-        final PermissionService permissionService = PermissionService.getInstance();
 
         final String groupId = context.getRequest().getParam("groupId");
-        final String permissionId = context.getRequest().getParam("permissionId");
 
         final Group group = groupService.find(groupId);
-        final Permission permission = permissionService.find(permissionId);
 
-        if (group == null || permission == null) {
+        if (group == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
             Json response = new Json();
             response.setString("msg", "Group or permission not found");
             context.getResponse().setBody(response);
             return;
         }
+
+        final Permission permission = permissionFromBody(context.getRequest().getBody(), group.getId());
+
+        group.getPermissions().stream().filter(p -> p.getRoute().equals(permission.getRoute())).findFirst().ifPresent(group::removePermission);
 
         group.addPermission(permission);
 
@@ -189,15 +200,13 @@ public class GroupResource {
         final String groupId = context.getRequest().getParam("groupId");
 
         final UUID userUUID;
-        final UUID groupUUID;
 
         try {
             userUUID = UUID.fromString(userId);
-            groupUUID = UUID.fromString(groupId);
         } catch (Exception e) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
             Json response = new Json();
-            response.setString("msg", "Invalid user or group id");
+            response.setString("msg", "Invalid user id");
             context.getResponse().setBody(response);
             return;
         }
@@ -224,8 +233,68 @@ public class GroupResource {
         context.getResponse().setCode(ResponseCodes.OK);
     }
 
+    @PermissionCheck
+    @AuthorizedOnly
+    @Delete(BASE_PATH + "/group/{groupId}/permission/{permissionRoute}")
+    public void deletePermissionFromGroup(HttpContext context) {
+        final GroupService groupService = GroupService.getInstance();
+        final String route = URLDecoder.decode(context.getRequest().getParam("permissionRoute"),
+                StandardCharsets.UTF_8);
+
+        final String groupId = context.getRequest().getParam("groupId");
+
+        final Group group = groupService.find(groupId);
+
+        if (group == null) {
+            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
+            Json response = new Json();
+            response.setString("msg", "Group not found");
+            context.getResponse().setBody(response);
+            return;
+        }
+
+        final Permission permission = group.getPermissions().stream().filter(p -> p.getRoute().equals(route)).findFirst().orElse(null);
+
+
+        if (permission == null) {
+            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
+            Json response = new Json();
+            response.setString("msg", "Permission not found");
+            context.getResponse().setBody(response);
+            return;
+        }
+
+        group.removePermission(permission);
+
+        if (!groupService.update(group)) {
+            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
+            Json response = new Json();
+            response.setString("msg", "Failed to delete permission from group");
+            context.getResponse().setBody(response);
+            return;
+        }
+
+        context.getResponse().setCode(ResponseCodes.OK);
+    }
 
     private boolean validateCreateGroupRequest(Json body) {
         return body.hasKey("name");
+    }
+
+    private boolean validateAddPermissionToGroupRequest(Json body) {
+        return body.hasKey("route") && body.hasKey("get") && body.hasKey("post") && body.hasKey("put") && body.hasKey("delete");
+    }
+
+    private Permission permissionFromBody(Json body, UUID groupId) {
+        final Permission permission = new Permission();
+
+        permission.setRoute(body.getString("route"));
+        permission.setOwner(groupId);
+        permission.setPermissionGET(body.getInt("get").equals(1));
+        permission.setPermissionPOST(body.getInt("post").equals(1));
+        permission.setPermissionPUT(body.getInt("put").equals(1));
+        permission.setPermissionDELETE(body.getInt("delete").equals(1));
+
+        return permission;
     }
 }
