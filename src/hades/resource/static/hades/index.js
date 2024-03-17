@@ -3,6 +3,9 @@ function startup() {
 }
 
 function openUsersTab() {
+    document.getElementById("headline").innerText = "Hades - Users";
+    document.title = "Hades - Users";
+
     const centerContainer = document.getElementById("centerContainer");
     centerContainer.innerHTML = "";
 
@@ -29,6 +32,9 @@ function openUsersTab() {
 }
 
 function openGroupsTab() {
+    document.getElementById("headline").innerText = "Hades - Groups";
+    document.title = "Hades - Groups";
+
     const centerContainer = document.getElementById("centerContainer");
     centerContainer.innerHTML = "";
 
@@ -57,7 +63,8 @@ function loadAllGroups() {
         }
     }).then(response => response.json())
         .then(data => {
-            const groups = data["groups"];
+            const groups = data["groups"].sort((a, b) => a["name"].localeCompare(b["name"]));
+
             const ulist = document.getElementById("outGroups");
             ulist.innerHTML = "";
 
@@ -118,7 +125,7 @@ function openGroupDetails(groupId) {
 
             container.appendChild(table);
 
-            displayGroupPermissions(groupId, data["permissions"], container);
+            displayGroupPermissions(groupId, data["permissions"].sort((a, b) => a["route"].localeCompare(b["route"])), container);
         });
 }
 
@@ -265,7 +272,7 @@ function loadUsers() {
         }
     }).then(response => response.json())
         .then(data => {
-            const users = data["users"];
+            const users = data["users"].sort((a, b) => a["displayName"].localeCompare(b["displayName"]));
             const ulist = document.getElementById("outUsers");
             ulist.innerHTML = "";
 
@@ -415,7 +422,7 @@ async function loadUserGroups(userId, outputContainer) {
         ul.classList.add("ulGroups");
         outputContainer.appendChild(ul);
 
-        data["groups"].forEach(group => {
+        data["groups"].sort((a, b) => a["name"].localeCompare(b["name"])).forEach(group => {
             const li = document.createElement("li");
             li.appendChild(document.createTextNode(group["name"]));
             ul.appendChild(li);
@@ -469,7 +476,7 @@ async function loadUserPermissions(userId, outputContainer) {
             trh.appendChild(th6);
             table.appendChild(trh);
 
-            permissions.forEach(permission => table.appendChild(permissionToTableRow(userId, permission)));
+            permissions.sort((a, b) => a["route"].localeCompare(b["route"])).forEach(permission => table.appendChild(permissionToTableRow(userId, permission)));
 
             outputContainer.appendChild(table);
         }).catch(error => {
@@ -567,7 +574,7 @@ function generateRouteSelect() {
         }
     }).then(response => response.json())
         .then(data => {
-            data["routes"].forEach(route => {
+            data["routes"].sort((a, b) => a["route"].localeCompare(b["route"])).forEach(route => {
                 const option = document.createElement("option");
                 option.value = route;
                 option.appendChild(document.createTextNode(route));
@@ -585,7 +592,7 @@ function generateGroupSelect() {
         }
     }).then(response => response.json())
         .then(data => {
-            data["groups"].forEach(group => {
+            data["groups"].sort((a, b) => a["name"].localeCompare(b["name"])).forEach(group => {
                 const option = document.createElement("option");
                 option.value = group["id"];
                 option.appendChild(document.createTextNode(group["name"]));
