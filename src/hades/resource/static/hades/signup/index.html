@@ -5,12 +5,12 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Hades - Login</title>
+    <title>Hades - Signup</title>
     <link rel="stylesheet" href="style.css">
     <script src="index.js"></script>
 </head>
 <body>
-<h1>Login</h1>
+<h1>Signup</h1>
 <div class="container-wrapper">
     <div class="container">
         <table>
@@ -24,15 +24,31 @@
             </tr>
             <tr>
                 <td>
+                    <label for="inputMail">E-Mail:</label>
+                </td>
+                <td>
+                    <input type="text" id="inputMail">
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <label for="inputPassword">Password:</label>
                 </td>
                 <td>
                     <input type="password" id="inputPassword">
                 </td>
             </tr>
+            <tr>
+                <td>
+                    <label for="inputPasswordRepeat">Repeat password:</label>
+                </td>
+                <td>
+                    <input type="password" id="inputPasswordRepeat">
+                </td>
+            </tr>
         </table>
-        <button id="buttonLogin" onclick="doLogin()">Login</button>
-        <a href="/hades/signup/" style="display: block; text-align: center">No account? Signup</a>
+        <button id="buttonLogin" onclick="doSignup()">Signup</button>
+        <a href="/hades/login/" style="display: block; text-align: center">Already have an account? Login</a>
     </div>
 </div>
 </body>
