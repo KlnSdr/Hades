@@ -49,6 +49,10 @@ function openGroupsTab() {
     const hr = document.createElement("hr");
     centerContainer.appendChild(hr);
 
+    const outGroupActions = document.createElement("div");
+    outGroupActions.id = "outGroupActions";
+    centerContainer.appendChild(outGroupActions);
+
     const containerGroupDetails = document.createElement("div");
     containerGroupDetails.id = "containerGroupDetails";
     centerContainer.appendChild(containerGroupDetails);
@@ -81,6 +85,57 @@ function loadAllGroups() {
         });
 }
 
+function populateGroupActionBar(groupId) {
+    const container = document.getElementById("outGroupActions");
+    container.innerHTML = "";
+
+    const actionBar = document.createElement("div");
+    actionBar.classList.add("actionBar");
+
+    const bttnAddNew = document.createElement("button");
+    bttnAddNew.appendChild(document.createTextNode("add Permission"));
+    bttnAddNew.onclick = () => openAddPermissionGroup(groupId);
+    actionBar.appendChild(bttnAddNew);
+
+    container.appendChild(actionBar);
+}
+
+function openAddPermissionGroup(groupId) {
+    const output = document.createElement("div");
+
+    const lblRoute = document.createElement("label");
+    lblRoute.appendChild(document.createTextNode("Route:"));
+    output.appendChild(lblRoute);
+
+    const selectRoute = generateRouteSelect();
+    output.appendChild(selectRoute);
+
+    const bttn = document.createElement("button");
+    bttn.appendChild(document.createTextNode("add"));
+    bttn.onclick = () => {
+        addPermissionGroup(groupId, selectRoute.value);
+        closePopup(bttn);
+    };
+    output.appendChild(bttn);
+
+    openPopup(output);
+}
+
+function addPermissionGroup(groupId, route) {
+    const permission = {
+        route: route,
+        get: 0,
+        post: 0,
+        put: 0,
+        delete: 0
+    };
+    saveGroupPermission(groupId, permission, () => {
+        openGroupDetails(groupId);
+    }, (error) => {
+        alert(error.message);
+    });
+}
+
 function openGroupDetails(groupId) {
     const container = document.getElementById("containerGroupDetails");
     container.innerHTML = "";
@@ -94,6 +149,7 @@ function openGroupDetails(groupId) {
         .then(response => response.json())
         .then(data => {
             container.innerHTML = "";
+            populateGroupActionBar(data["id"]);
 
             const table = document.createElement("table");
 
@@ -574,7 +630,7 @@ function generateRouteSelect() {
         }
     }).then(response => response.json())
         .then(data => {
-            data["routes"].sort((a, b) => a["route"].localeCompare(b["route"])).forEach(route => {
+            data["routes"].sort((a, b) => a.localeCompare(b)).forEach(route => {
                 const option = document.createElement("option");
                 option.value = route;
                 option.appendChild(document.createTextNode(route));
