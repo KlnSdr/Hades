@@ -18,7 +18,7 @@ function doSignup() {
             throw new Error("Signup failed");
         })
         .then(data => {
-            location.assign("/");
+            location.assign("/hades/");
         })
         .catch(error => {
             alert("Signup failed. Please try again.");
