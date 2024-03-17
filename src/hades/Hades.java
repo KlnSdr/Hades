@@ -44,11 +44,11 @@ public class Hades implements DobbyEntryPoint {
             LOGGER.info("Permission check is disabled.");
         }
 
-        LOGGER.info("discovering protected routes...");
-        HadesAnnotationDiscoverer.discoverRoutes("");
-
         LOGGER.info("running updates...");
         UpdateService.getInstance().runUpdates();
+
+        LOGGER.info("discovering protected routes...");
+        HadesAnnotationDiscoverer.discoverRoutes("");
     }
 
     private void registerStaticContentRoot() {

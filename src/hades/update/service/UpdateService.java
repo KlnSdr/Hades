@@ -46,6 +46,7 @@ public class UpdateService {
                 if (runUpdate(update)) {
                     markUpdateRan(update);
                     updatesRan.getAndIncrement();
+                    LOGGER.info("done");
                 } else {
                     LOGGER.error("Failed to run update: " + update.getName());
                     System.exit(1);
