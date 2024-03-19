@@ -32,7 +32,8 @@ function openUsersTab() {
     containerOutUsers.id = "containerOutUsers";
     centerContainer.appendChild(containerOutUsers);
 
-    const outUsers = document.createElement("ul");
+    const outUsers = document.createElement("table");
+    outUsers.classList.add("tblUsers");
     outUsers.id = "outUsers";
     containerOutUsers.appendChild(outUsers);
 
@@ -61,7 +62,8 @@ function openGroupsTab() {
     containerOutGroups.id = "containerOutUsers";
     centerContainer.appendChild(containerOutGroups);
 
-    const outGroups = document.createElement("ul");
+    const outGroups = document.createElement("table");
+    outGroups.classList.add("tblUsers");
     outGroups.id = "outGroups";
     containerOutGroups.appendChild(outGroups);
 
@@ -132,18 +134,24 @@ function loadAllGroups() {
         .then((data) => {
             const groups = data["groups"].sort((a, b) => a["name"].localeCompare(b["name"]));
 
-            const ulist = document.getElementById("outGroups");
-            ulist.innerHTML = "";
+            const tblGroups = document.getElementById("outGroups");
+            tblGroups.innerHTML = "";
 
             groups.forEach((group) => {
-                const li = document.createElement("li");
-                li.appendChild(document.createTextNode(group["name"]));
+                const tr = document.createElement("tr");
+
+                const tdName = document.createElement("td");
+                tdName.appendChild(document.createTextNode(group["name"]));
+                tr.appendChild(tdName);
+
+                const tdBttn = document.createElement("td");
                 const bttn = document.createElement("button");
                 bttn.appendChild(document.createTextNode("edit"));
                 bttn.onclick = () => openGroupDetails(group["id"]);
-                li.appendChild(bttn);
+                tdBttn.appendChild(bttn);
+                tr.appendChild(tdBttn);
 
-                ulist.appendChild(li);
+                tblGroups.appendChild(tr);
             });
         });
 }
@@ -395,18 +403,24 @@ function loadUsers() {
         .then((response) => response.json())
         .then((data) => {
             const users = data["users"].sort((a, b) => a["displayName"].localeCompare(b["displayName"]));
-            const ulist = document.getElementById("outUsers");
-            ulist.innerHTML = "";
+            const tblUsers = document.getElementById("outUsers");
+            tblUsers.innerHTML = "";
 
             users.forEach((user) => {
-                const li = document.createElement("li");
-                li.appendChild(document.createTextNode(user["displayName"]));
+                const tr = document.createElement("tr");
+
+                const tdName = document.createElement("td");
+                tdName.appendChild(document.createTextNode(user["displayName"]));
+                tr.appendChild(tdName);
+
+                const tdBttn = document.createElement("td");
                 const bttn = document.createElement("button");
                 bttn.appendChild(document.createTextNode("edit"));
                 bttn.onclick = () => openUserDetails(user["id"]);
-                li.appendChild(bttn);
+                tdBttn.appendChild(bttn);
+                tr.appendChild(tdBttn);
 
-                ulist.appendChild(li);
+                tblUsers.appendChild(tr);
             });
         });
 }

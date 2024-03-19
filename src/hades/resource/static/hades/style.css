@@ -130,3 +130,8 @@ table {
     margin: auto;
     text-align: left;
 }
+
+.tblUsers {
+    width: revert;
+    margin: revert;
+}
