@@ -10,11 +10,17 @@
     <script src="index.js"></script>
 </head>
 <body onload="startup()">
-<h1 id="headline">Hades</h1>
-<button onclick="openUsersTab()">Users</button>
-<button onclick="openGroupsTab()">Groups</button>
-<button onclick="doLogout()">logout</button>
-<hr>
+<nav>
+    <h1 id="headline">Hades</h1>
+    <div class="navButtons">
+        <button onclick="openUsersTab()">Users</button>
+        <button onclick="openGroupsTab()">Groups</button>
+    </div>
+    <div class="navbarRight">
+        <label id="lblCurrentUser">(...)</label>
+        <button onclick="doLogout()">logout</button>
+    </div>
+</nav>
 <div id="centerContainer"></div>
 </body>
 </html>
