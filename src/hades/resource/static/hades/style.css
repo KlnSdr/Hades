@@ -24,8 +24,8 @@ nav {
     background-color: darkred;
     color: #f9f9f9;
     height: 50px;
-    width:100%;
-    display:flex;
+    width: 100%;
+    display: flex;
     align-items: center;
 }
 
@@ -43,6 +43,12 @@ button:hover {
 #headline {
     display: inline;
     margin-left: 5px;
+    text-decoration: none;
+    color: #f9f9f9;
+}
+
+#headline:active {
+    color: #f9f9f9;
 }
 
 #centerContainer {
@@ -134,4 +140,53 @@ table {
 .tblUsers {
     width: revert;
     margin: revert;
+}
+
+.baseTechnology {
+    display: inline-block;
+}
+
+.technology {
+    width: 25vw;
+    margin: 5px;
+    padding: 5px;
+    border: 2px solid #16161d;
+    border-radius: 5px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+}
+
+.card_Hades {
+    background-color: #16161d;
+    color: #f9f9f9;
+}
+
+.card_dobby,
+.card_thot {
+    background-color: #f9f9f9;
+    color: #16161d;
+}
+
+.logo, .actionIcon {
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.actionIcon {
+    cursor: pointer;
+    margin: 0 10%;
+}
+
+.technologyTitle {
+    display: inline-block;
+}
+
+.description {
+    max-width: 50%;
+    text-align: justify;
+    margin: auto;
 }

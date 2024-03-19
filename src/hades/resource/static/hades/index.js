@@ -1,6 +1,79 @@
 function startup() {
-    openUsersTab();
-    displayCurrentUserDisplayName().then(() => {});
+    displayLandingPage();
+    displayCurrentUserDisplayName().then(() => {
+    });
+}
+
+function displayLandingPage() {
+    document.title = "Hades";
+
+    const centerContainer = document.getElementById("centerContainer");
+    centerContainer.innerHTML = "";
+
+    const div = document.createElement("div");
+
+    const h1Welcome = document.createElement("h1");
+    h1Welcome.appendChild(document.createTextNode("Welcome to Hades"));
+    div.appendChild(h1Welcome);
+
+    const pDescription = document.createElement("p");
+    pDescription.classList.add("description");
+    pDescription.appendChild(document.createTextNode("The perfect solution tailored for small-scale projects that require simplified user and permission management without the overhead of a full-fledged IAM system. Designed with simplicity in mind, Hades offers a lightweight yet robust platform to effortlessly handle user access and permissions for your projects. Say goodbye to complexity and hello to streamlined management with Hades."));
+    div.appendChild(pDescription);
+
+    div.appendChild(document.createElement("br"));
+
+    const divActions = document.createElement("div");
+
+    const imgUser = document.createElement("img");
+    imgUser.classList.add("actionIcon");
+    imgUser.src = "/hades/img/icon_user.png";
+    imgUser.alt = "User";
+    imgUser.onclick = () => openUsersTab();
+    divActions.appendChild(imgUser);
+
+    const imgGroup = document.createElement("img");
+    imgGroup.classList.add("actionIcon");
+    imgGroup.src = "/hades/img/icon_group.png";
+    imgGroup.alt = "Group";
+    imgGroup.onclick = () => openGroupsTab();
+    divActions.appendChild(imgGroup);
+
+    div.appendChild(divActions);
+
+    div.appendChild(document.createElement("br"));
+
+    const divBaseTechnology = document.createElement("div");
+
+    const h2Tech = document.createElement("h2");
+    h2Tech.appendChild(document.createTextNode("Technologies"));
+    divBaseTechnology.appendChild(h2Tech);
+
+    divBaseTechnology.classList.add("baseTechnology");
+
+    ["Hades", "thot", "dobby"].forEach((technology) => {
+        const card = document.createElement("div");
+        card.classList.add("technology", `card_${technology}`);
+        card.onclick = () => {
+            window.open(`https://github.com/klnsdr/${technology}`, "_blank");
+        };
+
+        const logo = document.createElement("img");
+        logo.classList.add("logo");
+        logo.src = `/hades/img/logo_${technology}.png`;
+        logo.alt = technology;
+        card.appendChild(logo);
+
+        const cardTitle = document.createElement("h2");
+        cardTitle.classList.add("technologyTitle");
+        cardTitle.appendChild(document.createTextNode(technology));
+        card.appendChild(cardTitle);
+        divBaseTechnology.appendChild(card);
+    });
+
+    div.appendChild(divBaseTechnology);
+
+    centerContainer.appendChild(div);
 }
 
 async function displayCurrentUserDisplayName() {
@@ -22,7 +95,6 @@ async function displayCurrentUserDisplayName() {
 }
 
 function openUsersTab() {
-    document.getElementById("headline").innerText = "Hades - Users";
     document.title = "Hades - Users";
 
     const centerContainer = document.getElementById("centerContainer");
@@ -52,7 +124,6 @@ function openUsersTab() {
 }
 
 function openGroupsTab() {
-    document.getElementById("headline").innerText = "Hades - Groups";
     document.title = "Hades - Groups";
 
     const centerContainer = document.getElementById("centerContainer");
