@@ -24,6 +24,6 @@ To extend the
 build in functionality with your own you can define your own updates by implementing the
 `Update` interface and restarting the system. All new updates will be applied automatically.
 
-As Hades is based on [dobby](https://github.com/klnsdr/dobby) version `^0.1.3` you can override the default style by
+As Hades is based on [dobby](https://github.com/klnsdr/dobby) version `^0.1.2` you can override the default style by
 placing a `style.css` file in the static content directory of your project in a subfolder called `/hades` or
 `/hades/login`.
