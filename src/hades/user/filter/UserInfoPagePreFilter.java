@@ -5,7 +5,13 @@ import dobby.files.service.StaticFileService;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
+import dobby.io.response.ResponseCodes;
+import dobby.util.Json;
+import hades.template.TemplateEngine;
+import hades.user.User;
+import hades.user.service.UserService;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class UserInfoPagePreFilter implements Filter {
@@ -37,11 +43,36 @@ public class UserInfoPagePreFilter implements Filter {
                 return true;
             }
 
+            final String userId = path.substring(6, 42);
+
+            if (!userId.equalsIgnoreCase(httpContext.getSession().get("userId"))) {
+                httpContext.getResponse().setCode(ResponseCodes.NOT_FOUND);
+                return false;
+            }
+
+            final StaticFile renderedFile = TemplateEngine.render(userPage, getUserInfoFromId(userId));
+
             httpContext.getResponse().setHeader("Content-Type", userPage.getContentType());
-            httpContext.getResponse().setBody(userPage.getContent());
+            httpContext.getResponse().setBody(renderedFile.getContent());
             return false;
         }
 
         return true;
+    }
+
+    private Json getUserInfoFromId(String userId) {
+        final Json userInfo = new Json();
+
+        final User user = UserService.getInstance().find(UUID.fromString(userId));
+
+        if (user == null) {
+            return new Json();
+        }
+
+        userInfo.setString("USERID", userId);
+        userInfo.setString("USERNAME", user.getDisplayName());
+        userInfo.setString("EMAIL", user.getMail());
+
+        return userInfo;
     }
 }

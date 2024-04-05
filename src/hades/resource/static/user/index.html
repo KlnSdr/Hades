@@ -3,8 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <title>Hades - Userinfo</title>
+    <link rel="stylesheet" href="/hades/style.css">
+
+    <style>
+        tr:hover {
+            background-color: initial;
+            color: initial;
+        }
+
+        td table tr:hover {
+            background-color: darkred;
+            color: #f9f9f9;
+        }
+
+        td table {
+            width: initial;
+        }
+
+        h1, p {
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        const userId = '{{USERID}}';
+    </script>
+    <script src="/user/index.js"></script>
 </head>
 <body>
-<h1>Hello World!</h1>
+<h1>{{USERNAME}}</h1>
+<p>{{USERID}}</p>
+<table>
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <td>
+                        <label for="username">Username:</label>
+                    </td>
+                    <td>
+                        <input type="text" id="username" name="username" value="{{USERNAME}}">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button id="updateUsername" onclick="updateName()">Update Username</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="email">Email:</label>
+                    </td>
+                    <td>
+                        <input type="email" id="email" name="email" value="{{EMAIL}}">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button id="updateEmail" onclick="updateMail()">Update Email</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table>
+                <tr>
+                    <td>
+                        <label for="password">Old Password:</label>
+                    </td>
+                    <td>
+                        <input type="password" id="password" name="password">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="newPassword">New Password:</label>
+                    </td>
+                    <td>
+                        <input type="password" id="newPassword" name="newPassword">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="confirmPassword">Confirm Password:</label>
+                    </td>
+                    <td>
+                        <input type="password" id="confirmPassword" name="confirmPassword">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button id="updatePassword" onclick="updatePassword()">Update Password</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

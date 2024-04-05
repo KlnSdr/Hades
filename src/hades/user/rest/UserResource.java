@@ -3,6 +3,7 @@ package hades.user.rest;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
+import dobby.annotations.Put;
 import dobby.io.HttpContext;
 import dobby.io.request.Request;
 import dobby.io.response.Response;
@@ -194,6 +195,136 @@ public class UserResource {
         response.setList("users", List.of(Arrays.stream(users).map(User::toJson).toArray()));
 
         context.getResponse().setBody(response);
+    }
+
+    @AuthorizedOnly
+    @Put(ROUTE_PREFIX + "/id/{id}/update/mail")
+    public void updateMail(HttpContext context) {
+        final String idString = context.getRequest().getParam("id");
+        final UUID id = uuidFromString(idString, context);
+
+        if (id == null || !idString.equalsIgnoreCase(context.getSession().get("userId"))) {
+            return;
+        }
+
+        final User user = UserService.getInstance().find(id);
+
+        if (user == null) {
+            UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
+            return;
+        }
+
+        final Request request = context.getRequest();
+        final Json body = request.getBody();
+
+        final String mail = body.getString("mail");
+
+        if (mail == null) {
+            UserResourceErrorResponses.malformedRequest(context.getResponse());
+            return;
+        }
+
+        user.setMail(mail);
+
+        final boolean didUpdate = UserService.getInstance().update(user);
+
+        if (!didUpdate) {
+            UserResourceErrorResponses.couldNotSaveUser(context.getResponse(), user.getDisplayName());
+            return;
+        }
+
+        context.getResponse().setBody(user.toJson());
+    }
+
+    @AuthorizedOnly
+    @Put(ROUTE_PREFIX + "/id/{id}/update/name")
+    public void updateDisplayName(HttpContext context) {
+        final String idString = context.getRequest().getParam("id");
+        final UUID id = uuidFromString(idString, context);
+
+        if (id == null || !idString.equalsIgnoreCase(context.getSession().get("userId"))) {
+            return;
+        }
+
+        final User user = UserService.getInstance().find(id);
+
+        if (user == null) {
+            UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
+            return;
+        }
+
+        final Request request = context.getRequest();
+        final Json body = request.getBody();
+
+        final String name = body.getString("displayName");
+
+        if (name == null) {
+            UserResourceErrorResponses.malformedRequest(context.getResponse());
+            return;
+        }
+
+        user.setDisplayName(name);
+
+        final boolean didUpdate = UserService.getInstance().update(user);
+
+        if (!didUpdate) {
+            UserResourceErrorResponses.couldNotSaveUser(context.getResponse(), user.getDisplayName());
+            return;
+        }
+
+        context.getResponse().setBody(user.toJson());
+    }
+
+    @AuthorizedOnly
+    @Put(ROUTE_PREFIX + "/id/{id}/update/password")
+    public void updatePassword(HttpContext context) {
+        final String idString = context.getRequest().getParam("id");
+        final UUID id = uuidFromString(idString, context);
+
+        if (id == null || !idString.equalsIgnoreCase(context.getSession().get("userId"))) {
+            return;
+        }
+
+        final User user = UserService.getInstance().find(id);
+
+        if (user == null) {
+            UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
+            return;
+        }
+
+        final Request request = context.getRequest();
+        final Json body = request.getBody();
+
+        final String oldPassword = body.getString("oldPassword");
+        final String password = body.getString("password");
+        final String passwordRepeat = body.getString("passwordRepeat");
+
+        if (oldPassword == null || !Security.verifyPassword(oldPassword, user.getPassword())) {
+            UserResourceErrorResponses.wrongPassword(context.getResponse());
+            return;
+        }
+
+        if (password == null || !password.equals(passwordRepeat)) {
+            UserResourceErrorResponses.passwordsDoNotMatch(context.getResponse());
+            return;
+        }
+
+        final String hashedPassword = hashPassword(password);
+        if (hashedPassword == null) {
+            UserResourceErrorResponses.couldNotHashPassword(context.getResponse());
+            return;
+        }
+
+        user.setPassword(hashedPassword);
+
+        final boolean didUpdate = UserService.getInstance().update(user);
+
+        if (!didUpdate) {
+            UserResourceErrorResponses.couldNotSaveUser(context.getResponse(), user.getDisplayName());
+            return;
+        }
+
+        context.getResponse().setBody(user.toJson());
     }
 
     private UUID uuidFromString(String idString, HttpContext context) {
