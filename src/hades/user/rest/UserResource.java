@@ -263,6 +263,11 @@ public class UserResource {
             return;
         }
 
+        if (UserService.getInstance().findByName(name).length > 0) {
+            UserResourceErrorResponses.displayNameAlreadyTaken(context.getResponse(), name);
+            return;
+        }
+
         user.setDisplayName(name);
 
         final boolean didUpdate = UserService.getInstance().update(user);
