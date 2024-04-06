@@ -3,7 +3,7 @@ package hades.authorized;
 import dobby.io.request.RequestTypes;
 import dobby.util.Json;
 import hades.authorized.service.PermissionService;
-import hades.common.DataClass;
+import janus.DataClass;
 import thot.annotations.Bucket;
 
 import java.util.UUID;

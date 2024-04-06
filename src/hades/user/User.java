@@ -1,8 +1,8 @@
 package hades.user;
 
 import dobby.util.Json;
-import hades.common.DataClass;
 import hades.user.service.UserService;
+import janus.DataClass;
 import thot.annotations.Bucket;
 
 import java.util.UUID;

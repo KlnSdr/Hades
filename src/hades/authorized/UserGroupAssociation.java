@@ -3,7 +3,7 @@ package hades.authorized;
 
 import dobby.util.Json;
 import hades.authorized.service.GroupService;
-import hades.common.DataClass;
+import janus.DataClass;
 import thot.annotations.Bucket;
 
 @Bucket(GroupService.USER_GROUP_ASSOCIATION_BUCKET)

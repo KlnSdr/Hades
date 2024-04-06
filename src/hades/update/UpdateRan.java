@@ -1,8 +1,8 @@
 package hades.update;
 
 import dobby.util.Json;
-import hades.common.DataClass;
 import hades.update.service.UpdateService;
+import janus.DataClass;
 import thot.annotations.Bucket;
 
 @Bucket(UpdateService.BUCKET_NAME)
