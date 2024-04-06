@@ -10,10 +10,13 @@ import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
 import dobby.session.service.SessionService;
+import dobby.util.Config;
 import dobby.util.Json;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
+import hades.authorized.Group;
+import hades.authorized.service.GroupService;
 import hades.common.Security;
 import hades.user.User;
 import hades.user.service.UserService;
@@ -25,6 +28,23 @@ import java.util.UUID;
 public class UserResource {
     private static final Logger LOGGER = new Logger(UserResource.class);
     private static final String ROUTE_PREFIX = "/rest/users";
+
+    private static String normalLoginRedirect = null;
+    private static String adminLoginRedirect = null;
+
+    private static String getNormalLoginRedirect() {
+        if (normalLoginRedirect == null) {
+            normalLoginRedirect = Config.getInstance().getString("hades.login.redirect.success", "/");
+        }
+        return normalLoginRedirect;
+    }
+
+    private static String getAdminLoginRedirect() {
+        if (adminLoginRedirect == null) {
+            adminLoginRedirect = Config.getInstance().getString("hades.login.redirect.successAdmin", getNormalLoginRedirect());
+        }
+        return adminLoginRedirect;
+    }
 
     @Post(ROUTE_PREFIX)
     public void createUser(HttpContext context) {
@@ -67,7 +87,11 @@ public class UserResource {
         logUserIn(user, context);
 
         response.setCode(ResponseCodes.CREATED);
-        response.setBody(user.toJson());
+        final Json resPayload = new Json();
+        resPayload.setJson("user", user.toJson());
+        resPayload.setString("redirectTo", getNormalLoginRedirect());
+
+        context.getResponse().setBody(resPayload);
     }
 
     @Post(ROUTE_PREFIX + "/login")
@@ -96,7 +120,25 @@ public class UserResource {
 
         logUserIn(user, context);
 
-        context.getResponse().setBody(user.toJson());
+        final Json resPayload = new Json();
+        resPayload.setJson("user", user.toJson());
+
+        final Group[] groups = GroupService.getInstance().findGroupsByUser(user.getId());
+        boolean isAdmin = false;
+        for (Group group : groups) {
+            if (group.getName().equals("admin")) {
+                isAdmin = true;
+                break;
+            }
+        }
+
+        if (isAdmin) {
+            resPayload.setString("redirectTo", getAdminLoginRedirect());
+        } else {
+            resPayload.setString("redirectTo", getNormalLoginRedirect());
+        }
+
+        context.getResponse().setBody(resPayload);
     }
 
     private void logUserIn(User user, HttpContext context) {

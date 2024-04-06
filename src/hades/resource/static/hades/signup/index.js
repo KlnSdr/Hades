@@ -18,7 +18,7 @@ function doSignup() {
             throw new Error("Signup failed");
         })
         .then(data => {
-            location.assign("/hades/");
+            location.assign(data["redirectTo"]);
         })
         .catch(error => {
             alert("Signup failed. Please try again.");

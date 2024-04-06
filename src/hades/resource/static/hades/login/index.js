@@ -16,7 +16,7 @@ function doLogin() {
             throw new Error("Login failed");
         })
         .then(data => {
-            location.assign("/hades/");
+            location.assign(data["redirectTo"]);
         })
         .catch(error => {
             alert("Login failed. Please try again.");
