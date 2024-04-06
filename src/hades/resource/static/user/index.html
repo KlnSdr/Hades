@@ -29,8 +29,16 @@
         const userId = '{{USERID}}';
     </script>
     <script src="/user/index.js"></script>
+    <script src="/hades/logout.js"></script>
 </head>
 <body>
+<nav>
+    <h1><a id="headline" href="/hades/">Hades</a></h1>
+    <div class="navbarRight">
+        <label id="lblCurrentUser">({{USERNAME}})</label>
+        <button onclick="doLogout()">logout</button>
+    </div>
+</nav>
 <h1>{{USERNAME}}</h1>
 <p>{{USERID}}</p>
 <table>
