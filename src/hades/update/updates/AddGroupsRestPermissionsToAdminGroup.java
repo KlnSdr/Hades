@@ -4,6 +4,7 @@ import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
 import hades.update.Update;
+import hades.update.UpdateOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +70,6 @@ public class AddGroupsRestPermissionsToAdminGroup implements Update {
 
     @Override
     public int getOrder() {
-        return 4;
+        return UpdateOrder.ADD_GROUPS_REST_PERMISSIONS_TO_ADMIN_GROUP.getOrder();
     }
 }

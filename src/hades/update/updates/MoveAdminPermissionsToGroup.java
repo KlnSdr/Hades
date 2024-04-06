@@ -5,6 +5,7 @@ import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
 import hades.authorized.service.PermissionService;
 import hades.update.Update;
+import hades.update.UpdateOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -47,6 +48,6 @@ public class MoveAdminPermissionsToGroup implements Update {
 
     @Override
     public int getOrder() {
-        return 3;
+        return UpdateOrder.MOVE_ADMIN_PERMISSIONS_TO_GROUP.getOrder();
     }
 }

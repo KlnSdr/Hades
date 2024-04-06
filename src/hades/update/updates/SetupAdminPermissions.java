@@ -3,6 +3,7 @@ package hades.update.updates;
 import hades.authorized.Permission;
 import hades.authorized.service.PermissionService;
 import hades.update.Update;
+import hades.update.UpdateOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -62,6 +63,6 @@ public class SetupAdminPermissions implements Update {
 
     @Override
     public int getOrder() {
-        return 1;
+        return UpdateOrder.SETUP_ADMIN_PERMISSIONS.getOrder();
     }
 }

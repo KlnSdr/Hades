@@ -4,6 +4,7 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
+import hades.filter.FilterOrder;
 
 public class BlockStaticFilesPreFilter implements Filter {
     @Override
@@ -18,7 +19,7 @@ public class BlockStaticFilesPreFilter implements Filter {
 
     @Override
     public int getOrder() {
-        return 0;
+        return FilterOrder.BLOCK_STATIC_FILES_PRE_FILTER.getOrder();
     }
 
     @Override

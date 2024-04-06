@@ -4,6 +4,7 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.request.RequestTypes;
+import hades.filter.FilterOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -23,7 +24,7 @@ public class ReplaceDisplayNamePreFilter implements Filter {
 
     @Override
     public int getOrder() {
-        return 10;
+        return FilterOrder.REPLACE_DISPLAY_NAME_PRE_FILTER.getOrder();
     }
 
     @Override

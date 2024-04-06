@@ -4,6 +4,7 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
+import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
 public class RedirectMeToUserPagePreFilter implements Filter {
@@ -19,7 +20,7 @@ public class RedirectMeToUserPagePreFilter implements Filter {
 
     @Override
     public int getOrder() {
-        return 9;
+        return FilterOrder.REDIRECT_ME_TO_USER_PAGE_PRE_FILTER.getOrder();
     }
 
     @Override

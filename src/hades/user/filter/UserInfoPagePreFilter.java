@@ -7,6 +7,7 @@ import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
+import hades.filter.FilterOrder;
 import hades.template.TemplateEngine;
 import hades.user.User;
 import hades.user.service.UserService;
@@ -29,7 +30,7 @@ public class UserInfoPagePreFilter implements Filter {
 
     @Override
     public int getOrder() {
-        return 10;
+        return FilterOrder.USER_INFO_PAGE_PRE_FILTER.getOrder();
     }
 
     @Override

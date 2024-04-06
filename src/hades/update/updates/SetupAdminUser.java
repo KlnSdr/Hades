@@ -1,6 +1,7 @@
 package hades.update.updates;
 
 import hades.update.Update;
+import hades.update.UpdateOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -23,6 +24,6 @@ public class SetupAdminUser implements Update {
     }
 
     public int getOrder() {
-        return 0;
+        return UpdateOrder.SETUP_ADMIN_USER.getOrder();
     }
 }

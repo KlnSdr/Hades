@@ -12,6 +12,7 @@ import hades.authorized.service.AuthorizedRoutesService;
 import hades.authorized.service.GroupService;
 import hades.authorized.service.PermissionCheckService;
 import hades.authorized.service.PermissionService;
+import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class AutorizedRoutePreFilter implements Filter {
 
     @Override
     public int getOrder() {
-        return 0;
+        return FilterOrder.AUTHORIZED_ROUTE_PRE_FILTER.getOrder();
     }
 
     @Override

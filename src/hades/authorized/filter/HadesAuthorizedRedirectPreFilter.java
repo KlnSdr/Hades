@@ -6,6 +6,7 @@ import dobby.io.HttpContext;
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
+import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
 public class HadesAuthorizedRedirectPreFilter implements Filter {
@@ -21,7 +22,7 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
 
     @Override
     public int getOrder() {
-        return 5;
+        return FilterOrder.AUTHORIZED_REDIRECT_PRE_FILTER.getOrder();
     }
 
     @Override

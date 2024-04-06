@@ -2,6 +2,7 @@ package hades.update.updates;
 
 import dobby.util.logging.Logger;
 import hades.update.Update;
+import hades.update.UpdateOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -41,6 +42,6 @@ public class SetUserDefinedAdminPassword implements Update {
 
     @Override
     public int getOrder() {
-        return 5;
+        return UpdateOrder.SET_ADMIN_PASSWORD.getOrder();
     }
 }
