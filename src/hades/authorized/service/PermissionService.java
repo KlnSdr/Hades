@@ -58,12 +58,13 @@ public class PermissionService {
             return true;
         }
 
-        final Permission permission = Janus.parse(Connector.read(PERMISSION_BUCKET, userId + "_" + route, Json.class),
-                Permission.class);
+        final Json result = Connector.read(PERMISSION_BUCKET, userId + "_" + route, Json.class);
 
-        if (permission == null) {
+        if (result == null) {
             return false;
         }
+
+        final Permission permission = Janus.parse(result, Permission.class);
 
         return permission.hasPermission(requestMethod);
     }
