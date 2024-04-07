@@ -2,6 +2,7 @@ package hades.filter;
 
 public enum FilterOrder {
 
+    CONTEXT_PRE_FILTER(9),
     AUTHORIZED_ROUTE_PRE_FILTER(10),
     AUTHORIZED_REDIRECT_PRE_FILTER(11),
     BLOCK_STATIC_FILES_PRE_FILTER(12),
