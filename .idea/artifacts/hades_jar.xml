@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/hades_jar</output-path>
     <root id="archive" name="hades.jar">
       <element id="module-output" name="hades" />
-      <element id="extracted-dir" path="$USER_HOME$/dev/customJars/thot/v0.1.3/thot.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/dev/customJars/thot/v0.1.4-SNAPSHOT/thot.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

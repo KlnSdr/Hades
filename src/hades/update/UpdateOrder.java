@@ -1,6 +1,7 @@
 package hades.update;
 
 public enum UpdateOrder {
+    CREATE_BASIC_BUCKETS(-1),
     SETUP_ADMIN_USER(0),
     SETUP_ADMIN_PERMISSIONS(1),
     MOVE_ADMIN_PERMISSIONS_TO_GROUP(3),

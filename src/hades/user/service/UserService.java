@@ -1,7 +1,9 @@
 package hades.user.service;
 
 import dobby.session.Session;
+import dobby.util.Json;
 import hades.user.User;
+import janus.Janus;
 import thot.connector.Connector;
 
 import java.util.ArrayList;
@@ -23,13 +25,18 @@ public class UserService {
     }
 
     public User find(UUID id) {
-        return Connector.read(USER_BUCKET, id.toString(), User.class);
+        return Janus.parse(Connector.read(USER_BUCKET, id.toString(), Json.class), User.class);
     }
 
     public User[] findByName(String displayName) {
-        final User[] users = Connector.readPattern(USER_BUCKET, ".*", User.class);
-        if (users == null) {
+        final Json[] result = Connector.readPattern(USER_BUCKET, ".*", Json.class);
+        if (result == null) {
             return new User[0];
+        }
+
+        final User[] users = new User[result.length];
+        for (int i = 0; i < result.length; i++) {
+            users[i] = Janus.parse(result[i], User.class);
         }
 
         final ArrayList<User> usersWithName = new ArrayList<>();
@@ -42,7 +49,17 @@ public class UserService {
     }
 
     public User[] findAll() {
-        return Connector.readPattern(USER_BUCKET, ".*", User.class);
+        final Json[] result = Connector.readPattern(USER_BUCKET, ".*", Json.class);
+        if (result == null) {
+            return new User[0];
+        }
+
+        final User[] users = new User[result.length];
+        for (int i = 0; i < result.length; i++) {
+            users[i] = Janus.parse(result[i], User.class);
+        }
+
+        return users;
     }
 
     public boolean delete(UUID id) {
@@ -50,7 +67,7 @@ public class UserService {
     }
 
     public boolean update(User user) {
-        return Connector.write(USER_BUCKET, user.getKey(), user);
+        return Connector.write(USER_BUCKET, user.getKey(), user.toStoreJson());
     }
 
 

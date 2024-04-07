@@ -4,12 +4,19 @@ package hades.authorized;
 import dobby.util.Json;
 import hades.authorized.service.GroupService;
 import janus.DataClass;
+import janus.annotations.JanusString;
 import thot.annotations.Bucket;
 
 @Bucket(GroupService.USER_GROUP_ASSOCIATION_BUCKET)
 public class UserGroupAssociation implements DataClass {
-    private final String userId;
-    private final String groupId;
+    @JanusString("userId")
+    private String userId;
+    @JanusString("groupId")
+    private String groupId;
+
+    public UserGroupAssociation() {
+
+    }
 
     public UserGroupAssociation(String userId, String groupId) {
         this.userId = userId;

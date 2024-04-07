@@ -1,7 +1,9 @@
 package hades.authorized.service;
 
+import dobby.util.Json;
 import hades.authorized.Group;
 import hades.authorized.UserGroupAssociation;
+import janus.Janus;
 import thot.connector.Connector;
 
 import java.util.ArrayList;
@@ -23,11 +25,11 @@ public class GroupService {
     }
 
     public boolean update(Group group) {
-        return Connector.write(GROUP_BUCKET, group.getKey(), group);
+        return Connector.write(GROUP_BUCKET, group.getKey(), group.toStoreJson());
     }
 
     public Group find(String key) {
-        return Connector.read(GROUP_BUCKET, key, Group.class);
+        return Janus.parse(Connector.read(GROUP_BUCKET, key, Json.class), Group.class);
     }
 
     public boolean delete(String key) {
@@ -35,7 +37,12 @@ public class GroupService {
     }
 
     public Group[] findAll() {
-        return Connector.readPattern(GROUP_BUCKET, ".*", Group.class);
+        final Json[] result = Connector.readPattern(GROUP_BUCKET, ".*", Json.class);
+        final Group[] groups = new Group[result.length];
+        for (int i = 0; i < result.length; i++) {
+            groups[i] = Janus.parse(result[i], Group.class);
+        }
+        return groups;
     }
 
     public Group findByName(String name) {
@@ -50,7 +57,8 @@ public class GroupService {
     }
 
     public boolean addUserToGroup(String userId, String groupId) {
-        return Connector.write(USER_GROUP_ASSOCIATION_BUCKET, userId + "_" + groupId, new UserGroupAssociation(userId, groupId));
+        return Connector.write(USER_GROUP_ASSOCIATION_BUCKET, userId + "_" + groupId, new UserGroupAssociation(userId
+                , groupId).toJson());
     }
 
     public boolean removeUserFromGroup(String userId, String groupId) {
@@ -58,16 +66,13 @@ public class GroupService {
     }
 
     public Group[] findGroupsByUser(UUID userId) {
-        final UserGroupAssociation[] userGroupAssociations = Connector.readPattern(USER_GROUP_ASSOCIATION_BUCKET, userId + "_.*", UserGroupAssociation.class);
-        final String[] groupIds = new String[userGroupAssociations.length];
-        for (int i = 0; i < userGroupAssociations.length; i++) {
-            groupIds[i] = userGroupAssociations[i].getKey().split("_")[1];
-        }
+        final Json[] result = Connector.readPattern(USER_GROUP_ASSOCIATION_BUCKET, userId + "_.*", Json.class);
+        final Group[] groups = new Group[result.length];
 
-        final Group[] groups = new Group[groupIds.length];
-
-        for (int i = 0; i < groupIds.length; i++) {
-            groups[i] = find(groupIds[i]);
+        for (int i = 0; i < result.length; i++) {
+            final UserGroupAssociation userGroupAssociation = Janus.parse(result[i], UserGroupAssociation.class);
+            final String groupId = userGroupAssociation.getKey().split("_")[1];
+            groups[i] = find(groupId);
         }
 
         return groups;

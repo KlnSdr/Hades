@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="v0.1">
+    <CLASSES>
+      <root url="file://$USER_HOME$/dev/customJars/thot/v0.1.4-SNAPSHOT" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/dev/customJars/thot/v0.1.4-SNAPSHOT" recursive="false" />
+  </library>
+</component>

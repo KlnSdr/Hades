@@ -3,15 +3,21 @@ package hades.user;
 import dobby.util.Json;
 import hades.user.service.UserService;
 import janus.DataClass;
+import janus.annotations.JanusString;
+import janus.annotations.JanusUUID;
 import thot.annotations.Bucket;
 
 import java.util.UUID;
 
 @Bucket(UserService.USER_BUCKET)
 public class User implements DataClass {
+    @JanusUUID("id")
     private final UUID id;
+    @JanusString("displayName")
     private String displayName;
+    @JanusString("mail")
     private String mail;
+    @JanusString("password")
     private String password;
 
     public User() {
@@ -53,6 +59,12 @@ public class User implements DataClass {
         json.setString("displayName", displayName);
         json.setString("mail", mail);
 
+        return json;
+    }
+
+    public Json toStoreJson() {
+        final Json json = toJson();
+        json.setString("password", password);
         return json;
     }
 

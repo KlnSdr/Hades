@@ -3,6 +3,9 @@ package hades.authorized;
 import dobby.util.Json;
 import hades.authorized.service.GroupService;
 import janus.DataClass;
+import janus.annotations.JanusList;
+import janus.annotations.JanusString;
+import janus.annotations.JanusUUID;
 import thot.annotations.Bucket;
 
 import java.util.ArrayList;
@@ -11,10 +14,16 @@ import java.util.UUID;
 
 @Bucket(GroupService.GROUP_BUCKET)
 public class Group implements DataClass {
-    private final UUID id;
-    private final String name;
-
+    @JanusUUID("id")
+    private UUID id;
+    @JanusString("name")
+    private String name;
+    @JanusList("permissions")
     private final List<Permission> permissions = new ArrayList<>();
+
+    public Group() {
+
+    }
 
     public Group(String name) {
         this.id = UUID.randomUUID();
@@ -56,6 +65,14 @@ public class Group implements DataClass {
         this.permissions.forEach(permission -> permissions.add(permission.toJson()));
         json.setList("permissions", permissions);
 
+        return json;
+    }
+
+    public Json toStoreJson() {
+        final Json json = toJson();
+        final ArrayList<Object> permissions = new ArrayList<>();
+        this.permissions.forEach(permission -> permissions.add(permission.toStoreJson()));
+        json.setList("permissions", permissions);
         return json;
     }
 }
