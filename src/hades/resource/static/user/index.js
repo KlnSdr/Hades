@@ -1,7 +1,7 @@
 function updateMail() {
     const mail = document.getElementById('email').value;
 
-    fetch(`/rest/users/id/${userId}/update/mail`, {
+    fetch(`{{CONTEXT}}/rest/users/id/${userId}/update/mail`, {
         method: 'PUT', headers: {
             'Content-Type': 'application/json',
         }, body: JSON.stringify({mail}),
@@ -17,7 +17,7 @@ function updateMail() {
 function updateName() {
     const displayName = document.getElementById('username').value;
 
-    fetch(`/rest/users/id/${userId}/update/name`, {
+    fetch(`{{CONTEXT}}/rest/users/id/${userId}/update/name`, {
         method: 'PUT', headers: {
             'Content-Type': 'application/json',
         }, body: JSON.stringify({displayName}),
@@ -35,7 +35,7 @@ function updatePassword() {
     const password = document.getElementById('newPassword').value;
     const passwordRepeat = document.getElementById('confirmPassword').value;
 
-    fetch(`/rest/users/id/${userId}/update/password`, {
+    fetch(`{{CONTEXT}}/rest/users/id/${userId}/update/password`, {
         method: 'PUT', headers: {
             'Content-Type': 'application/json',
         }, body: JSON.stringify({oldPassword, password, passwordRepeat}),

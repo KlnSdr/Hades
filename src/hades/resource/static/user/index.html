@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Hades - Userinfo</title>
-    <link rel="stylesheet" href="/hades/style.css">
+    <link rel="stylesheet" href="{{CONTEXT}}/hades/style.css">
 
     <style>
         tr:hover {
@@ -28,12 +28,12 @@
     <script>
         const userId = '{{USERID}}';
     </script>
-    <script src="/user/index.js"></script>
-    <script src="/hades/logout.js"></script>
+    <script src="{{CONTEXT}}/user/index.js"></script>
+    <script src="{{CONTEXT}}/hades/logout.js"></script>
 </head>
 <body>
 <nav>
-    <h1><a id="headline" href="/hades/">Hades</a></h1>
+    <h1><a id="headline" href="{{CONTEXT}}/hades/">Hades</a></h1>
     <div class="navbarRight">
         <label id="lblCurrentUser">({{USERNAME}})</label>
         <button onclick="doLogout()">logout</button>

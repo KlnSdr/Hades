@@ -15,7 +15,7 @@ import hades.user.service.UserService;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public class UserInfoPagePreFilter implements Filter {
+public class UserInfoPagePostFilter implements Filter {
     private static final Pattern USER_PAGE_PATTERN = Pattern.compile("^/user/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/index.html)?$");
 
     @Override
@@ -25,12 +25,12 @@ public class UserInfoPagePreFilter implements Filter {
 
     @Override
     public FilterType getType() {
-        return FilterType.PRE;
+        return FilterType.POST;
     }
 
     @Override
     public int getOrder() {
-        return FilterOrder.USER_INFO_PAGE_PRE_FILTER.getOrder();
+        return FilterOrder.USER_INFO_PAGE_POST_FILTER.getOrder();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class UserInfoPagePreFilter implements Filter {
 
             httpContext.getResponse().setHeader("Content-Type", userPage.getContentType());
             httpContext.getResponse().setBody(renderedFile.getContent());
-            return false;
+            httpContext.getResponse().setCode(ResponseCodes.OK);
         }
 
         return true;

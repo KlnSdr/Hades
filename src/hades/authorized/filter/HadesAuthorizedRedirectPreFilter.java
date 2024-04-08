@@ -6,6 +6,7 @@ import dobby.io.HttpContext;
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
+import dobby.util.Config;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
@@ -37,7 +38,7 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
         if (path.equalsIgnoreCase("/hades") || path.equalsIgnoreCase("/hades/") || path.equalsIgnoreCase("/hades/index.html")) {
             final Response response = httpContext.getResponse();
 
-            response.setHeader("location", "/hades/login/");
+            response.setHeader("location", Config.getInstance().getString("hades.context", "") + "/hades/login/");
             response.setCode(ResponseCodes.FOUND);
 
             return false;

@@ -4,6 +4,7 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
+import dobby.util.Config;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
@@ -35,7 +36,8 @@ public class RedirectMeToUserPagePreFilter implements Filter {
             return true;
         } else {
             httpContext.getResponse().setCode(ResponseCodes.FOUND);
-            httpContext.getResponse().setHeader("Location", "/hades/login/");
+            httpContext.getResponse().setHeader("Location", Config.getInstance().getString("hades.context", "") +
+                    "/hades/login/");
             return false;
         }
     }

@@ -89,7 +89,8 @@ public class UserResource {
         response.setCode(ResponseCodes.CREATED);
         final Json resPayload = new Json();
         resPayload.setJson("user", user.toJson());
-        resPayload.setString("redirectTo", getNormalLoginRedirect());
+        resPayload.setString("redirectTo",
+                Config.getInstance().getString("hades.context", "") + getNormalLoginRedirect());
 
         context.getResponse().setBody(resPayload);
     }
@@ -132,10 +133,12 @@ public class UserResource {
             }
         }
 
+        final String appContext = Config.getInstance().getString("hades.context", "");
+
         if (isAdmin) {
-            resPayload.setString("redirectTo", getAdminLoginRedirect());
+            resPayload.setString("redirectTo", appContext + getAdminLoginRedirect());
         } else {
-            resPayload.setString("redirectTo", getNormalLoginRedirect());
+            resPayload.setString("redirectTo", appContext + getNormalLoginRedirect());
         }
 
         context.getResponse().setBody(resPayload);

@@ -4,7 +4,7 @@ function doSignup() {
     const password = document.getElementById('inputPassword').value;
     const passwordRepeat = document.getElementById('inputPasswordRepeat').value;
 
-    fetch("/rest/users", {
+    fetch("{{CONTEXT}}/rest/users", {
         method: "POST", headers: {
             "Content-Type": "application/json"
         }, body: JSON.stringify({

@@ -1,10 +1,11 @@
-package hades.filter;
+package hades.filter.pre;
 
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Config;
+import hades.filter.FilterOrder;
 
 public class ContextPreFilter implements Filter {
     @Override
@@ -39,7 +40,7 @@ public class ContextPreFilter implements Filter {
 
         final String newPath = path.substring(appContext.length());
         if (newPath.isEmpty()) {
-            httpContext.getResponse().setHeader("Location", appContext + "/");
+            httpContext.getResponse().setHeader("Location", appContext + "/index.html");
             httpContext.getResponse().setCode(ResponseCodes.FOUND);
             return false;
         }

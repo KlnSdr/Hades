@@ -27,14 +27,14 @@ function displayLandingPage() {
 
     const imgUser = document.createElement("img");
     imgUser.classList.add("actionIcon");
-    imgUser.src = "/hades/img/icon_user.png";
+    imgUser.src = "{{CONTEXT}}/hades/img/icon_user.png";
     imgUser.alt = "User";
     imgUser.onclick = () => openUsersTab();
     divActions.appendChild(imgUser);
 
     const imgGroup = document.createElement("img");
     imgGroup.classList.add("actionIcon");
-    imgGroup.src = "/hades/img/icon_group.png";
+    imgGroup.src = "{{CONTEXT}}/hades/img/icon_group.png";
     imgGroup.alt = "Group";
     imgGroup.onclick = () => openGroupsTab();
     divActions.appendChild(imgGroup);
@@ -60,7 +60,7 @@ function displayLandingPage() {
 
         const logo = document.createElement("img");
         logo.classList.add("logo");
-        logo.src = `/hades/img/logo_${technology}.png`;
+        logo.src = `{{CONTEXT}}/hades/img/logo_${technology}.png`;
         logo.alt = technology;
         card.appendChild(logo);
 
@@ -77,7 +77,7 @@ function displayLandingPage() {
 }
 
 async function displayCurrentUserDisplayName() {
-    fetch("/rest/users/loginUserInfo", {
+    fetch("{{CONTEXT}}/rest/users/loginUserInfo", {
         method: "GET", headers: {
             "Content-Type": "application/json",
         }
@@ -179,7 +179,7 @@ function createNewGroup() {
 }
 
 function saveNewGroup(groupName) {
-    fetch("/rest/groups", {
+    fetch("{{CONTEXT}}/rest/groups", {
         method: "POST", headers: {
             "Content-Type": "application/json",
         }, body: JSON.stringify({name: groupName}),
@@ -196,7 +196,7 @@ function saveNewGroup(groupName) {
 }
 
 function loadAllGroups() {
-    fetch("/rest/groups/all", {
+    fetch("{{CONTEXT}}/rest/groups/all", {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -279,7 +279,7 @@ function openGroupDetails(groupId) {
     container.innerHTML = "";
     container.innerText = "Loading group details...";
 
-    fetch(`/rest/groups/id/${groupId}`, {
+    fetch(`{{CONTEXT}}/rest/groups/id/${groupId}`, {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -410,7 +410,7 @@ function updateGroupPermission(groupId, sender) {
 function saveGroupPermission(groupId, permission, onSuccess = () => {
 }, onError = (error) => {
 }) {
-    fetch(`/rest/groups/id/${groupId}/permission`, {
+    fetch(`{{CONTEXT}}/rest/groups/id/${groupId}/permission`, {
         method: "PUT", headers: {
             "Content-Type": "application/json",
         }, body: JSON.stringify(permission),
@@ -437,7 +437,7 @@ function createDeleteGroupPermissionButton(groupId) {
 
 function deleteGroupPermission(sender, groupId) {
     const route = sender.parentElement.parentElement.children[0].innerText;
-    fetch(`/rest/groups/group/${groupId}/permission/${encodeURIComponent(route)}`, {
+    fetch(`{{CONTEXT}}/rest/groups/group/${groupId}/permission/${encodeURIComponent(route)}`, {
         method: "DELETE", headers: {
             "Content-Type": "application/json",
         },
@@ -454,7 +454,7 @@ function deleteGroupPermission(sender, groupId) {
 }
 
 function loadUsers() {
-    fetch("/rest/users/all", {
+    fetch("{{CONTEXT}}/rest/users/all", {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -532,7 +532,7 @@ function populateActionBar(userId) {
 }
 
 async function loadUserInfo(userId, outputContainer) {
-    fetch(`/rest/users/id/${userId}`, {
+    fetch(`{{CONTEXT}}/rest/users/id/${userId}`, {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -599,7 +599,7 @@ async function loadUserInfo(userId, outputContainer) {
 }
 
 async function loadUserGroups(userId, outputContainer) {
-    fetch(`/rest/groups/user/${userId}`, {
+    fetch(`{{CONTEXT}}/rest/groups/user/${userId}`, {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -635,7 +635,7 @@ async function loadUserGroups(userId, outputContainer) {
 }
 
 async function loadUserPermissions(userId, outputContainer) {
-    fetch(`/rest/permission/user/${userId}`, {
+    fetch(`{{CONTEXT}}/rest/permission/user/${userId}`, {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -724,7 +724,7 @@ function createDeleteButton(userId) {
 
 function deletePermission(sender, userId) {
     const route = sender.parentElement.parentElement.children[0].innerText;
-    fetch(`/rest/permission/user/${userId}/route/${encodeURIComponent(route)}`, {
+    fetch(`{{CONTEXT}}/rest/permission/user/${userId}/route/${encodeURIComponent(route)}`, {
         method: "DELETE", headers: {
             "Content-Type": "application/json",
         },
@@ -774,7 +774,7 @@ function updatePermission(userId, sender) {
 
 function generateRouteSelect() {
     const select = document.createElement("select");
-    fetch("/rest/permission/checked-routes", {
+    fetch("{{CONTEXT}}/rest/permission/checked-routes", {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -795,7 +795,7 @@ function generateRouteSelect() {
 
 function generateGroupSelect() {
     const select = document.createElement("select");
-    fetch("/rest/groups/all", {
+    fetch("{{CONTEXT}}/rest/groups/all", {
         method: "GET", headers: {
             "Content-Type": "application/json",
         },
@@ -857,7 +857,7 @@ function openAddToGroup(userId) {
 }
 
 function addToGroup(userId, group) {
-    fetch(`/rest/groups/user/${userId}/group/${group}`, {
+    fetch(`{{CONTEXT}}/rest/groups/user/${userId}/group/${group}`, {
         method: "POST", headers: {
             "Content-Type": "application/json",
         },
@@ -887,7 +887,7 @@ function addPermission(userId, route) {
 function savePermission(userId, permission, onSuccess = () => {
 }, onError = (error) => {
 }) {
-    fetch(`/rest/permission/user/${userId}`, {
+    fetch(`{{CONTEXT}}/rest/permission/user/${userId}`, {
         method: "POST", headers: {
             "Content-Type": "application/json",
         }, body: JSON.stringify(permission),

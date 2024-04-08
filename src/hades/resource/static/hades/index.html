@@ -6,11 +6,11 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hades</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{CONTEXT}}/hades/style.css">
     <script src="index.js"></script>
     <script src="logout.js"></script>
-    <link rel="icon" type="image/png" href="img/logo_Hades.png" />
-    <link rel="apple-touch-icon" href="img/logo_Hades.png" type="image/png" />
+    <link rel="icon" type="image/png" href="{{CONTEXT}}/hades/img/logo_Hades.png" />
+    <link rel="apple-touch-icon" href="{{CONTEXT}}/hades/img/logo_Hades.png" type="image/png" />
 </head>
 <body onload="startup()">
 <nav>
@@ -20,7 +20,7 @@
         <button onclick="openGroupsTab()">Groups</button>
     </div>
     <div class="navbarRight">
-        <label id="lblCurrentUser" onclick="window.location.assign('/me')">(...)</label>
+        <label id="lblCurrentUser" onclick="window.location.assign('{{CONTEXT}}/me')">(...)</label>
         <button onclick="doLogout()">logout</button>
     </div>
 </nav>

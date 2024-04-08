@@ -2,7 +2,7 @@ function doLogin() {
     const username = document.getElementById('inputUsername').value;
     const password = document.getElementById('inputPassword').value;
 
-    fetch("/rest/users/login", {
+    fetch("{{CONTEXT}}/rest/users/login", {
         method: "POST", headers: {
             "Content-Type": "application/json"
         }, body: JSON.stringify({
