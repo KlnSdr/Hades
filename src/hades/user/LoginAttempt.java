@@ -1,0 +1,83 @@
+package hades.user;
+
+import dobby.util.Json;
+import hades.user.service.UserService;
+import janus.DataClass;
+import janus.annotations.JanusBoolean;
+import janus.annotations.JanusInteger;
+import janus.annotations.JanusString;
+import janus.annotations.JanusUUID;
+import thot.annotations.Bucket;
+
+import java.util.UUID;
+
+@Bucket(UserService.LIMIT_LOGIN_BUCKET)
+public class LoginAttempt implements DataClass {
+    @JanusUUID("userId")
+    private UUID userId;
+    @JanusInteger("loginAttempts")
+    private Integer loginAttempts = 0;
+
+    @JanusBoolean("isLocked")
+    private boolean isLocked = false;
+
+    @JanusString("lockedUntil")
+    private String lockedUntil;
+
+    public LoginAttempt() {
+    }
+
+    public LoginAttempt(UUID userId, Integer loginAttempts) {
+        this.userId = userId;
+        this.loginAttempts = loginAttempts;
+    }
+
+    public void incrementLoginAttempts() {
+        loginAttempts++;
+
+        if (loginAttempts >= 5) {
+            lockForDuration(300000);
+        }
+    }
+
+    public boolean isLocked() {
+        if (isLocked) {
+            final long lockedUntilLong = Long.parseLong(lockedUntil);
+            if (lockedUntilLong < System.currentTimeMillis()) {
+                isLocked = false;
+                lockedUntil = null;
+            }
+        }
+
+        return isLocked;
+    }
+
+    private void lockForDuration(int duration) {
+        isLocked = true;
+        lockedUntil = String.valueOf(System.currentTimeMillis() + duration);
+    }
+
+    @Override
+    public String getKey() {
+        return userId.toString();
+    }
+
+    @Override
+    public Json toJson() {
+        final Json json = new Json();
+        json.setString("userId", userId.toString());
+        json.setInt("loginAttempts", loginAttempts);
+        json.setInt("isLocked", isLocked ? 1 : 0);
+        json.setString("lockedUntil", lockedUntil);
+        return json;
+    }
+
+    public Json toStoreJson() {
+        final Json json = new Json();
+        json.setString("userId", userId.toString());
+        json.setInt("loginAttempts", loginAttempts);
+        json.setString("isLocked", isLocked ? "true" : "false");
+        json.setString("lockedUntil", lockedUntil);
+        return json;
+    }
+}

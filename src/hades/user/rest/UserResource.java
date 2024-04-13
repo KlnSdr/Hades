@@ -113,8 +113,15 @@ public class UserResource {
         }
 
         final User user = users[0];
+        boolean isLocked = UserService.getInstance().isLocked(user.getId());
+
+        if (isLocked) {
+            UserResourceErrorResponses.userIsLocked(context.getResponse());
+            return;
+        }
 
         if (!Security.verifyPassword(loginUserDTO.getPassword(), user.getPassword())) {
+            UserService.getInstance().incrementLoginAttempts(user.getId());
             UserResourceErrorResponses.wrongPassword(context.getResponse());
             return;
         }

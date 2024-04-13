@@ -5,6 +5,9 @@ import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
 
 public class ErrorResponses {
+    public static void forbidden(Response response, String message) {
+        sendErrorResponse(response, ResponseCodes.FORBIDDEN, message);
+    }
     public static void badRequest(Response response, String message) {
         sendErrorResponse(response, ResponseCodes.BAD_REQUEST, message);
     }

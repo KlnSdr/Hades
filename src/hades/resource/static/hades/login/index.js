@@ -19,6 +19,6 @@ function doLogin() {
             location.assign(data["redirectTo"]);
         })
         .catch(error => {
-            alert("Login failed. Please try again.");
+            alert("Login failed. Please try again later.");
         });
 }

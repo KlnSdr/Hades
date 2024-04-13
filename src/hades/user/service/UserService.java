@@ -2,6 +2,7 @@ package hades.user.service;
 
 import dobby.session.Session;
 import dobby.util.Json;
+import hades.user.LoginAttempt;
 import hades.user.User;
 import janus.Janus;
 import thot.connector.Connector;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 public class UserService {
     public static final String USER_BUCKET = "hades_users";
+    public static final String LIMIT_LOGIN_BUCKET = "hades_limit_login";
     private static UserService instance;
 
     private UserService() {
@@ -70,6 +72,22 @@ public class UserService {
         return Connector.write(USER_BUCKET, user.getKey(), user.toStoreJson());
     }
 
+    public void incrementLoginAttempts(UUID userId) {
+        final LoginAttempt loginAttempt = Janus.parse(Connector.read(LIMIT_LOGIN_BUCKET, userId.toString(), Json.class),
+                LoginAttempt.class);
+        if (loginAttempt == null) {
+            Connector.write(LIMIT_LOGIN_BUCKET, userId.toString(), new LoginAttempt(userId, 1).toStoreJson());
+        } else {
+            loginAttempt.incrementLoginAttempts();
+            Connector.write(LIMIT_LOGIN_BUCKET, userId.toString(), loginAttempt.toStoreJson());
+        }
+    }
+
+    public boolean isLocked(UUID userId) {
+        final LoginAttempt loginAttempt = Janus.parse(Connector.read(LIMIT_LOGIN_BUCKET, userId.toString(), Json.class),
+                LoginAttempt.class);
+        return loginAttempt != null && loginAttempt.isLocked();
+    }
 
     public boolean isLoggedIn(Session session) {
         final String sessionUserId = session.get("userId");

@@ -4,6 +4,10 @@ import dobby.io.response.Response;
 import hades.common.ErrorResponses;
 
 public class UserResourceErrorResponses {
+    public static void userIsLocked(Response response) {
+        ErrorResponses.forbidden(response, "User is locked.");
+    }
+
     public static void malformedRequest(Response response) {
         ErrorResponses.badRequest(response, "Malformed request.");
     }
