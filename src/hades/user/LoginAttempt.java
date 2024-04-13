@@ -1,5 +1,6 @@
 package hades.user;
 
+import dobby.util.Config;
 import dobby.util.Json;
 import hades.user.service.UserService;
 import janus.DataClass;
@@ -35,8 +36,8 @@ public class LoginAttempt implements DataClass {
     public void incrementLoginAttempts() {
         loginAttempts++;
 
-        if (loginAttempts >= 5) {
-            lockForDuration(300000);
+        if (loginAttempts >= Config.getInstance().getInt("maxLoginAttempts", 5)) {
+            lockForDuration(Config.getInstance().getInt("lockDuration", 300000));
         }
     }
 
