@@ -9,7 +9,6 @@ public enum FilterOrder {
     REPLACE_DISPLAY_NAME_PRE_FILTER(13),
     REDIRECT_ME_TO_USER_PAGE_PRE_FILTER(14),
     // ============================================
-    COOKIE_EXTENSION_POST_FILTER(-1),
     USER_INFO_PAGE_POST_FILTER(9),
     REPLACE_CONTEXT_IN_FILES_POST_FILTER(10),
     ;

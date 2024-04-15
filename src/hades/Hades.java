@@ -11,7 +11,7 @@ import hades.update.service.UpdateService;
 import thot.connector.Connector;
 
 public class Hades implements DobbyEntryPoint {
-    private static final String version = "v0.0.3-dev";
+    private static final String version = "v0.0.2";
     private static final Logger LOGGER = new Logger(Hades.class);
 
     public static void main(String[] args) {
