@@ -68,6 +68,13 @@ public class UserResource {
 
         final User user = createUserDTO.toUser();
 
+        final boolean userNameAlreadyTaken = UserService.getInstance().findByName(user.getDisplayName()).length > 0;
+
+        if (userNameAlreadyTaken) {
+            UserResourceErrorResponses.displayNameAlreadyTaken(context.getResponse(), user.getDisplayName());
+            return;
+        }
+
         final String hashedPassword = hashPassword(createUserDTO.getPassword());
         if (hashedPassword == null) {
             UserResourceErrorResponses.couldNotHashPassword(context.getResponse());
