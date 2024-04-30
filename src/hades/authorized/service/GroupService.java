@@ -1,12 +1,11 @@
 package hades.authorized.service;
 
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.authorized.Group;
 import hades.authorized.UserGroupAssociation;
 import janus.Janus;
 import thot.connector.Connector;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class GroupService {
@@ -29,7 +28,7 @@ public class GroupService {
     }
 
     public Group find(String key) {
-        return Janus.parse(Connector.read(GROUP_BUCKET, key, Json.class), Group.class);
+        return Janus.parse(Connector.read(GROUP_BUCKET, key, NewJson.class), Group.class);
     }
 
     public boolean delete(String key) {
@@ -37,7 +36,7 @@ public class GroupService {
     }
 
     public Group[] findAll() {
-        final Json[] result = Connector.readPattern(GROUP_BUCKET, ".*", Json.class);
+        final NewJson[] result = Connector.readPattern(GROUP_BUCKET, ".*", NewJson.class);
         final Group[] groups = new Group[result.length];
         for (int i = 0; i < result.length; i++) {
             groups[i] = Janus.parse(result[i], Group.class);
@@ -66,7 +65,7 @@ public class GroupService {
     }
 
     public Group[] findGroupsByUser(UUID userId) {
-        final Json[] result = Connector.readPattern(USER_GROUP_ASSOCIATION_BUCKET, userId + "_.*", Json.class);
+        final NewJson[] result = Connector.readPattern(USER_GROUP_ASSOCIATION_BUCKET, userId + "_.*", NewJson.class);
         final Group[] groups = new Group[result.length];
 
         for (int i = 0; i < result.length; i++) {

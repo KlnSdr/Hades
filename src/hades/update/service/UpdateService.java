@@ -1,11 +1,8 @@
 package hades.update.service;
 
-import dobby.util.Json;
 import dobby.util.logging.Logger;
 import hades.update.Update;
 import hades.update.UpdateDiscoverer;
-import hades.update.UpdateRan;
-import janus.Janus;
 import thot.connector.Connector;
 
 import java.util.ArrayList;
@@ -63,14 +60,13 @@ public class UpdateService {
     }
 
     private void markUpdateRan(Update update) {
-        final UpdateRan updateRan = new UpdateRan(update.getName());
-        Connector.write(BUCKET_NAME, updateRan.getKey(), updateRan.toJson());
+        Connector.write(BUCKET_NAME, update.getName(), true);
     }
 
     private boolean didUpdateRun(Update update) {
         final String updateName = update.getName();
 
-        final Json didRun = Connector.read(BUCKET_NAME, updateName, Json.class);
+        final Object didRun = Connector.read(BUCKET_NAME, updateName, Object.class);
 
         return didRun != null;
     }

@@ -1,7 +1,7 @@
 package hades.user.service;
 
 import dobby.session.Session;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.user.LoginAttempt;
 import hades.user.User;
 import janus.Janus;
@@ -27,11 +27,11 @@ public class UserService {
     }
 
     public User find(UUID id) {
-        return Janus.parse(Connector.read(USER_BUCKET, id.toString(), Json.class), User.class);
+        return Janus.parse(Connector.read(USER_BUCKET, id.toString(), NewJson.class), User.class);
     }
 
     public User[] findByName(String displayName) {
-        final Json[] result = Connector.readPattern(USER_BUCKET, ".*", Json.class);
+        final NewJson[] result = Connector.readPattern(USER_BUCKET, ".*", NewJson.class);
         if (result == null) {
             return new User[0];
         }
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     public User[] findAll() {
-        final Json[] result = Connector.readPattern(USER_BUCKET, ".*", Json.class);
+        final NewJson[] result = Connector.readPattern(USER_BUCKET, ".*", NewJson.class);
         if (result == null) {
             return new User[0];
         }
@@ -73,7 +73,7 @@ public class UserService {
     }
 
     public void incrementLoginAttempts(UUID userId) {
-        final LoginAttempt loginAttempt = Janus.parse(Connector.read(LIMIT_LOGIN_BUCKET, userId.toString(), Json.class),
+        final LoginAttempt loginAttempt = Janus.parse(Connector.read(LIMIT_LOGIN_BUCKET, userId.toString(), NewJson.class),
                 LoginAttempt.class);
         if (loginAttempt == null) {
             Connector.write(LIMIT_LOGIN_BUCKET, userId.toString(), new LoginAttempt(userId, 1).toStoreJson());
@@ -84,7 +84,7 @@ public class UserService {
     }
 
     public boolean isLocked(UUID userId) {
-        final LoginAttempt loginAttempt = Janus.parse(Connector.read(LIMIT_LOGIN_BUCKET, userId.toString(), Json.class),
+        final LoginAttempt loginAttempt = Janus.parse(Connector.read(LIMIT_LOGIN_BUCKET, userId.toString(), NewJson.class),
                 LoginAttempt.class);
         return loginAttempt != null && loginAttempt.isLocked();
     }

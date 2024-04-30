@@ -6,7 +6,7 @@ import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.Response;
 import dobby.util.Config;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
 import hades.template.TemplateEngine;
 
@@ -39,7 +39,7 @@ public class ReplaceContextInFilesPostFilter implements Filter {
         final StaticFile staticFile = new StaticFile();
         staticFile.setContent(response.getBody());
 
-        final Json json = new Json();
+        final NewJson json = new NewJson();
         json.setString("CONTEXT", Config.getInstance().getString("hades.context", ""));
 
         final StaticFile renderedFile = TemplateEngine.render(staticFile, json);

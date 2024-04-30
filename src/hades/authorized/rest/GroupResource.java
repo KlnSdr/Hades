@@ -6,13 +6,12 @@ import dobby.annotations.Post;
 import dobby.annotations.Put;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
-import hades.authorized.service.PermissionService;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -33,7 +32,7 @@ public class GroupResource {
 
         final Group[] groups = groupService.findAll();
 
-        final Json body = new Json();
+        final NewJson body = new NewJson();
 
         body.setList("groups", Arrays.stream(groups).map(Group::toJson).collect(Collectors.toList()));
 
@@ -49,7 +48,7 @@ public class GroupResource {
 
         if (!validateCreateGroupRequest(context.getRequest().getBody())) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Invalid request");
             context.getResponse().setBody(response);
             return;
@@ -60,7 +59,7 @@ public class GroupResource {
 
         if (groupService.findByName(groupName) != null) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Group already exists");
             context.getResponse().setBody(response);
             return;
@@ -70,7 +69,7 @@ public class GroupResource {
 
         if (!groupService.update(group)) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Failed to create group");
             context.getResponse().setBody(response);
             return;
@@ -91,7 +90,7 @@ public class GroupResource {
 
         if (group == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Group not found");
             context.getResponse().setBody(response);
             return;
@@ -110,7 +109,7 @@ public class GroupResource {
 
         if (!groupService.delete(groupId)) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Failed to delete group");
             context.getResponse().setBody(response);
             return;
@@ -125,7 +124,7 @@ public class GroupResource {
     public void addPermissionToGroup(HttpContext context) {
         if (!validateAddPermissionToGroupRequest(context.getRequest().getBody())) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Invalid request");
             context.getResponse().setBody(response);
             return;
@@ -139,7 +138,7 @@ public class GroupResource {
 
         if (group == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Group or permission not found");
             context.getResponse().setBody(response);
             return;
@@ -153,7 +152,7 @@ public class GroupResource {
 
         if (!groupService.update(group)) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Failed to add permission to group");
             context.getResponse().setBody(response);
             return;
@@ -175,7 +174,7 @@ public class GroupResource {
             userUUID = UUID.fromString(userId);
         } catch (Exception e) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Invalid user id");
             context.getResponse().setBody(response);
             return;
@@ -183,7 +182,7 @@ public class GroupResource {
 
         final Group[] groups = groupService.findGroupsByUser(userUUID);
 
-        final Json body = new Json();
+        final NewJson body = new NewJson();
 
         body.setList("groups", Arrays.stream(groups).map(Group::toJson).collect(Collectors.toList()));
 
@@ -205,7 +204,7 @@ public class GroupResource {
             userUUID = UUID.fromString(userId);
         } catch (Exception e) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Invalid user id");
             context.getResponse().setBody(response);
             return;
@@ -216,7 +215,7 @@ public class GroupResource {
 
         if (group == null || user == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Group or user not found");
             context.getResponse().setBody(response);
             return;
@@ -224,7 +223,7 @@ public class GroupResource {
 
         if (!groupService.addUserToGroup(userId, groupId)) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Failed to add user to group");
             context.getResponse().setBody(response);
             return;
@@ -247,7 +246,7 @@ public class GroupResource {
 
         if (group == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Group not found");
             context.getResponse().setBody(response);
             return;
@@ -258,7 +257,7 @@ public class GroupResource {
 
         if (permission == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Permission not found");
             context.getResponse().setBody(response);
             return;
@@ -268,7 +267,7 @@ public class GroupResource {
 
         if (!groupService.update(group)) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Failed to delete permission from group");
             context.getResponse().setBody(response);
             return;
@@ -277,15 +276,15 @@ public class GroupResource {
         context.getResponse().setCode(ResponseCodes.OK);
     }
 
-    private boolean validateCreateGroupRequest(Json body) {
+    private boolean validateCreateGroupRequest(NewJson body) {
         return body.hasKey("name");
     }
 
-    private boolean validateAddPermissionToGroupRequest(Json body) {
-        return body.hasKey("route") && body.hasKey("get") && body.hasKey("post") && body.hasKey("put") && body.hasKey("delete");
+    private boolean validateAddPermissionToGroupRequest(NewJson body) {
+        return body.hasKeys("route", "get", "post", "put", "delete");
     }
 
-    private Permission permissionFromBody(Json body, UUID groupId) {
+    private Permission permissionFromBody(NewJson body, UUID groupId) {
         final Permission permission = new Permission();
 
         permission.setRoute(body.getString("route"));

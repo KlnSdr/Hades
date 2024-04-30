@@ -5,7 +5,7 @@ import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.authorized.Permission;
@@ -24,7 +24,7 @@ public class PermissionResource {
     @AuthorizedOnly
     @Get(BASE_PATH + "/checked-routes")
     public void getAllPermissionCheckedRoutes(HttpContext context) {
-        Json response = new Json();
+        final NewJson response = new NewJson();
         response.setList("routes", PermissionCheckService.getInstance().getPermissionCheckRoutes());
         context.getResponse().setBody(response);
     }
@@ -40,7 +40,7 @@ public class PermissionResource {
 
         Permission[] permissions = PermissionService.getInstance().findByUser(userId);
 
-        Json response = new Json();
+        final NewJson response = new NewJson();
         response.setList("permissions", List.of(Arrays.stream(permissions).map(Permission::toJson).toArray()));
 
         context.getResponse().setBody(response);
@@ -50,10 +50,10 @@ public class PermissionResource {
     @AuthorizedOnly
     @Post(BASE_PATH + "/user/{userId}")
     public void addPermissionToUser(HttpContext context) {
-        final Json body = context.getRequest().getBody();
+        final NewJson body = context.getRequest().getBody();
         if (!validateAddPermissionRequest(body)) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Invalid request");
             context.getResponse().setBody(response);
             return;
@@ -76,7 +76,7 @@ public class PermissionResource {
 
         if (!success) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Could not add permission");
             context.getResponse().setBody(response);
         }
@@ -98,7 +98,7 @@ public class PermissionResource {
 
         if (!success) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Could not delete permission");
             context.getResponse().setBody(response);
         }
@@ -109,14 +109,14 @@ public class PermissionResource {
             return UUID.fromString(idString);
         } catch (IllegalArgumentException e) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            Json response = new Json();
+            final NewJson response = new NewJson();
             response.setString("msg", "Invalid userId");
             context.getResponse().setBody(response);
             return null;
         }
     }
 
-    private boolean validateAddPermissionRequest(Json body) {
-        return body.hasKeys(new String[]{"route", "get", "post", "put", "delete"});
+    private boolean validateAddPermissionRequest(NewJson body) {
+        return body.hasKeys("route", "get", "post", "put", "delete");
     }
 }

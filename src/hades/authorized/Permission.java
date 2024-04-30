@@ -1,7 +1,7 @@
 package hades.authorized;
 
 import dobby.io.request.RequestTypes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.authorized.service.PermissionService;
 import janus.DataClass;
 import janus.annotations.JanusBoolean;
@@ -81,8 +81,8 @@ public class Permission implements DataClass {
     }
 
     @Override
-    public Json toJson() {
-        final Json json = new Json();
+    public NewJson toJson() {
+        final NewJson json = new NewJson();
         json.setString("owner", owner.toString());
         json.setString("route", route);
         // TODO JanusBoolean exepects "true" and not 1
@@ -93,8 +93,8 @@ public class Permission implements DataClass {
         return json;
     }
 
-    public Json toStoreJson() {
-        final Json json = new Json();
+    public NewJson toStoreJson() {
+        final NewJson json = new NewJson();
         json.setString("owner", owner.toString());
         json.setString("route", route);
         // TODO JanusBoolean exepects "true" and not 1

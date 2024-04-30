@@ -5,7 +5,7 @@ import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.request.RequestTypes;
 import dobby.io.response.ResponseCodes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.AuthorizedRoutesService;
@@ -54,9 +54,9 @@ public class AutorizedRoutePreFilter implements Filter {
         } catch (Exception e) {
             httpContext.getResponse().setCode(ResponseCodes.BAD_REQUEST);
 
-            final Json payload = new Json();
+            final NewJson payload = new NewJson();
             payload.setString("error", "Invalid user id");
-            httpContext.getResponse().setBody(payload.toString());
+            httpContext.getResponse().setBody(payload);
 
             return false;
         }

@@ -6,7 +6,7 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
 import hades.template.TemplateEngine;
 import hades.user.User;
@@ -61,13 +61,13 @@ public class UserInfoPagePostFilter implements Filter {
         return true;
     }
 
-    private Json getUserInfoFromId(String userId) {
-        final Json userInfo = new Json();
+    private NewJson getUserInfoFromId(String userId) {
+        final NewJson userInfo = new NewJson();
 
         final User user = UserService.getInstance().find(UUID.fromString(userId));
 
         if (user == null) {
-            return new Json();
+            return new NewJson();
         }
 
         userInfo.setString("USERID", userId);

@@ -11,7 +11,7 @@ import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
 import dobby.session.service.SessionService;
 import dobby.util.Config;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
@@ -94,7 +94,7 @@ public class UserResource {
         logUserIn(user, context);
 
         response.setCode(ResponseCodes.CREATED);
-        final Json resPayload = new Json();
+        final NewJson resPayload = new NewJson();
         resPayload.setJson("user", user.toJson());
         resPayload.setString("redirectTo",
                 Config.getInstance().getString("hades.context", "") + getNormalLoginRedirect());
@@ -135,7 +135,7 @@ public class UserResource {
 
         logUserIn(user, context);
 
-        final Json resPayload = new Json();
+        final NewJson resPayload = new NewJson();
         resPayload.setJson("user", user.toJson());
 
         final Group[] groups = GroupService.getInstance().findGroupsByUser(user.getId());
@@ -250,7 +250,7 @@ public class UserResource {
     public void getAllUsers(HttpContext context) {
         final User[] users = UserService.getInstance().findAll();
 
-        Json response = new Json();
+        final NewJson response = new NewJson();
         response.setList("users", List.of(Arrays.stream(users).map(User::toJson).toArray()));
 
         context.getResponse().setBody(response);
@@ -274,7 +274,7 @@ public class UserResource {
         }
 
         final Request request = context.getRequest();
-        final Json body = request.getBody();
+        final NewJson body = request.getBody();
 
         final String mail = body.getString("mail");
 
@@ -313,7 +313,7 @@ public class UserResource {
         }
 
         final Request request = context.getRequest();
-        final Json body = request.getBody();
+        final NewJson body = request.getBody();
 
         final String name = body.getString("displayName");
 
@@ -357,7 +357,7 @@ public class UserResource {
         }
 
         final Request request = context.getRequest();
-        final Json body = request.getBody();
+        final NewJson body = request.getBody();
 
         final String oldPassword = body.getString("oldPassword");
         final String password = body.getString("password");

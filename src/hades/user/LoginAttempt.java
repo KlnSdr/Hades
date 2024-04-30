@@ -1,7 +1,7 @@
 package hades.user;
 
 import dobby.util.Config;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.user.service.UserService;
 import janus.DataClass;
 import janus.annotations.JanusBoolean;
@@ -64,8 +64,8 @@ public class LoginAttempt implements DataClass {
     }
 
     @Override
-    public Json toJson() {
-        final Json json = new Json();
+    public NewJson toJson() {
+        final NewJson json = new NewJson();
         json.setString("userId", userId.toString());
         json.setInt("loginAttempts", loginAttempts);
         json.setInt("isLocked", isLocked ? 1 : 0);
@@ -73,8 +73,8 @@ public class LoginAttempt implements DataClass {
         return json;
     }
 
-    public Json toStoreJson() {
-        final Json json = new Json();
+    public NewJson toStoreJson() {
+        final NewJson json = new NewJson();
         json.setString("userId", userId.toString());
         json.setInt("loginAttempts", loginAttempts);
         json.setString("isLocked", isLocked ? "true" : "false");

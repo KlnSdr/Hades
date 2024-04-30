@@ -2,7 +2,7 @@ package hades.common;
 
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 
 public class ErrorResponses {
     public static void forbidden(Response response, String message) {
@@ -26,7 +26,7 @@ public class ErrorResponses {
 
     private static void sendErrorResponse(Response response, ResponseCodes code, String message) {
         response.setCode(code);
-        final Json payload = new Json();
+        final NewJson payload = new NewJson();
         payload.setString("message", message);
         response.setBody(payload);
     }

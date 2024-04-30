@@ -1,7 +1,7 @@
 package hades.authorized.service;
 
 import dobby.io.request.RequestTypes;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.authorized.Permission;
 import janus.Janus;
 import thot.connector.Connector;
@@ -28,11 +28,11 @@ public class PermissionService {
     }
 
     public Permission find(String key) {
-        return Janus.parse(Connector.read(PERMISSION_BUCKET, key, Json.class), Permission.class);
+        return Janus.parse(Connector.read(PERMISSION_BUCKET, key, NewJson.class), Permission.class);
     }
 
     public Permission[] findByUser(UUID userId) {
-        final Json[] result = Connector.readPattern(PERMISSION_BUCKET, userId.toString() + "_.*", Json.class);
+        final NewJson[] result = Connector.readPattern(PERMISSION_BUCKET, userId.toString() + "_.*", NewJson.class);
         final Permission[] permissions = new Permission[result.length];
 
         for (int i = 0; i < result.length; i++) {
@@ -58,7 +58,7 @@ public class PermissionService {
             return true;
         }
 
-        final Json result = Connector.read(PERMISSION_BUCKET, userId + "_" + route, Json.class);
+        final NewJson result = Connector.read(PERMISSION_BUCKET, userId + "_" + route, NewJson.class);
 
         if (result == null) {
             return false;

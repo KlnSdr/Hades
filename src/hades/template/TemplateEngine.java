@@ -1,7 +1,7 @@
 package hades.template;
 
 import dobby.files.StaticFile;
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class TemplateEngine {
     private static final Pattern VARIABLE_PATTER = Pattern.compile("\\{\\{[a-zA-Z]+}}");
 
-    public static StaticFile render(StaticFile template, Json data) {
+    public static StaticFile render(StaticFile template, NewJson data) {
         final StaticFile renderedTemplate = new StaticFile();
         renderedTemplate.setContentType(template.getContentType());
 

@@ -1,6 +1,6 @@
 package hades.authorized;
 
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.authorized.service.GroupService;
 import janus.DataClass;
 import janus.annotations.JanusList;
@@ -56,8 +56,8 @@ public class Group implements DataClass {
     }
 
     @Override
-    public Json toJson() {
-        final Json json = new Json();
+    public NewJson toJson() {
+        final NewJson json = new NewJson();
         json.setString("id", id.toString());
         json.setString("name", name);
 
@@ -68,8 +68,8 @@ public class Group implements DataClass {
         return json;
     }
 
-    public Json toStoreJson() {
-        final Json json = toJson();
+    public NewJson toStoreJson() {
+        final NewJson json = toJson();
         final ArrayList<Object> permissions = new ArrayList<>();
         this.permissions.forEach(permission -> permissions.add(permission.toStoreJson()));
         json.setList("permissions", permissions);

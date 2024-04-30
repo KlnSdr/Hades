@@ -1,6 +1,6 @@
 package hades.user;
 
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.user.service.UserService;
 import janus.DataClass;
 import janus.annotations.JanusString;
@@ -53,8 +53,8 @@ public class User implements DataClass {
     }
 
     @Override
-    public Json toJson() {
-        final Json json = new Json();
+    public NewJson toJson() {
+        final NewJson json = new NewJson();
         json.setString("id", id.toString());
         json.setString("displayName", displayName);
         json.setString("mail", mail);
@@ -62,8 +62,8 @@ public class User implements DataClass {
         return json;
     }
 
-    public Json toStoreJson() {
-        final Json json = toJson();
+    public NewJson toStoreJson() {
+        final NewJson json = toJson();
         json.setString("password", password);
         return json;
     }

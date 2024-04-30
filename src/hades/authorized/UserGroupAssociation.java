@@ -1,7 +1,6 @@
 package hades.authorized;
 
-
-import dobby.util.Json;
+import dobby.util.json.NewJson;
 import hades.authorized.service.GroupService;
 import janus.DataClass;
 import janus.annotations.JanusString;
@@ -29,8 +28,8 @@ public class UserGroupAssociation implements DataClass {
     }
 
     @Override
-    public Json toJson() {
-        final Json json = new Json();
+    public NewJson toJson() {
+        final NewJson json = new NewJson();
         json.setString("userId", userId);
         json.setString("groupId", groupId);
         return json;
