@@ -39,7 +39,7 @@ function loadAllBuckets() {
 
                 const bucketLink = document.createElement("a");
                 bucketLink.className = "bucket";
-                bucketLink.innerHTML = bucket;
+                bucketLink.innerText = bucket;
                 bucketLink.onclick = () => openBucket(bucket);
 
                 li.appendChild(bucketLink);
@@ -53,7 +53,7 @@ function openBucket(bucketName) {
     bucketDetails.innerHTML = "";
 
     const bucketNameHeader = document.createElement("h2");
-    bucketNameHeader.innerHTML = "Bucket: " + bucketName;
+    bucketNameHeader.innerText = "Bucket: " + bucketName;
     bucketDetails.appendChild(bucketNameHeader);
 
     const bucketKeys = document.createElement("ul");
@@ -79,13 +79,34 @@ function loadBucketKeys(bucketName) {
 
                 const keyLink = document.createElement("a");
                 keyLink.className = "key";
-                keyLink.innerHTML = key;
+                keyLink.innerText = key;
                 keyLink.onclick = () => openValue(bucketName, key);
 
                 li.appendChild(keyLink);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.innerText = "X";
+                deleteButton.onclick = () => doDeleteItem(bucketName, key);
+                li.appendChild(deleteButton);
+
                 bucketKeys.appendChild(li);
             });
         });
+}
+
+function doDeleteItem(bucketName, key) {
+    fetch("{{CONTEXT}}/dbExplorer/delete", {
+        method: "POST", headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({bucket: bucketName, key: key})
+    }).then(response => {
+        if (response.ok) {
+            loadBucketKeys(bucketName);
+        } else {
+            alert("Failed to delete item: " + response.statusText);
+        }
+    });
 }
 
 function openValue(bucketName, key) {
@@ -101,11 +122,11 @@ function openValue(bucketName, key) {
             bucketDetails.classList.add("bucketDetails");
 
             const keyHeader = document.createElement("h3");
-            keyHeader.innerHTML = "Key: " + key;
+            keyHeader.innerText = "Key: " + key;
             bucketDetails.appendChild(keyHeader);
 
             const value = document.createElement("pre");
-            value.innerHTML = JSON.stringify(data, null, 2);
+            value.innerText = JSON.stringify(data, null, 2);
             bucketDetails.appendChild(value);
 
             openPopup(bucketDetails);

@@ -1,5 +1,6 @@
 package hades.dbExplorer.rest;
 
+import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
@@ -93,6 +94,25 @@ public class DbExplorerResource {
         }
 
         context.getResponse().setBody(response);
+    }
+
+    @Post(BASE_PATH + "/delete")
+    public void deleteValue(HttpContext context) {
+        final NewJson body = context.getRequest().getBody();
+        if(!body.hasKeys("bucket", "key")) {
+            sendMalformedRequest(context);
+            return;
+        }
+
+        final String bucketName = body.getString("bucket");
+        final String key = body.getString("key");
+
+        if (!Connector.delete(bucketName, key)) {
+            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
+            return;
+        }
+
+        context.getResponse().setCode(ResponseCodes.NO_CONTENT);
     }
 
     private static void sendMalformedRequest(HttpContext context) {
