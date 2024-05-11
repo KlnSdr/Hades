@@ -67,10 +67,11 @@ function loadBucketKeys(bucketName) {
     const bucketKeys = document.getElementById("bucketKeys");
     bucketKeys.innerHTML = "";
 
-    fetch(`{{CONTEXT}}/dbExplorer/${bucketName}/keys`, {
-        method: "GET", headers: {
+    fetch("{{CONTEXT}}/dbExplorer/keys", {
+        method: "POST", headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify({bucket: bucketName})
     }).then(response => response.json())
         .then(data => {
             data["keys"].forEach(key => {
@@ -88,10 +89,11 @@ function loadBucketKeys(bucketName) {
 }
 
 function openValue(bucketName, key) {
-    fetch(`{{CONTEXT}}/dbExplorer/${bucketName}/key/${key}`, {
-        method: "GET", headers: {
+    fetch("{{CONTEXT}}/dbExplorer/read", {
+        method: "POST", headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify({bucket: bucketName, key: key})
     }).then(response => response.json())
         .then(data => {
             const bucketDetails = document.createElement("div");

@@ -1,6 +1,7 @@
 package hades.dbExplorer.rest;
 
 import dobby.annotations.Get;
+import dobby.annotations.Post;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
@@ -26,9 +27,15 @@ public class DbExplorerResource {
         context.getResponse().setBody(response);
     }
 
-    @Get(BASE_PATH + "/{bucketName}/keys")
+    @Post(BASE_PATH + "/keys")
     public void getKeys(HttpContext context) {
-        final String bucketName = context.getRequest().getParam("bucketName");
+        final NewJson body = context.getRequest().getBody();
+        if (!body.hasKeys("bucket")) {
+            sendMalformedRequest(context);
+            return;
+        }
+
+        final String bucketName = body.getString("bucket");
         final String[] keys = Connector.getKeys(bucketName);
 
         final NewJson response = new NewJson();
@@ -37,11 +44,17 @@ public class DbExplorerResource {
         context.getResponse().setBody(response);
     }
 
-    @Get(BASE_PATH + "/{bucketName}/key/{key}")
+    @Post(BASE_PATH + "/read")
     public void getValue(HttpContext context) {
-        final String bucketName = context.getRequest().getParam("bucketName");
-        final String key = context.getRequest().getParam("key");
-        final Object[] value = Connector.readPattern(bucketName, "(?i)" + key, Object.class);
+        final NewJson body = context.getRequest().getBody();
+        if(!body.hasKeys("bucket", "key")) {
+            sendMalformedRequest(context);
+            return;
+        }
+
+        final String bucketName = body.getString("bucket");
+        final String key = body.getString("key");
+        final Object[] value = Connector.readPattern(bucketName, key, Object.class);
 
         if (value == null || value.length == 0) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
@@ -80,5 +93,12 @@ public class DbExplorerResource {
         }
 
         context.getResponse().setBody(response);
+    }
+
+    private static void sendMalformedRequest(HttpContext context) {
+        context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
+        final NewJson payload = new NewJson();
+        payload.setString("error", "Malformed request");
+        context.getResponse().setBody(payload);
     }
 }
