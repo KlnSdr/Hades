@@ -907,6 +907,11 @@ function openPopup(contentBody) {
     const background = document.createElement("div");
     background.setAttribute("X-Type", "popupBackground");
     background.classList.add("popupBackground");
+    background.onclick = (event) => {
+        if (event.target === background) {
+            closePopup(background);
+        }
+    };
 
     const popup = document.createElement("div");
     popup.classList.add("popup");

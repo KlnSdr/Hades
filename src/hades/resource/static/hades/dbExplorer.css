@@ -1,0 +1,15 @@
+.dbExplorer {
+    width: 50%;
+    margin-left: 25%;
+    text-align: left;
+}
+
+.bucket {
+    text-decoration: underline;
+    cursor: pointer;
+    color: darkred;
+}
+
+.bucketDetails h3 {
+    width: 100%;
+}
