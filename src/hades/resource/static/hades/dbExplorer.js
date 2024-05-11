@@ -56,7 +56,7 @@ function openBucket(bucketName) {
     bucketNameHeader.innerText = "Bucket: " + bucketName;
     bucketDetails.appendChild(bucketNameHeader);
 
-    const bucketKeys = document.createElement("ul");
+    const bucketKeys = document.createElement("table");
     bucketKeys.id = "bucketKeys";
     bucketDetails.appendChild(bucketKeys);
 
@@ -75,21 +75,28 @@ function loadBucketKeys(bucketName) {
     }).then(response => response.json())
         .then(data => {
             data["keys"].forEach(key => {
-                const li = document.createElement("li");
+                const tr = document.createElement("tr");
 
                 const keyLink = document.createElement("a");
                 keyLink.className = "key";
                 keyLink.innerText = key;
-                keyLink.onclick = () => openValue(bucketName, key);
 
-                li.appendChild(keyLink);
+                const tdLink = document.createElement("td");
+                tdLink.appendChild(keyLink);
+                tdLink.addEventListener("dblclick", () => openValue(bucketName, key));
+
+                tr.appendChild(tdLink);
 
                 const deleteButton = document.createElement("button");
+                deleteButton.className = "dbExplorerdeleteButton";
                 deleteButton.innerText = "X";
                 deleteButton.onclick = () => doDeleteItem(bucketName, key);
-                li.appendChild(deleteButton);
 
-                bucketKeys.appendChild(li);
+                const tdButton = document.createElement("td");
+                tdButton.appendChild(deleteButton);
+                tr.appendChild(tdButton);
+
+                bucketKeys.appendChild(tr);
             });
         });
 }
