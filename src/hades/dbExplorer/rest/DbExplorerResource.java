@@ -1,12 +1,13 @@
 package hades.dbExplorer.rest;
 
-import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Json;
 import dobby.util.json.NewJson;
+import hades.annotations.AuthorizedOnly;
+import hades.annotations.PermissionCheck;
 import thot.connector.Connector;
 
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import static hades.common.Util.convert;
 public class DbExplorerResource {
     private static final String BASE_PATH = "/dbExplorer";
 
+    @PermissionCheck
+    @AuthorizedOnly
     @Get(BASE_PATH + "/buckets")
     public void getBuckets(HttpContext context) {
         final String[] bucketNames = Connector.getBuckets();
@@ -28,6 +31,8 @@ public class DbExplorerResource {
         context.getResponse().setBody(response);
     }
 
+    @PermissionCheck
+    @AuthorizedOnly
     @Post(BASE_PATH + "/keys")
     public void getKeys(HttpContext context) {
         final NewJson body = context.getRequest().getBody();
@@ -45,6 +50,8 @@ public class DbExplorerResource {
         context.getResponse().setBody(response);
     }
 
+    @PermissionCheck
+    @AuthorizedOnly
     @Post(BASE_PATH + "/read")
     public void getValue(HttpContext context) {
         final NewJson body = context.getRequest().getBody();
@@ -96,6 +103,8 @@ public class DbExplorerResource {
         context.getResponse().setBody(response);
     }
 
+    @PermissionCheck
+    @AuthorizedOnly
     @Post(BASE_PATH + "/delete")
     public void deleteValue(HttpContext context) {
         final NewJson body = context.getRequest().getBody();

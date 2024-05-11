@@ -27,6 +27,8 @@ public class PermissionCheckService {
     }
 
     public String getMatching(String route) {
+        route = route.toLowerCase();
+
         if (permissionCheckRoutes.contains(route)) {
             return route;
         }

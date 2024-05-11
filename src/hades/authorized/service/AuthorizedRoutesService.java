@@ -28,6 +28,8 @@ public class AuthorizedRoutesService {
     }
 
     public String getMatching(String route) {
+        route = route.toLowerCase();
+
         if (authorizedRoutes.contains(route)) {
             return route;
         }
