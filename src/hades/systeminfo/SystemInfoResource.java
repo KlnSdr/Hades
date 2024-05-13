@@ -7,6 +7,8 @@ import dobby.util.Config;
 import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
 import hades.Hades;
+import hades.annotations.AuthorizedOnly;
+import hades.annotations.PermissionCheck;
 
 import java.lang.reflect.Field;
 
@@ -14,6 +16,8 @@ public class SystemInfoResource {
     private static final String BASE_PATH = "/systeminfo";
     private static final Logger LOGGER = new Logger(SystemInfoResource.class);
 
+    @AuthorizedOnly
+    @PermissionCheck
     @Get(BASE_PATH)
     public void getSystemInfo(HttpContext context) {
         final NewJson response = new NewJson();
