@@ -31,6 +31,11 @@ public class SystemInfoResource {
         response.setString("app_name", Config.getInstance().getString("application.name", "<APP_NAME>"));
         response.setString("app_version", Config.getInstance().getString("application.version", "<APP_VERSION>"));
         response.setString("app_context", Config.getInstance().getString("hades.context", "/"));
+        response.setString("heap_max", formatSize(Runtime.getRuntime().maxMemory()));
+        response.setString("heap_total", formatSize(Runtime.getRuntime().totalMemory()));
+        response.setString("heap_free", formatSize(Runtime.getRuntime().freeMemory()));
+        response.setString("heap_used", formatSize(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+        response.setString("cpu_cores", String.valueOf(Runtime.getRuntime().availableProcessors()));
 
         context.getResponse().setBody(response);
     }
@@ -45,5 +50,11 @@ public class SystemInfoResource {
             LOGGER.trace(e);
             return "";
         }
+    }
+
+    private static String formatSize(long v) {
+        if (v < 1024) return v + " B";
+        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
+        return String.format("%.1f %sB", (double)v / (1L << (z*10)), " KMGTPE".charAt(z));
     }
 }
