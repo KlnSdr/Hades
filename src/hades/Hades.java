@@ -14,6 +14,10 @@ public class Hades implements DobbyEntryPoint {
     private static final String version = "v0.0.3";
     private static final Logger LOGGER = new Logger(Hades.class);
 
+    public static String getVersion() {
+        return version;
+    }
+
     public static void main(String[] args) {
         new Hades().startApplication(Hades.class);
     }
