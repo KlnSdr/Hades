@@ -1,11 +1,15 @@
 package hades.filter.pre;
 
+import dobby.files.StaticFile;
+import dobby.files.service.StaticFileService;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.Config;
+import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
+import hades.template.TemplateEngine;
 
 public class ContextPreFilter implements Filter {
     @Override
@@ -34,7 +38,15 @@ public class ContextPreFilter implements Filter {
         appContext = appContext.toLowerCase();
 
         if (!path.toLowerCase().startsWith(appContext)) {
+            final NewJson data = new NewJson();
+            data.setString("INVALIDCONTEXT", getContextFromPath(path.toLowerCase()));
             httpContext.getResponse().setCode(ResponseCodes.NOT_FOUND);
+
+            final StaticFile contextNotFoundFile = StaticFileService.getInstance().get("/error/ContextNotFound.html");
+            if (contextNotFoundFile != null) {
+                httpContext.getResponse().setBody(TemplateEngine.render(contextNotFoundFile, data).getContent());
+                httpContext.getResponse().setHeader("Content-Type", contextNotFoundFile.getContentType());
+            }
             return false;
         }
 
@@ -47,5 +59,13 @@ public class ContextPreFilter implements Filter {
 
         httpContext.getRequest().setPath(newPath);
         return true;
+    }
+
+    private String getContextFromPath(String path) {
+        final String[] splitPath = path.split("/");
+        if (splitPath.length < 2) {
+            return "/";
+        }
+        return "/" + splitPath[1];
     }
 }
