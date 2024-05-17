@@ -192,3 +192,8 @@ table {
     text-align: justify;
     margin: auto;
 }
+
+#bttnShowConfig {
+    float: left;
+    margin-left: 25%;
+}

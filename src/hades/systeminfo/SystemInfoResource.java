@@ -3,6 +3,7 @@ package hades.systeminfo;
 import dobby.Dobby;
 import dobby.annotations.Get;
 import dobby.io.HttpContext;
+import dobby.io.response.ResponseCodes;
 import dobby.util.Config;
 import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
@@ -13,12 +14,11 @@ import hades.annotations.PermissionCheck;
 import java.lang.reflect.Field;
 
 public class SystemInfoResource {
-    private static final String BASE_PATH = "/systeminfo";
     private static final Logger LOGGER = new Logger(SystemInfoResource.class);
 
     @AuthorizedOnly
     @PermissionCheck
-    @Get(BASE_PATH)
+    @Get("/systeminfo")
     public void getSystemInfo(HttpContext context) {
         final NewJson response = new NewJson();
         response.setString("os", System.getProperty("os.name"));
@@ -49,6 +49,34 @@ public class SystemInfoResource {
             LOGGER.error("Failed to get Dobby version.");
             LOGGER.trace(e);
             return "";
+        }
+    }
+
+    @Get("/configFile")
+    public void getConfigContent(HttpContext context) {
+        final NewJson configContent = getConfigFileAsJson();
+
+        if (configContent == null) {
+            final NewJson response = new NewJson();
+            response.setString("msg", "Could not get config file.");
+
+            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
+            context.getResponse().setBody(response);
+            return;
+        }
+
+        context.getResponse().setBody(configContent.toString().replaceAll("\\\\", "\\\\\\\\"));
+    }
+
+    private static NewJson getConfigFileAsJson() {
+        try {
+            final Field configContent = Config.class.getDeclaredField("configJson");
+            configContent.setAccessible(true);
+            return (NewJson) configContent.get(Config.getInstance());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOGGER.error("Config File Content");
+            LOGGER.trace(e);
+            return null;
         }
     }
 
