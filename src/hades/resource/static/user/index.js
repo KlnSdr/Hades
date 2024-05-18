@@ -47,3 +47,30 @@ function updatePassword() {
         }
     });
 }
+
+function copyToken() {
+    navigator.clipboard.writeText(document.getElementById("inputLoginToken").value).then(r => {
+        document.getElementById("bttnCopyToken").classList.add("pulseGreen");
+        setTimeout(() => {
+            document.getElementById("bttnCopyToken").classList.remove("pulseGreen");
+        }, 750);
+    }).catch(e => {
+        alert("Error: Could not copy token to clipboard");
+    });
+}
+
+function regenToken() {
+    document.getElementById("bttnRegenToken").innerText = "generating...";
+    fetch(`{{CONTEXT}}/rest/users/id/${userId}/update/token`, {
+        method: 'PUT',
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert('Error regenerating token');
+        }
+    }).then(resJson => {
+        document.getElementById("inputLoginToken").value = resJson["token"];
+        document.getElementById("bttnRegenToken").innerText = "regenerate";
+    });
+}

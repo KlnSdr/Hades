@@ -1,5 +1,6 @@
 package hades.common;
 
+import dobby.io.request.Request;
 import dobby.util.Json;
 import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
@@ -72,5 +73,9 @@ public class Util {
         }
 
         return newJson;
+    }
+
+    public static boolean requestHasHeader(Request request, String headerName) {
+        return request.getHeaderKeys().contains(headerName.toLowerCase());
     }
 }

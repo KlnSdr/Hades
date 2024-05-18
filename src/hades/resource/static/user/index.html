@@ -41,6 +41,12 @@
 </nav>
 <h1>{{USERNAME}}</h1>
 <p>{{USERID}}</p>
+<div style="text-align: center">
+    <label for="inputLoginToken">Login-Token:</label>
+    <input type="text" name="" id="inputLoginToken" disabled style="width: 25%" value="{{LOGINTOKEN}}">
+    <button id="bttnCopyToken" onclick="copyToken()">copy</button>
+    <button id="bttnRegenToken" onclick="regenToken()">regenerate</button>
+</div>
 <table>
     <tr>
         <td>

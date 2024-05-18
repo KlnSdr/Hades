@@ -10,6 +10,7 @@ import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
 import hades.template.TemplateEngine;
 import hades.user.User;
+import hades.user.service.TokenLoginService;
 import hades.user.service.UserService;
 
 import java.util.UUID;
@@ -73,6 +74,7 @@ public class UserInfoPagePostFilter implements Filter {
         userInfo.setString("USERID", userId);
         userInfo.setString("USERNAME", user.getDisplayName());
         userInfo.setString("EMAIL", user.getMail());
+        userInfo.setString("LOGINTOKEN", TokenLoginService.getInstance().findTokenForUser(user));
 
         return userInfo;
     }

@@ -9,7 +9,6 @@ import dobby.io.request.Request;
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
-import dobby.session.service.SessionService;
 import dobby.util.Config;
 import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
@@ -17,8 +16,10 @@ import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.authorized.Group;
 import hades.authorized.service.GroupService;
+import hades.common.ErrorResponses;
 import hades.common.Security;
 import hades.user.User;
+import hades.user.service.TokenLoginService;
 import hades.user.service.UserService;
 
 import java.util.Arrays;
@@ -91,7 +92,8 @@ public class UserResource {
             return;
         }
 
-        logUserIn(user, context);
+        UserService.getInstance().logUserIn(user, context);
+        TokenLoginService.getInstance().setTokenForUser(user, TokenLoginService.getInstance().generateTokenForUser());
 
         response.setCode(ResponseCodes.CREATED);
         final NewJson resPayload = new NewJson();
@@ -133,7 +135,7 @@ public class UserResource {
             return;
         }
 
-        logUserIn(user, context);
+        UserService.getInstance().logUserIn(user, context);
 
         final NewJson resPayload = new NewJson();
         resPayload.setJson("user", user.toJson());
@@ -156,12 +158,6 @@ public class UserResource {
         }
 
         context.getResponse().setBody(resPayload);
-    }
-
-    private void logUserIn(User user, HttpContext context) {
-        final Session session = SessionService.getInstance().newSession();
-        session.set("userId", user.getId().toString());
-        context.setSession(session);
     }
 
     @AuthorizedOnly
@@ -293,6 +289,44 @@ public class UserResource {
         }
 
         context.getResponse().setBody(user.toJson());
+    }
+
+    @AuthorizedOnly
+    @Put(ROUTE_PREFIX + "/id/{id}/update/token")
+    public void regenerateToken(HttpContext context) {
+        final String idString = context.getRequest().getParam("id");
+        final UUID id = uuidFromString(idString, context);
+
+        if (id == null || !idString.equalsIgnoreCase(context.getSession().get("userId"))) {
+            return;
+        }
+
+        final User user = UserService.getInstance().find(id);
+
+        if (user == null) {
+            UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
+            return;
+        }
+
+        final String newToken = TokenLoginService.getInstance().generateTokenForUser();
+        final String oldToken = TokenLoginService.getInstance().findTokenForUser(user);
+
+        if (!oldToken.isEmpty()) {
+            if (!TokenLoginService.getInstance().delete(oldToken)) {
+                ErrorResponses.internalError(context.getResponse(), "Could not delete old token");
+                return;
+            }
+        }
+
+        final boolean didSave = TokenLoginService.getInstance().setTokenForUser(user, newToken);
+        if (!didSave) {
+            ErrorResponses.internalError(context.getResponse(), "Could not save new token");
+            return;
+        }
+
+        final NewJson response = new NewJson();
+        response.setString("token", newToken);
+        context.getResponse().setBody(response);
     }
 
     @AuthorizedOnly

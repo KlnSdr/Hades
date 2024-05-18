@@ -1,6 +1,8 @@
 package hades.user.service;
 
+import dobby.io.HttpContext;
 import dobby.session.Session;
+import dobby.session.service.SessionService;
 import dobby.util.json.NewJson;
 import hades.user.LoginAttempt;
 import hades.user.User;
@@ -105,5 +107,11 @@ public class UserService {
         }
 
         return find(userId) != null;
+    }
+
+    public void logUserIn(User user, HttpContext context) {
+        final Session session = SessionService.getInstance().newSession();
+        session.set("userId", user.getId().toString());
+        context.setSession(session);
     }
 }
