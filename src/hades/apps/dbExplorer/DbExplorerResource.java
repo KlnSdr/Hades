@@ -1,4 +1,4 @@
-package hades.dbExplorer.rest;
+package hades.apps.dbExplorer;
 
 import dobby.annotations.Get;
 import dobby.annotations.Post;

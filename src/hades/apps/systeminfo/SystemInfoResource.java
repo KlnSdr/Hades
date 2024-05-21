@@ -1,4 +1,4 @@
-package hades.systeminfo;
+package hades.apps.systeminfo;
 
 import dobby.Dobby;
 import dobby.annotations.Get;
