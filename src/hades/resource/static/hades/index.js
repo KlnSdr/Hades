@@ -25,19 +25,20 @@ function displayLandingPage() {
 
     const divActions = document.createElement("div");
 
-    const imgUser = document.createElement("img");
-    imgUser.classList.add("actionIcon");
-    imgUser.src = "{{CONTEXT}}/hades/img/icon_user.png";
-    imgUser.alt = "User";
-    imgUser.onclick = () => openUsersTab();
-    divActions.appendChild(imgUser);
+    const menuActionsImages = [
+        { image:"icon_user.png", alt: "Users", click: () => openUsersTab() },
+        { image:"icon_group.png", alt: "Groups", click: () => openGroupsTab() },
+        { image:"icon_dbExplorer.png", alt: "Database Explorer", click: () => openDBExplorer() }
+    ];
 
-    const imgGroup = document.createElement("img");
-    imgGroup.classList.add("actionIcon");
-    imgGroup.src = "{{CONTEXT}}/hades/img/icon_group.png";
-    imgGroup.alt = "Group";
-    imgGroup.onclick = () => openGroupsTab();
-    divActions.appendChild(imgGroup);
+    menuActionsImages.forEach(action => {
+        const img = document.createElement("img");
+        img.classList.add("actionIcon");
+        img.src = "{{CONTEXT}}/hades/img/" + action.image;
+        img.alt = action.alt;
+        img.onclick = action.click;
+        divActions.appendChild(img);
+    });
 
     div.appendChild(divActions);
 
