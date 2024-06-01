@@ -28,7 +28,8 @@ function displayLandingPage() {
     const menuActionsImages = [
         { image:"icon_user.png", alt: "Users", click: () => openUsersTab() },
         { image:"icon_group.png", alt: "Groups", click: () => openGroupsTab() },
-        { image:"icon_dbExplorer.png", alt: "Database Explorer", click: () => openDBExplorer() }
+        { image:"icon_dbExplorer.png", alt: "Database Explorer", click: () => openDBExplorer() },
+        { image:"icon_sysinfo.png", alt: "System Information", click: () => openSystemInfo() }
     ];
 
     menuActionsImages.forEach(action => {
