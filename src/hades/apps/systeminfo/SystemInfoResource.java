@@ -52,6 +52,8 @@ public class SystemInfoResource {
         }
     }
 
+    @AuthorizedOnly
+    @PermissionCheck
     @Get("/configFile")
     public void getConfigContent(HttpContext context) {
         final NewJson configContent = getConfigFileAsJson();
