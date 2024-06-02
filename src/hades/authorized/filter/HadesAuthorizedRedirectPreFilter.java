@@ -10,7 +10,20 @@ import dobby.util.Config;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class HadesAuthorizedRedirectPreFilter implements Filter {
+    private static final ArrayList<String> redirectPaths = new ArrayList<>(Arrays.asList("/hades", "/hades/", "/hades/index.html"));
+
+    public static void addRedirectPath(String path) {
+        redirectPaths.add(path);
+    }
+
+    public static void removeRedirectPath(String path) {
+        redirectPaths.remove(path);
+    }
+
     @Override
     public String getName() {
         return "authorized-redirect-pre-filter";
@@ -28,17 +41,17 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
 
     @Override
     public boolean run(HttpContext httpContext) {
-        final String path = httpContext.getRequest().getPath();
+        final String path = httpContext.getRequest().getPath().toLowerCase();
         final Session session = httpContext.getSession();
 
         if (UserService.getInstance().isLoggedIn(session)) {
             return true;
         }
 
-        if (path.equalsIgnoreCase("/hades") || path.equalsIgnoreCase("/hades/") || path.equalsIgnoreCase("/hades/index.html")) {
+        if (redirectPaths.contains(path)) {
             final Response response = httpContext.getResponse();
 
-            response.setHeader("location", Config.getInstance().getString("hades.context", "") + "/hades/login/");
+            response.setHeader("location", Config.getInstance().getString("hades.context", "") + Config.getInstance().getString("hades.unauthorizedRedirectTarget", "/hades/login/"));
             response.setCode(ResponseCodes.FOUND);
 
             return false;

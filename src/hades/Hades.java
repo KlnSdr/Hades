@@ -2,16 +2,20 @@ package hades;
 
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
+import dobby.util.Config;
 import dobby.util.StaticContentDir;
 import dobby.util.logging.Logger;
 import hades.annotations.DisablePermissionCheck;
 import hades.authorized.HadesAnnotationDiscoverer;
+import hades.authorized.filter.HadesAuthorizedRedirectPreFilter;
 import hades.authorized.service.PermissionService;
 import hades.update.service.UpdateService;
 import thot.connector.Connector;
 
+import java.util.List;
+
 public class Hades implements DobbyEntryPoint {
-    private static final String version = "v0.0.4";
+    private static final String version = "v0.5";
     private static final Logger LOGGER = new Logger(Hades.class);
 
     public static String getVersion() {
@@ -46,6 +50,7 @@ public class Hades implements DobbyEntryPoint {
 
         ensureThotIsRunning();
         registerStaticContentRoot();
+        addUnAuthorizedRedirectPaths();
 
         if (Dobby.getMainClass().isAnnotationPresent(DisablePermissionCheck.class)) {
             PermissionService.getInstance().setEnabled(false);
@@ -57,6 +62,14 @@ public class Hades implements DobbyEntryPoint {
 
         LOGGER.info("discovering protected routes...");
         HadesAnnotationDiscoverer.discoverRoutes("");
+    }
+
+    private void addUnAuthorizedRedirectPaths() {
+        final List<Object> redirectPaths = Config.getInstance().getList("hades.unauthorizedRedirectPaths", List.of());
+
+        for (Object path : redirectPaths) {
+            HadesAuthorizedRedirectPreFilter.addRedirectPath(path.toString());
+        }
     }
 
     private void registerStaticContentRoot() {
