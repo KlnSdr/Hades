@@ -136,6 +136,7 @@ public class UserResource {
         }
 
         UserService.getInstance().logUserIn(user, context);
+        UserService.getInstance().resetLoginAttempts(user.getId());
 
         final NewJson resPayload = new NewJson();
         resPayload.setJson("user", user.toJson());

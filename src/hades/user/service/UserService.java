@@ -91,6 +91,10 @@ public class UserService {
         return loginAttempt != null && loginAttempt.isLocked();
     }
 
+    public void resetLoginAttempts(UUID userId) {
+        Connector.delete(LIMIT_LOGIN_BUCKET, userId.toString());
+    }
+
     public boolean isLoggedIn(Session session) {
         final String sessionUserId = session.get("userId");
 
