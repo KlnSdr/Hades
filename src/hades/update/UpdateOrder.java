@@ -13,7 +13,8 @@ public enum UpdateOrder {
     SYSTEM_INFO_PERMISSION(9),
     TOKEN_LOGIN_BUCKET(10),
     ADD_ADMIN_LOGIN_TOKEN(11),
-    ADD_CONFIG_FILE_PERMISSION(12)
+    ADD_CONFIG_FILE_PERMISSION(12),
+    MESSAGES_UPDATE(13)
     ;
 
     private final int i;

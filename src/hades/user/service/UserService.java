@@ -118,4 +118,11 @@ public class UserService {
         session.set("userId", user.getId().toString());
         context.setSession(session);
     }
+
+    public User getSystemUser() {
+        final User system = new User();
+        system.setMail("system@system");
+        system.setDisplayName("System");
+        return system;
+    }
 }

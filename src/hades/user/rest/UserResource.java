@@ -426,7 +426,7 @@ public class UserResource {
         context.getResponse().setBody(user.toJson());
     }
 
-    private UUID uuidFromString(String idString, HttpContext context) {
+    public static UUID uuidFromString(String idString, HttpContext context) {
         try {
             return UUID.fromString(idString);
         } catch (IllegalArgumentException e) {
