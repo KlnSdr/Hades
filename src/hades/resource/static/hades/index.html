@@ -8,14 +8,16 @@
     <title>Hades</title>
     <link rel="stylesheet" href="{{CONTEXT}}/hades/style.css">
     <link rel="stylesheet" href="{{CONTEXT}}/hades/dbExplorer.css">
+    <link rel="stylesheet" href="{{CONTEXT}}/hades/messages.css">
     <script src="{{CONTEXT}}/hades/index.js"></script>
     <script src="{{CONTEXT}}/hades/dbExplorer.js"></script>
     <script src="{{CONTEXT}}/hades/systemInfoPage.js"></script>
+    <script src="{{CONTEXT}}/hades/messages.js"></script>
     <script src="{{CONTEXT}}/hades/logout.js"></script>
     <link rel="icon" type="image/png" href="{{CONTEXT}}/hades/img/logo_Hades.png" />
     <link rel="apple-touch-icon" href="{{CONTEXT}}/hades/img/logo_Hades.png" type="image/png" />
 </head>
-<body onload="startup()">
+<body onload="startup(); loadMessages()">
 <nav>
     <h1><a id="headline" href="javascript:void(0);" onclick="displayLandingPage()">Hades</a></h1>
     <div class="navButtons">
@@ -25,6 +27,7 @@
         <button onclick="openSystemInfo()">System Info</button>
     </div>
     <div class="navbarRight">
+        <button id="bttnMessages">Nachrichten: 0</button>
         <label id="lblCurrentUser" onclick="window.location.assign('{{CONTEXT}}/me')">(...)</label>
         <button onclick="doLogout()">logout</button>
     </div>
