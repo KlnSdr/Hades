@@ -29,6 +29,9 @@ public class UserService {
     }
 
     public User find(UUID id) {
+        if (id.toString().equals("00000000-0000-0000-0000-000000000000")) {
+            return getSystemUser();
+        }
         return Janus.parse(Connector.read(USER_BUCKET, id.toString(), NewJson.class), User.class);
     }
 
@@ -119,10 +122,22 @@ public class UserService {
         context.setSession(session);
     }
 
+    public User getAdminUser() {
+        final User[] admins = findByName("admin");
+
+        if (admins.length == 0) {
+            return null;
+        }
+        return admins[0];
+    }
+
     public User getSystemUser() {
-        final User system = new User();
-        system.setMail("system@system");
-        system.setDisplayName("System");
-        return system;
+        final NewJson systemUserJson = new NewJson();
+        systemUserJson.setString("id", "00000000-0000-0000-0000-000000000000");
+        systemUserJson.setString("displayName", "System");
+        systemUserJson.setString("mail", "system@system");
+        systemUserJson.setString("password", "");
+
+        return Janus.parse(systemUserJson, User.class);
     }
 }

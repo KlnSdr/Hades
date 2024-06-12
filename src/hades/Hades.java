@@ -9,9 +9,15 @@ import hades.annotations.DisablePermissionCheck;
 import hades.authorized.HadesAnnotationDiscoverer;
 import hades.authorized.filter.HadesAuthorizedRedirectPreFilter;
 import hades.authorized.service.PermissionService;
+import hades.messaging.Message;
+import hades.messaging.service.MessageService;
 import hades.update.service.UpdateService;
+import hades.user.User;
+import hades.user.service.UserService;
 import thot.connector.Connector;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class Hades implements DobbyEntryPoint {
@@ -78,6 +84,20 @@ public class Hades implements DobbyEntryPoint {
 
     @Override
     public void postStart() {
+        sendWelcomeMessage();
+    }
 
+    private void sendWelcomeMessage() {
+        final MessageService messageService = MessageService.getInstance();
+        final User admin = UserService.getInstance().getAdminUser();
+        final String content = "Hades " + version + " started on the " + LocalDate.now() + " at " + LocalTime.now();
+
+        if (admin == null) {
+            LOGGER.error("Admin user not found. Cannot send startup message.");
+            return;
+        }
+
+        final Message message = messageService.newSystemMessage(admin.getId(), content);
+        messageService.update(message);
     }
 }

@@ -2,6 +2,7 @@ package hades.messaging.service;
 
 import dobby.util.json.NewJson;
 import hades.messaging.Message;
+import hades.user.service.UserService;
 import janus.Janus;
 import thot.connector.Connector;
 
@@ -73,7 +74,7 @@ public class MessageService {
     public Message newSystemMessage(UUID to, String message) {
         final Message newMessage = new Message();
         newMessage.setTo(to);
-        newMessage.setFrom(null);
+        newMessage.setFrom(UserService.getInstance().getSystemUser().getId());
         newMessage.setMessage(message);
         return newMessage;
     }
