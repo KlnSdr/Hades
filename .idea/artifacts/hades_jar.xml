@@ -2,8 +2,11 @@
   <artifact type="jar" build-on-make="true" name="hades:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/hades_jar</output-path>
     <root id="archive" name="hades.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
       <element id="module-output" name="hades" />
-      <element id="extracted-dir" path="$USER_HOME$/dev/customJars/thot/v0.1.6/thot.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../thot/out/artifacts/thot_jar/thot.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

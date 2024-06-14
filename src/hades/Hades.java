@@ -2,6 +2,7 @@ package hades;
 
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
+import dobby.files.service.StaticFileService;
 import dobby.util.Config;
 import dobby.util.StaticContentDir;
 import dobby.util.logging.Logger;
@@ -9,6 +10,7 @@ import hades.annotations.DisablePermissionCheck;
 import hades.authorized.HadesAnnotationDiscoverer;
 import hades.authorized.filter.HadesAuthorizedRedirectPreFilter;
 import hades.authorized.service.PermissionService;
+import hades.filter.post.ReplaceContextInFilesObserver;
 import hades.messaging.Message;
 import hades.messaging.service.MessageService;
 import hades.update.service.UpdateService;
@@ -57,6 +59,7 @@ public class Hades implements DobbyEntryPoint {
         ensureThotIsRunning();
         registerStaticContentRoot();
         addUnAuthorizedRedirectPaths();
+        addObservers();
 
         if (Dobby.getMainClass().isAnnotationPresent(DisablePermissionCheck.class)) {
             PermissionService.getInstance().setEnabled(false);
@@ -76,6 +79,11 @@ public class Hades implements DobbyEntryPoint {
         for (Object path : redirectPaths) {
             HadesAuthorizedRedirectPreFilter.addRedirectPath(path.toString());
         }
+    }
+
+    private void addObservers() {
+        LOGGER.info("registering observers...");
+        StaticFileService.getInstance().addObserver(new ReplaceContextInFilesObserver());
     }
 
     private void registerStaticContentRoot() {
