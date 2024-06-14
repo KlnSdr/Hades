@@ -41,15 +41,7 @@ public class SystemInfoResource {
     }
 
     private static String getDobbyVersion() {
-        try {
-            final Field versionField = Dobby.class.getDeclaredField("version");
-            versionField.setAccessible(true);
-            return (String) versionField.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.error("Failed to get Dobby version.");
-            LOGGER.trace(e);
-            return "";
-        }
+        return Dobby.getVersion();
     }
 
     @AuthorizedOnly
