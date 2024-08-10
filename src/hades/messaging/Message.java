@@ -8,7 +8,7 @@ import janus.DataClass;
 import janus.annotations.JanusBoolean;
 import janus.annotations.JanusString;
 import janus.annotations.JanusUUID;
-import thot.annotations.Bucket;
+import thot.annotations.v2.Bucket;
 
 import java.util.UUID;
 

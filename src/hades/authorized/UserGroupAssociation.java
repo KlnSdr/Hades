@@ -4,7 +4,7 @@ import dobby.util.json.NewJson;
 import hades.authorized.service.GroupService;
 import janus.DataClass;
 import janus.annotations.JanusString;
-import thot.annotations.Bucket;
+import thot.annotations.v2.Bucket;
 
 @Bucket(GroupService.USER_GROUP_ASSOCIATION_BUCKET)
 public class UserGroupAssociation implements DataClass {

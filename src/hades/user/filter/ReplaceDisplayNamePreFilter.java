@@ -32,11 +32,23 @@ public class ReplaceDisplayNamePreFilter implements Filter {
         final String route = httpContext.getRequest().getPath();
         final RequestTypes requestType = httpContext.getRequest().getType();
 
-        if (!route.startsWith("/rest/users") || (requestType != RequestTypes.GET && requestType != RequestTypes.DELETE)) {
+        final String routePrefix;
+
+        if (route.startsWith("/rest/users")) {
+            if (requestType != RequestTypes.GET && requestType != RequestTypes.DELETE) {
+                return true;
+            }
+            routePrefix = "/rest/users";
+        } else if (route.startsWith("/rest/messages/send")) {
+            if (requestType != RequestTypes.POST) {
+                return true;
+            }
+            routePrefix = "/rest/messages/send";
+        } else {
             return true;
         }
 
-        final String[] parts = route.split("/rest/users");
+        final String[] parts = route.split(routePrefix);
         if (parts.length != 2) {
             return true;
         }
@@ -51,7 +63,7 @@ public class ReplaceDisplayNamePreFilter implements Filter {
             return true;
         }
 
-        httpContext.getRequest().setPath("/rest/users/" + user[0].getId().toString());
+        httpContext.getRequest().setPath(routePrefix + "/" + user[0].getId().toString());
         return true;
     }
 }
