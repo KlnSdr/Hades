@@ -20,7 +20,7 @@ public class CreateUserDTO {
     }
 
     public static CreateUserDTO fromRequest(Request request) {
-        final String displayName = request.getBody().getString("displayName");
+        final String displayName = request.getBody().getString("displayName").toLowerCase();
         final String mail = request.getBody().getString("mail");
         final String password = request.getBody().getString("password");
         final String passwordRepeat = request.getBody().getString("passwordRepeat");
