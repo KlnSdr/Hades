@@ -14,6 +14,16 @@ public class SetUserDefinedAdminPassword implements Update {
     private static final Logger LOGGER = new Logger(SetUserDefinedAdminPassword.class);
 
     @Override
+    public boolean run(String[] args) {
+        if (args.length != 1) {
+            LOGGER.error("Invalid number of arguments");
+            return false;
+        }
+
+        return runUpdate(args[0]);
+    }
+
+    @Override
     public boolean run() {
         final char[] password = System.console().readPassword("Admin password:");
         final char[] confirmPassword = System.console().readPassword("Confirm admin password:");
@@ -23,6 +33,10 @@ public class SetUserDefinedAdminPassword implements Update {
             return false;
         }
 
+        return runUpdate(new String(password));
+    }
+
+    private boolean runUpdate(String password) {
         final User[] adminRead = UserService.getInstance().findByName("admin");
 
         if (adminRead.length == 0) {

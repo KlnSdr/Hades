@@ -14,7 +14,8 @@ public enum UpdateOrder {
     TOKEN_LOGIN_BUCKET(10),
     ADD_ADMIN_LOGIN_TOKEN(11),
     ADD_CONFIG_FILE_PERMISSION(12),
-    MESSAGES_UPDATE(13)
+    MESSAGES_UPDATE(13),
+    HADES_INSTALLED(14)
     ;
 
     private final int i;

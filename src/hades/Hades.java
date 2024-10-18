@@ -66,8 +66,12 @@ public class Hades implements DobbyEntryPoint {
             LOGGER.info("Permission check is disabled.");
         }
 
-        LOGGER.info("running updates...");
-        UpdateService.getInstance().runUpdates();
+        if (UpdateService.getInstance().isInstalled()) {
+            LOGGER.info("running updates...");
+            if (!UpdateService.getInstance().runUpdates()) {
+                System.exit(1);
+            }
+        }
 
         LOGGER.info("discovering protected routes...");
         HadesAnnotationDiscoverer.discoverRoutes("");
@@ -92,7 +96,12 @@ public class Hades implements DobbyEntryPoint {
 
     @Override
     public void postStart() {
-        sendWelcomeMessage();
+        if (UpdateService.getInstance().isInstalled()) {
+            sendWelcomeMessage();
+        } else {
+            LOGGER.error("Hades is not installed. Please run the installer:");
+            LOGGER.error("access the installer at: http://localhost:" + Config.getInstance().getInt("dobby.port", 3000) + "/hades/installer");
+        }
     }
 
     private void sendWelcomeMessage() {
