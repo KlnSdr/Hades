@@ -4,24 +4,34 @@ function openPanelAdminPassword() {
     const container = document.getElementById('centerContainer');
     container.innerHTML = "";
 
+    const header = document.createElement('h1');
+    header.innerText = 'Set Admin Password';
+    container.appendChild(header);
+
+    const containerInputs = document.createElement('div');
+    containerInputs.style.display = 'flex';
+    containerInputs.style.flexDirection = 'column';
+
     const labelPassword = document.createElement('label');
     labelPassword.innerText = 'Password:';
-    container.appendChild(labelPassword);
+    containerInputs.appendChild(labelPassword);
 
     const inputPassword = document.createElement('input');
     inputPassword.type = 'password';
-    container.appendChild(inputPassword);
+    containerInputs.appendChild(inputPassword);
 
     const br = document.createElement('br');
-    container.appendChild(br);
+    containerInputs.appendChild(br);
 
     const labelConfirmPassword = document.createElement('label');
     labelConfirmPassword.innerText = 'Confirm Password:';
-    container.appendChild(labelConfirmPassword);
+    containerInputs.appendChild(labelConfirmPassword);
 
     const inputConfirmPassword = document.createElement('input');
     inputConfirmPassword.type = 'password';
-    container.appendChild(inputConfirmPassword);
+    containerInputs.appendChild(inputConfirmPassword);
+
+    container.appendChild(containerInputs);
 
     const br2 = document.createElement('br');
     container.appendChild(br2);
