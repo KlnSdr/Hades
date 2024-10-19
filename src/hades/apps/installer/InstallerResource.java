@@ -13,6 +13,7 @@ public class InstallerResource {
     @Post(BASE_PATH + "/run")
     public void runInstallationProcedure(HttpContext context) {
         if (updateService.isInstalled()) {
+            context.getResponse().setCode(ResponseCodes.CONFLICT);
             context.getResponse().setBody("Hades is already installed.");
             return;
         }
