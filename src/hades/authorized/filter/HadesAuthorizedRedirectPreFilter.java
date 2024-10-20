@@ -12,6 +12,7 @@ import hades.user.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class HadesAuthorizedRedirectPreFilter implements Filter {
     private static final ArrayList<String> redirectPaths = new ArrayList<>(Arrays.asList("/hades", "/hades/", "/hades/index.html"));
@@ -50,8 +51,14 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
 
         if (redirectPaths.contains(path)) {
             final Response response = httpContext.getResponse();
+            final String context = Config.getInstance().getString("hades.context", "");
+            String targetPath = Config.getInstance().getString("hades.unauthorizedRedirectTarget", "/hades/login");
 
-            response.setHeader("location", Config.getInstance().getString("hades.context", "") + Config.getInstance().getString("hades.unauthorizedRedirectTarget", "/hades/login/"));
+            if (targetPath.equals("/hades/login")) {
+                targetPath += "?src=" + Base64.getEncoder().encodeToString((context + path).getBytes());
+            }
+
+            response.setHeader("location", context + targetPath);
             response.setCode(ResponseCodes.FOUND);
 
             return false;
