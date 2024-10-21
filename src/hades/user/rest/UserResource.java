@@ -161,7 +161,6 @@ public class UserResource {
         context.getResponse().setBody(resPayload);
     }
 
-    @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/logout")
     public void doLogout(HttpContext context) {
         final Session session = context.getSession();
