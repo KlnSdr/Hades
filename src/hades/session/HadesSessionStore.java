@@ -1,9 +1,7 @@
 package hades.session;
 
-import dobby.session.DefaultSessionStore;
 import dobby.session.ISessionStore;
 import dobby.session.Session;
-import dobby.session.service.SessionService;
 import dobby.util.logging.Logger;
 import thot.connector.Connector;
 
@@ -14,15 +12,6 @@ import java.util.Optional;
 public class HadesSessionStore implements ISessionStore {
     private static final Logger LOGGER = new Logger(HadesSessionStore.class);
     private static final String BUCKET_NAME = "dobbySession";
-
-    public HadesSessionStore() {
-        final boolean didCreate = Connector.create("dobbySession", 100, true);
-
-        if (!didCreate) {
-            LOGGER.warn("Could not create volatile bucket for session information. Defaulting to in memory implementation provided by dobby.");
-            SessionService.getInstance().setSessionStore(new DefaultSessionStore());
-        }
-    }
 
     @Override
     public Optional<Session> find(String sessionId) {
