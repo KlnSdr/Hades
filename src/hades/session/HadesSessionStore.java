@@ -35,7 +35,7 @@ public class HadesSessionStore implements ISessionStore {
 
     @Override
     public void update(Session session) {
-        Connector.write(BUCKET_NAME, session.getId(), session);
+        Connector.writeCreateVolatile(BUCKET_NAME, session.getId(), session);
     }
 
     @Override
