@@ -105,6 +105,10 @@ public class Hades implements DobbyEntryPoint {
     }
 
     private void sendWelcomeMessage() {
+        if (Config.getInstance().getBoolean("hades.disableWelcomeMessage", false)) {
+            return;
+        }
+
         final MessageService messageService = MessageService.getInstance();
         final User admin = UserService.getInstance().getAdminUser();
         final String content = "Hades " + version + " started on the " + LocalDate.now() + " at " + LocalTime.now();
