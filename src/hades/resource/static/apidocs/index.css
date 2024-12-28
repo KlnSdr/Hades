@@ -1,0 +1,15 @@
+.getRoute {
+    background-color: green;
+}
+
+.postRoute {
+    background-color: blue;
+}
+
+.putRoute {
+    background-color: yellow;
+}
+
+.deleteRoute {
+    background-color: red;
+}

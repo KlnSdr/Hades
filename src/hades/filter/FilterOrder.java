@@ -10,6 +10,7 @@ public enum FilterOrder {
     BLOCK_STATIC_FILES_PRE_FILTER(13),
     REPLACE_DISPLAY_NAME_PRE_FILTER(14),
     REDIRECT_ME_TO_USER_PAGE_PRE_FILTER(15),
+    BUILD_API_DOCS_PRE_FILTER(16),
     // ============================================
     TOKEN_LOGIN_POST_FILTER(8),
     USER_INFO_PAGE_POST_FILTER(9),
