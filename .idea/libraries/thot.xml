@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="thot">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../thot/out/artifacts/thot_jar/thot.jar!/" />
+      <root url="jar://$USER_HOME$/dev/customJars/thot/v1.9/thot.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
