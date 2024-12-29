@@ -9,6 +9,8 @@ import dobby.io.response.ResponseCodes;
 import dobby.util.json.NewJson;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
+import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
@@ -26,6 +28,19 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get all groups",
+            description = "Get all groups",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns a list of all groups"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
     @Get(BASE_PATH + "/all")
     public void getAllGroups(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();
@@ -42,6 +57,31 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Create a group",
+            description = "Create a group",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 201,
+            message = "Group created"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid request"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 409,
+            message = "Group already exists"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to create group"
+    )
     @Post(BASE_PATH)
     public void createGroup(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();
@@ -80,6 +120,23 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get a group",
+            description = "Get a group",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns the group"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Group not found"
+    )
     @Get(BASE_PATH + "/id/{groupId}")
     public void getGroup(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();
@@ -101,6 +158,23 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Delete a group",
+            description = "Delete a group",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Group deleted"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to delete group"
+    )
     @Delete(BASE_PATH + "/id/{groupId}")
     public void deleteGroup(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();
@@ -120,6 +194,31 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Add permission to a group",
+            description = "Add permission to a group",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Permission added"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid request"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Group or permission not found"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to add permission to group"
+    )
     @Put(BASE_PATH + "/id/{groupId}/permission")
     public void addPermissionToGroup(HttpContext context) {
         if (!validateAddPermissionToGroupRequest(context.getRequest().getBody())) {
@@ -163,6 +262,23 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get all groups for a user",
+            description = "Get all groups a user is a member of",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns a list of groups"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid user id"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
     @Get(BASE_PATH + "/user/{userId}")
     public void getGroupsForUser(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();
@@ -191,6 +307,31 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Add a user to a group",
+            description = "Add a user to a group",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "User added to group"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid user id"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Group or user not found"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to add user to group"
+    )
     @Post(BASE_PATH + "/user/{userId}/group/{groupId}")
     public void addUserToGroup(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();
@@ -234,6 +375,27 @@ public class GroupResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Remove a permission from a group",
+            description = "Remove a permission from a group",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Permission removed"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Group or permission not found"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to delete permission from group"
+    )
     @Delete(BASE_PATH + "/group/{groupId}/permission/{permissionRoute}")
     public void deletePermissionFromGroup(HttpContext context) {
         final GroupService groupService = GroupService.getInstance();

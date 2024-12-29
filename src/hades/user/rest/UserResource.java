@@ -49,6 +49,15 @@ public class UserResource {
         return adminLoginRedirect;
     }
 
+    @ApiDoc(
+            summary = "Create a new user",
+            description = "Create a new user with the given display name, mail, and password",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 201, message = "User created successfully")
+    @ApiResponse(code = 400, message = "Malformed request")
+    @ApiResponse(code = 409, message = "Display name already taken")
+    @ApiResponse(code = 500, message = "Could not save user")
     @Post(ROUTE_PREFIX)
     public void createUser(HttpContext context) {
         final Request request = context.getRequest();
@@ -106,6 +115,16 @@ public class UserResource {
         context.getResponse().setBody(resPayload);
     }
 
+    @ApiDoc(
+            summary = "Login a user",
+            description = "Login a user with the given display name and password",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "User logged in successfully")
+    @ApiResponse(code = 400, message = "Malformed request")
+    @ApiResponse(code = 404, message = "User not found")
+    @ApiResponse(code = 409, message = "User is locked")
+    @ApiResponse(code = 500, message = "Could not verify password")
     @Post(ROUTE_PREFIX + "/login")
     public void doLogin(HttpContext context) {
         final Request request = context.getRequest();
@@ -166,7 +185,7 @@ public class UserResource {
     @ApiDoc(
             summary = "Logout the current user",
             description = "Logout the current user by destroying the session",
-            baseUrl = "/rest/users"
+            baseUrl = ROUTE_PREFIX
     )
     @ApiResponse(code = 200, message = "User logged out")
     @Get(ROUTE_PREFIX + "/logout")
@@ -182,10 +201,11 @@ public class UserResource {
     @ApiDoc(
             summary = "Get a user by id",
             description = "Returns a user based on the given id",
-            baseUrl = "/rest/users"
+            baseUrl = ROUTE_PREFIX
     )
     @ApiResponse(code = 200, message = "The user was found and its data is returned")
     @ApiResponse(code = 400, message = "The id is not a valid UUID")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
     @ApiResponse(code = 404, message = "The user was not found")
     @PermissionCheck
     @AuthorizedOnly
@@ -212,6 +232,15 @@ public class UserResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Delete a user by id",
+            description = "Delete a user based on the given id",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 204, message = "The user was deleted")
+    @ApiResponse(code = 400, message = "The id is not a valid UUID")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
+    @ApiResponse(code = 404, message = "The user was not found")
     @Delete(ROUTE_PREFIX + "/id/{id}")
     public void deleteUser(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -233,6 +262,13 @@ public class UserResource {
         context.getResponse().setCode(ResponseCodes.NO_CONTENT);
     }
 
+    @ApiDoc(
+            summary = "Get the currently logged in user",
+            description = "Returns the user that is currently logged in",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "The user was found and its data is returned")
+    @ApiResponse(code = 404, message = "The user was not found")
     @Get(ROUTE_PREFIX + "/loginUserInfo")
     public void getLoginUserInfo(HttpContext context) {
         final Session session = context.getSession();
@@ -258,6 +294,13 @@ public class UserResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get all users",
+            description = "Returns a list containing all users",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "The users were found and their data is returned")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
     @Get(ROUTE_PREFIX + "/all")
     public void getAllUsers(HttpContext context) {
         final User[] users = UserService.getInstance().findAll();
@@ -269,6 +312,16 @@ public class UserResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Update the mail of a user",
+            description = "Update the mail of a user based on the given id",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "The user was found and its data is returned")
+    @ApiResponse(code = 400, message = "Malformed request")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
+    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 500, message = "Could not save user")
     @Put(ROUTE_PREFIX + "/id/{id}/update/mail")
     public void updateMail(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -308,6 +361,16 @@ public class UserResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Update the login token of a user",
+            description = "Update the login token of a user based on the given id",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "The user was found and its data is returned")
+    @ApiResponse(code = 400, message = "Malformed request")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
+    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 500, message = "Could not save user")
     @Put(ROUTE_PREFIX + "/id/{id}/update/token")
     public void regenerateToken(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -346,6 +409,16 @@ public class UserResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Update the name of a user",
+            description = "Update the name of a user based on the given id",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "The user was found and its data is returned")
+    @ApiResponse(code = 400, message = "Malformed request")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
+    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 500, message = "Could not save user")
     @Put(ROUTE_PREFIX + "/id/{id}/update/name")
     public void updateDisplayName(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -390,6 +463,16 @@ public class UserResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Update the password of a user",
+            description = "Update the password of a user based on the given id",
+            baseUrl = ROUTE_PREFIX
+    )
+    @ApiResponse(code = 200, message = "The user was found and its data is returned")
+    @ApiResponse(code = 400, message = "Malformed request")
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
+    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 500, message = "Could not save user")
     @Put(ROUTE_PREFIX + "/id/{id}/update/password")
     public void updatePassword(HttpContext context) {
         final String idString = context.getRequest().getParam("id");

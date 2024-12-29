@@ -10,6 +10,8 @@ import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
+import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 import hades.messaging.Message;
 import hades.messaging.service.MessageService;
 
@@ -24,6 +26,23 @@ public class MessageResource {
     private static final String BASE_PATH = "/rest/messages";
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get all unread messages",
+            description = "Get all unread messages for a user",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns a list of all unread messages"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid user id"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
     @Get(BASE_PATH + "/unread")
     public void getUnreadMessages(HttpContext context) {
         final String userIdString = context.getSession().get("userId");
@@ -41,6 +60,27 @@ public class MessageResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get a message",
+            description = "Get a message by message id",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns the message"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid message id or user id"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Message not found"
+    )
     @Get(BASE_PATH + "/{messageId}")
     public void getMessage(HttpContext context) {
         final String messageIdString = context.getRequest().getParam("messageId");
@@ -68,6 +108,27 @@ public class MessageResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Mark a message as read",
+            description = "Mark a message as read by message id",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Message marked as read"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid message id or user id"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Message not found"
+    )
     @Put(BASE_PATH + "/read/{messageId}")
     public void markMessageAsRead(HttpContext context) {
         final String messageIdString = context.getRequest().getParam("messageId");
@@ -102,6 +163,31 @@ public class MessageResource {
     }
 
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Delete a message",
+            description = "Delete a message by message id",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 204,
+            message = "Message deleted successfully"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid message id or user id"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Message not found"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Could not delete message"
+    )
     @Delete(BASE_PATH + "/{messageId}")
     public void deleteMessage(HttpContext context) {
         final String messageIdString = context.getRequest().getParam("messageId");
@@ -139,6 +225,27 @@ public class MessageResource {
 
     @AuthorizedOnly
     @PermissionCheck
+    @ApiDoc(
+            summary = "Send a message",
+            description = "Send a message to a user",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 204,
+            message = "Message sent successfully"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Invalid request body"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to send message"
+    )
     @Post(BASE_PATH + "/send/{userToId}")
     public void sendMessage(HttpContext context) {
         final NewJson body = context.getRequest().getBody();

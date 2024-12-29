@@ -8,6 +8,8 @@ import dobby.util.Json;
 import dobby.util.json.NewJson;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
+import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 import thot.connector.Connector;
 
 import java.util.Arrays;
@@ -20,6 +22,19 @@ public class DbExplorerResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get all buckets",
+            description = "Get all buckets in the database",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns a list of all buckets"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
     @Get(BASE_PATH + "/buckets")
     public void getBuckets(HttpContext context) {
         final String[] bucketNames = Connector.getBuckets();
@@ -33,6 +48,23 @@ public class DbExplorerResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Get all keys",
+            description = "Get all keys in a bucket",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns a list of all keys in the bucket"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "No Bucket was specified"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
     @Post(BASE_PATH + "/keys")
     public void getKeys(HttpContext context) {
         final NewJson body = context.getRequest().getBody();
@@ -52,6 +84,27 @@ public class DbExplorerResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Read a value from a bucket",
+            description = "Get the value of a key in a bucket",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns the value of the key"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "No Bucket or Key was specified"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Key not found"
+    )
     @Post(BASE_PATH + "/read")
     public void getValue(HttpContext context) {
         final NewJson body = context.getRequest().getBody();
@@ -105,6 +158,27 @@ public class DbExplorerResource {
 
     @PermissionCheck
     @AuthorizedOnly
+    @ApiDoc(
+            summary = "Delete a value from a bucket",
+            description = "Delete a value from a bucket",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 204,
+            message = "Value deleted"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "No Bucket or Key was specified"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 404,
+            message = "Key not found"
+    )
     @Post(BASE_PATH + "/delete")
     public void deleteValue(HttpContext context) {
         final NewJson body = context.getRequest().getBody();

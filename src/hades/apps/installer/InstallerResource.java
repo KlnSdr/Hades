@@ -4,12 +4,35 @@ import dobby.annotations.Post;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.json.NewJson;
+import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 import hades.update.service.UpdateService;
 
 public class InstallerResource {
     private static final String BASE_PATH = "/installer";
     private static final UpdateService updateService = UpdateService.getInstance();
 
+    @ApiDoc(
+            summary = "Run installation procedure",
+            description = "Run the installation procedure to install Hades",
+            baseUrl = BASE_PATH
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Hades has been successfully installed"
+    )
+    @ApiResponse(
+            code = 400,
+            message = "Missing admin password"
+    )
+    @ApiResponse(
+            code = 409,
+            message = "Hades is already installed"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Failed to install Hades"
+    )
     @Post(BASE_PATH + "/run")
     public void runInstallationProcedure(HttpContext context) {
         if (updateService.isInstalled()) {

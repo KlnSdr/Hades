@@ -10,6 +10,8 @@ import dobby.util.logging.Logger;
 import hades.Hades;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
+import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 
 import java.lang.reflect.Field;
 
@@ -18,6 +20,18 @@ public class SystemInfoResource {
 
     @AuthorizedOnly
     @PermissionCheck
+    @ApiDoc(
+            summary = "Get system information",
+            description = "Get system information such as OS, Java, Hades, Dobby, and application versions, heap memory, CPU cores, and more."
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns system information"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
     @Get("/systeminfo")
     public void getSystemInfo(HttpContext context) {
         final NewJson response = new NewJson();
@@ -46,6 +60,22 @@ public class SystemInfoResource {
 
     @AuthorizedOnly
     @PermissionCheck
+    @ApiDoc(
+            summary = "Get config file content",
+            description = "Get the content of the config file as a JSON object."
+    )
+    @ApiResponse(
+            code = 200,
+            message = "Returns the content of the config file"
+    )
+    @ApiResponse(
+            code = 403,
+            message = "User does not have permission to access this resource"
+    )
+    @ApiResponse(
+            code = 500,
+            message = "Could not get config file"
+    )
     @Get("/configFile")
     public void getConfigContent(HttpContext context) {
         final NewJson configContent = getConfigFileAsJson();
