@@ -10,7 +10,7 @@ public abstract class HtmlElement {
     private final Map<String, String> attributes = new HashMap<>();
     private final String tag;
     private String value;
-    private List<String> styles = new ArrayList<>();
+    private final List<String> styles = new ArrayList<>();
 
     public HtmlElement(String tag) {
         this.tag = tag;

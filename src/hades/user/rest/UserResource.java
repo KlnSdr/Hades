@@ -14,6 +14,8 @@ import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
+import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 import hades.authorized.Group;
 import hades.authorized.service.GroupService;
 import hades.common.ErrorResponses;
@@ -161,6 +163,12 @@ public class UserResource {
         context.getResponse().setBody(resPayload);
     }
 
+    @ApiDoc(
+            summary = "Logout the current user",
+            description = "Logout the current user by destroying the session",
+            baseUrl = "/rest/users"
+    )
+    @ApiResponse(code = 200, message = "User logged out")
     @Get(ROUTE_PREFIX + "/logout")
     public void doLogout(HttpContext context) {
         final Session session = context.getSession();
