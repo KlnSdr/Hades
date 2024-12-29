@@ -2,11 +2,13 @@ package hades.apidocs;
 
 import dobby.io.request.RequestTypes;
 import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
 
 import java.util.List;
 
 public class RouteDocumentation {
     private ApiDoc apiDoc;
+    private ApiResponse[] apiResponses;
     private RequestTypes requestType;
     private List<String> params;
 
@@ -25,12 +27,23 @@ public class RouteDocumentation {
         this.params = params;
     }
 
+    public void setApiResponses(ApiResponse[] apiResponses) {
+        this.apiResponses = apiResponses;
+    }
+
     public RequestTypes getRequestType() {
         return requestType;
     }
 
     public List<String> getParams() {
         return params;
+    }
+
+    public ApiResponse[] getApiResponses() {
+        if (apiResponses == null) {
+            return new ApiResponse[0];
+        }
+        return apiResponses;
     }
 
     public String getSummary() {

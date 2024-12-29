@@ -2,10 +2,8 @@ package hades.apidocs.ui;
 
 import dobby.io.request.RequestTypes;
 import hades.apidocs.RouteDocumentation;
-import hades.html.Details;
-import hades.html.HtmlElement;
-import hades.html.Label;
-import hades.html.Paragraph;
+import hades.apidocs.annotations.ApiResponse;
+import hades.html.*;
 
 import java.util.List;
 
@@ -49,6 +47,15 @@ public class RouteSection extends HtmlElement {
 
         final Paragraph description = new Paragraph(routeDocumentation.getDescription());
         details.addChild(description);
+
+        final Headline responsesHeadline = new Headline(2, "Responses");
+        details.addChild(responsesHeadline);
+
+        for (ApiResponse apiResponse : routeDocumentation.getApiResponses()) {
+            final Paragraph responseParagraph = new Paragraph();
+            responseParagraph.setValue(apiResponse.code() + " - " + apiResponse.message());
+            details.addChild(responseParagraph);
+        }
 
         return details.toHtml();
     }

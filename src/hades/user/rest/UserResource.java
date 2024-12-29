@@ -179,6 +179,14 @@ public class UserResource {
         session.destroy();
     }
 
+    @ApiDoc(
+            summary = "Get a user by id",
+            description = "Returns a user based on the given id",
+            baseUrl = "/rest/users"
+    )
+    @ApiResponse(code = 200, message = "The user was found and its data is returned")
+    @ApiResponse(code = 400, message = "The id is not a valid UUID")
+    @ApiResponse(code = 404, message = "The user was not found")
     @PermissionCheck
     @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/id/{id}")

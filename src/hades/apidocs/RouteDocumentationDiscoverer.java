@@ -11,6 +11,8 @@ import dobby.util.RouteHelper;
 import dobby.util.Tupel;
 import dobby.util.logging.Logger;
 import hades.apidocs.annotations.ApiDoc;
+import hades.apidocs.annotations.ApiResponse;
+import hades.apidocs.annotations.ApiResponses;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -79,6 +81,12 @@ public class RouteDocumentationDiscoverer extends Classloader<Object> {
 
             if (method.isAnnotationPresent(ApiDoc.class)) {
                 routeDocumentation.setApiDoc(method.getAnnotation(ApiDoc.class));
+            }
+            if (method.isAnnotationPresent(ApiResponses.class)) {
+                routeDocumentation.setApiResponses(method.getAnnotation(ApiResponses.class).value());
+            }
+            if (method.isAnnotationPresent(ApiResponse.class)) {
+                routeDocumentation.setApiResponses(new ApiResponse[]{method.getAnnotation(ApiResponse.class)});
             }
 
             LOGGER.debug("Added route documentation for: " + processedRoute);
