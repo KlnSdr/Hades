@@ -1,5 +1,7 @@
 package hades.html;
 
+import java.util.List;
+
 public class Details extends HtmlElement {
     private final Summary summary = new Summary();
 
@@ -15,5 +17,9 @@ public class Details extends HtmlElement {
 
     public void setSummary(String text) {
         summary.setValue(text);
+    }
+
+    public void setSummaryContent(List<HtmlElement> content) {
+        summary.addAllChildren(content);
     }
 }

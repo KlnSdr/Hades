@@ -14,8 +14,8 @@ import dobby.routes.RouteManager;
 import dobby.util.Config;
 import dobby.util.json.NewJson;
 import dobby.util.logging.Logger;
+import hades.apidocs.ui.RouteSection;
 import hades.filter.FilterOrder;
-import hades.html.Details;
 import hades.html.Document;
 import hades.html.Headline;
 import hades.html.HtmlElement;
@@ -106,9 +106,7 @@ public class BuildApiDocsPreFilter implements Filter {
                 continue;
             }
 
-            final Details details = new Details(requestType.name() + " " + path);
-            details.addStyle(requestType.name().toLowerCase() + "Route");
-            elements.add(details);
+            elements.add(new RouteSection(requestType, path));
         }
 
         return elements;

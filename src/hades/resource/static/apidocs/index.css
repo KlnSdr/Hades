@@ -1,15 +1,51 @@
+.routeSection {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.requestTypeLabel {
+    padding: 5px;
+    border-radius: 5px;
+    margin-right: 10px;
+    width: 75px;
+    display: inline-block;
+    text-align: center;
+    color: white;
+}
+
 .getRoute {
-    background-color: green;
+    background-color: #ebf3fb;
+    border: 1px solid #61affe;
+}
+
+.getRoute .requestTypeLabel {
+    background-color: #61affe;
 }
 
 .postRoute {
-    background-color: blue;
+    background-color: #e8f6f0;
+    border: 1px solid #48cb90;
+}
+
+.postRoute .requestTypeLabel {
+    background-color: #48cb90;
 }
 
 .putRoute {
-    background-color: yellow;
+    background-color: #fbf1e6;
+    border: 1px solid #fca130;
+}
+
+.putRoute .requestTypeLabel {
+    background-color: #fca130;
 }
 
 .deleteRoute {
-    background-color: red;
+    background-color: #fae7e7;
+    border: 1px solid #f83e3e;
+}
+
+.deleteRoute .requestTypeLabel {
+    background-color: #f83e3e;
 }
