@@ -10,11 +10,13 @@ import java.util.List;
 public class RouteSection extends HtmlElement {
     private final RequestTypes requestType;
     private final String path;
+    private final List<String> params;
 
-    public RouteSection(RequestTypes requestType, String path) {
+    public RouteSection(RequestTypes requestType, String path, List<String> params) {
         super("section");
         this.requestType = requestType;
         this.path = path;
+        this.params = params;
     }
 
     @Override
@@ -26,9 +28,15 @@ public class RouteSection extends HtmlElement {
         final Label requestTypeLabel = new Label(requestType.name().toUpperCase());
         requestTypeLabel.addStyle("requestTypeLabel");
 
+        String modifiedPath = this.path;
+
+        for (String param : params) {
+            modifiedPath = modifiedPath.replaceFirst("\\*", "{" + param + "}");
+        }
+
         details.setSummaryContent(List.of(
                 requestTypeLabel,
-                new Label(path)
+                new Label(modifiedPath)
         ));
 
         return details.toHtml();

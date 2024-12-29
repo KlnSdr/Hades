@@ -106,7 +106,7 @@ public class BuildApiDocsPreFilter implements Filter {
                 continue;
             }
 
-            elements.add(new RouteSection(requestType, path));
+            elements.add(new RouteSection(requestType, path, route.getPathParams(requestType)));
         }
 
         return elements;
