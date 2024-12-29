@@ -18,6 +18,7 @@ import hades.html.Headline;
 import hades.html.HtmlElement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,20 +72,46 @@ public class BuildApiDocsPreFilter implements Filter {
         file.setContentType("text/html");
 
         RouteDocumentationDiscoverer.discoverRoutes();
-        final Map<String, List<RouteDocumentation>> routeDocumentationMap = RouteDocumentationDiscoverer.getRouteDocumentationMap();
+        final Map<String, Map<String, List<RouteDocumentation>>> routeDocumentationMap = sortRouteDocumentationByBaseUrl(RouteDocumentationDiscoverer.getRouteDocumentationMap());
 
         final Document doc = new Document();
         doc.setTitle("API Docs");
         doc.addChild(new Headline(1, "API Docs of " + Config.getInstance().getString("application.name", "\t&lt;APP_NAME\t&gt;")));
         doc.addStyle("{{CONTEXT}}/apidocs/index.css");
 
-        for (Map.Entry<String, List<RouteDocumentation>> entry : routeDocumentationMap.entrySet()) {
-            doc.addAllChildren(buildRouteElements(entry.getKey(), entry.getValue()));
+        final List<String> baseUrls = new ArrayList<>(routeDocumentationMap.keySet());
+        baseUrls.sort(String::compareTo);
+
+        for (String baseUrl : baseUrls) {
+            if (!baseUrl.isEmpty()) {
+                final Headline baseUrlHeadline = new Headline(2, baseUrl);
+                doc.addChild(baseUrlHeadline);
+            }
+
+            for (Map.Entry<String, List<RouteDocumentation>> entry : routeDocumentationMap.get(baseUrl).entrySet()) {
+                doc.addAllChildren(buildRouteElements(entry.getKey(), entry.getValue()));
+            }
         }
+
 
         file.setContent(doc.toHtml().getBytes());
 
         return file;
+    }
+
+    private Map<String, Map<String, List<RouteDocumentation>>> sortRouteDocumentationByBaseUrl(Map<String, List<RouteDocumentation>> routeDocumentationMap) {
+        final Map<String, Map<String, List<RouteDocumentation>>> sortedMap = new HashMap<>();
+
+        for (Map.Entry<String, List<RouteDocumentation>> entry : routeDocumentationMap.entrySet()) {
+            final RouteDocumentation routeDocumentation = entry.getValue().getFirst();
+            final String baseUrl = routeDocumentation.getBaseUrl();
+
+            final Map<String, List<RouteDocumentation>> map = sortedMap.getOrDefault(baseUrl, new HashMap<>());
+            map.put(entry.getKey(), entry.getValue());
+            sortedMap.put(baseUrl, map);
+        }
+
+        return sortedMap;
     }
 
     private List<HtmlElement> buildRouteElements(String path, List<RouteDocumentation> routeDocumentations) {

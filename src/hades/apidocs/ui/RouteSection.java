@@ -48,7 +48,7 @@ public class RouteSection extends HtmlElement {
         final Paragraph description = new Paragraph(routeDocumentation.getDescription());
         details.addChild(description);
 
-        final Headline responsesHeadline = new Headline(2, "Responses");
+        final Headline responsesHeadline = new Headline(3, "Responses");
         details.addChild(responsesHeadline);
 
         for (ApiResponse apiResponse : routeDocumentation.getApiResponses()) {
