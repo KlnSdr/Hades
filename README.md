@@ -36,3 +36,5 @@ placing a `style.css` file in the static content directory of your project in a 
   attempts. Default: `300000`
 - `hades.login.redirect.success`: The URL to redirect to after a successful login. Default: `/`
 - `hades.login.redirect.successAdmin`: The URL to redirect to after a successful login of an admin. Default: `/`
+- `hades.apidocs.enabled`: Enable the generated api documentation. Default: `false`
+- `hades.apidocs.hideHadesRoutes`: Hide the routes of the Hades web interface in the api documentation. Default: `false`

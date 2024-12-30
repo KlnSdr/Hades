@@ -7,6 +7,7 @@ import dobby.annotations.Put;
 import dobby.io.HttpContext;
 import dobby.io.request.RequestTypes;
 import dobby.util.Classloader;
+import dobby.util.Config;
 import dobby.util.RouteHelper;
 import dobby.util.Tupel;
 import dobby.util.logging.Logger;
@@ -42,6 +43,11 @@ public class RouteDocumentationDiscoverer extends Classloader<Object> {
         if (rootPackage.startsWith(".")) {
             rootPackage = rootPackage.substring(1);
         }
+
+        if (Config.getInstance().getBoolean("hades.apidocs.hideHadesRoutes", false) && rootPackage.startsWith("hades")) {
+            return;
+        }
+
         RouteDocumentationDiscoverer discoverer = new RouteDocumentationDiscoverer(rootPackage);
         discoverer.loadClasses().forEach(discoverer::analyzeClassAndMethods);
         String finalRootPackage = rootPackage;

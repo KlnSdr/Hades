@@ -5,8 +5,6 @@ import dobby.files.service.StaticFileService;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
-import dobby.io.request.RequestTypes;
-import dobby.routes.RouteManager;
 import dobby.util.Config;
 import dobby.util.logging.Logger;
 import hades.apidocs.RouteDocumentation;
@@ -25,8 +23,6 @@ import java.util.Map;
 public class BuildApiDocsPreFilter implements Filter {
     private static final StaticFileService staticFileService = StaticFileService.getInstance();
     private static final Logger LOGGER = new Logger(BuildApiDocsPreFilter.class);
-    private static final RouteManager routeManager = RouteManager.getInstance();
-    private static final List<RequestTypes> requestTypes = List.of(RequestTypes.GET, RequestTypes.POST, RequestTypes.PUT, RequestTypes.DELETE);
 
     @Override
     public String getName() {
@@ -47,6 +43,10 @@ public class BuildApiDocsPreFilter implements Filter {
     public boolean run(HttpContext httpContext) {
         final String docsPath = "/apidocs/index.html";
         final String requestUri = httpContext.getRequest().getPath();
+
+        if (!Config.getInstance().getBoolean("hades.apidocs.enabled", false)) {
+            return true;
+        }
 
         if (!requestUri.equalsIgnoreCase(docsPath)) {
             return true;
