@@ -1,0 +1,20 @@
+{
+  "remoteRepoUrl": "https://repo.klnsdr.com",
+  "project": {
+    "entry": "poc.Main",
+    "name": "hades",
+    "version": "0.7",
+    "group": "dobby",
+    "dependencies": [
+      {
+        "group": "dobby",
+        "name": "thot",
+        "version": "1.9"
+      }
+    ]
+  },
+  "compiler": {
+    "version": "21"
+  },
+  "exclude": []
+}
