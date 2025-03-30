@@ -17,15 +17,13 @@ public class UpdateService {
     private static final Logger LOGGER = new Logger(UpdateService.class);
     public static final String BUCKET_NAME = "hades_updates";
     private static UpdateService instance;
-    private boolean isInstalled;
+    private Boolean isInstalled = null;
 
     private static final List<Update> updates = new ArrayList<>();
 
     private UpdateService() {
         UpdateDiscoverer.discoverRoutes("");
         sortUpdates();
-
-        isInstalled = checkIfInstalled();
     }
 
     public static UpdateService getInstance() {
@@ -48,6 +46,9 @@ public class UpdateService {
     }
 
     public boolean isInstalled() {
+        if (isInstalled == null) {
+            isInstalled = checkIfInstalled();
+        }
         return isInstalled;
     }
 

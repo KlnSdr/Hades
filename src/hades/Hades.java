@@ -23,7 +23,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class Hades implements DobbyEntryPoint {
-    private static final String version = "v0.7";
+    private static final String version = "v0.8";
     private static final Logger LOGGER = new Logger(Hades.class);
 
     public static String getVersion() {
