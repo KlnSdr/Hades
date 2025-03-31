@@ -1,6 +1,6 @@
 package hades.update.updates;
 
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 import hades.update.Update;
 import hades.update.UpdateOrder;
 import hades.user.User;

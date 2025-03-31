@@ -5,7 +5,7 @@ import dobby.files.service.StaticFileService;
 import dobby.observer.Event;
 import dobby.observer.EventType;
 import dobby.observer.Observer;
-import dobby.util.Config;
+import dobby.Config;
 import dobby.util.Tupel;
 import dobby.util.json.NewJson;
 import hades.template.TemplateEngine;

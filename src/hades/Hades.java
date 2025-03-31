@@ -3,9 +3,9 @@ package hades;
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
 import dobby.files.service.StaticFileService;
-import dobby.util.Config;
+import dobby.Config;
 import dobby.util.StaticContentDir;
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 import hades.annotations.DisablePermissionCheck;
 import hades.authorized.HadesAnnotationDiscoverer;
 import hades.authorized.filter.HadesAuthorizedRedirectPreFilter;
@@ -23,7 +23,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class Hades implements DobbyEntryPoint {
-    private static final String version = "v0.8";
+    private static final String version = "v2.0";
     private static final Logger LOGGER = new Logger(Hades.class);
 
     public static String getVersion() {

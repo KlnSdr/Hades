@@ -3,7 +3,7 @@ package hades.filter.pre;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
-import dobby.util.Config;
+import dobby.Config;
 import hades.common.Util;
 import hades.filter.FilterOrder;
 import hades.user.User;

@@ -2,9 +2,9 @@ package hades.authorized;
 
 import dobby.util.json.NewJson;
 import hades.authorized.service.GroupService;
-import janus.DataClass;
-import janus.annotations.JanusString;
-import thot.annotations.v2.Bucket;
+import thot.janus.DataClass;
+import thot.janus.annotations.JanusString;
+import thot.api.annotations.v2.Bucket;
 
 @Bucket(GroupService.USER_GROUP_ASSOCIATION_BUCKET)
 public class UserGroupAssociation implements DataClass {

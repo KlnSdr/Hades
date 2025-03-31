@@ -1,8 +1,8 @@
 package hades.update.updates;
 
+import common.logger.Logger;
 import dobby.util.Json;
 import dobby.util.json.NewJson;
-import dobby.util.logging.Logger;
 import hades.authorized.service.GroupService;
 import hades.authorized.service.PermissionService;
 import hades.update.Update;
@@ -10,7 +10,7 @@ import hades.update.UpdateOrder;
 import hades.user.service.UserService;
 import thot.connector.Connector;
 
-import static hades.common.Util.convert;
+import static dobby.util.JsonConverter.convert;
 
 public class ConvertJsonToNewJson implements Update {
     private static final Logger LOGGER = new Logger(ConvertJsonToNewJson.class);

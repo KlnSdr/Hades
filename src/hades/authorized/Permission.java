@@ -3,11 +3,11 @@ package hades.authorized;
 import dobby.io.request.RequestTypes;
 import dobby.util.json.NewJson;
 import hades.authorized.service.PermissionService;
-import janus.DataClass;
-import janus.annotations.JanusBoolean;
-import janus.annotations.JanusString;
-import janus.annotations.JanusUUID;
-import thot.annotations.v2.Bucket;
+import thot.janus.DataClass;
+import thot.janus.annotations.JanusBoolean;
+import thot.janus.annotations.JanusString;
+import thot.janus.annotations.JanusUUID;
+import thot.api.annotations.v2.Bucket;
 
 import java.util.UUID;
 

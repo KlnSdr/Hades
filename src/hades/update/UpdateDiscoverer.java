@@ -1,7 +1,7 @@
 package hades.update;
 
 import dobby.util.Classloader;
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 import hades.update.service.UpdateService;
 
 import java.lang.reflect.InvocationTargetException;

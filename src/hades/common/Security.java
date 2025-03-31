@@ -1,6 +1,6 @@
 package hades.common;
 
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

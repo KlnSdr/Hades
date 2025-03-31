@@ -6,7 +6,7 @@ import dobby.io.HttpContext;
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
 import dobby.session.Session;
-import dobby.util.Config;
+import dobby.Config;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 

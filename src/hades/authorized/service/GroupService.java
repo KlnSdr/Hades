@@ -3,7 +3,7 @@ package hades.authorized.service;
 import dobby.util.json.NewJson;
 import hades.authorized.Group;
 import hades.authorized.UserGroupAssociation;
-import janus.Janus;
+import thot.janus.Janus;
 import thot.connector.Connector;
 
 import java.util.UUID;

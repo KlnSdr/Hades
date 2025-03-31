@@ -6,7 +6,7 @@ import dobby.session.service.SessionService;
 import dobby.util.json.NewJson;
 import hades.user.LoginAttempt;
 import hades.user.User;
-import janus.Janus;
+import thot.janus.Janus;
 import thot.connector.Connector;
 
 import java.util.ArrayList;

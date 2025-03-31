@@ -1,7 +1,7 @@
 package hades.common;
 
 import dobby.io.request.Request;
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 
 public class Util {
     private static final Logger LOGGER = new Logger(Util.class);

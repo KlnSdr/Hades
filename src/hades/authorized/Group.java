@@ -2,11 +2,11 @@ package hades.authorized;
 
 import dobby.util.json.NewJson;
 import hades.authorized.service.GroupService;
-import janus.DataClass;
-import janus.annotations.JanusList;
-import janus.annotations.JanusString;
-import janus.annotations.JanusUUID;
-import thot.annotations.v2.Bucket;
+import thot.janus.DataClass;
+import thot.janus.annotations.JanusList;
+import thot.janus.annotations.JanusString;
+import thot.janus.annotations.JanusUUID;
+import thot.api.annotations.v2.Bucket;
 
 import java.util.ArrayList;
 import java.util.List;

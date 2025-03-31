@@ -15,7 +15,7 @@ import thot.connector.Connector;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static hades.common.Util.convert;
+import static dobby.util.JsonConverter.convert;
 
 public class DbExplorerResource {
     private static final String BASE_PATH = "/dbExplorer";

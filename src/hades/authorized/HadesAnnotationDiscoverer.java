@@ -7,7 +7,7 @@ import dobby.annotations.Put;
 import dobby.io.HttpContext;
 import dobby.util.Classloader;
 import dobby.util.RouteHelper;
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.authorized.service.AuthorizedRoutesService;

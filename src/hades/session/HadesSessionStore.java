@@ -2,7 +2,7 @@ package hades.session;
 
 import dobby.session.ISessionStore;
 import dobby.session.Session;
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 import thot.connector.Connector;
 
 import java.util.HashMap;

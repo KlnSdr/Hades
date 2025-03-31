@@ -4,7 +4,7 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
-import dobby.util.Config;
+import dobby.Config;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 

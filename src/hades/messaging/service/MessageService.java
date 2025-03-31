@@ -3,7 +3,7 @@ package hades.messaging.service;
 import dobby.util.json.NewJson;
 import hades.messaging.Message;
 import hades.user.service.UserService;
-import janus.Janus;
+import thot.janus.Janus;
 import thot.connector.Connector;
 
 import java.util.ArrayList;

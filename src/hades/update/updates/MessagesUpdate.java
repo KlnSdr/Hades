@@ -1,6 +1,6 @@
 package hades.update.updates;
 
-import dobby.util.logging.Logger;
+import common.logger.Logger;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
