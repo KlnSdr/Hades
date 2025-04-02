@@ -1,9 +1,13 @@
 package hades.apidocs.ui;
 
+import common.html.Details;
+import common.html.Headline;
+import common.html.HtmlElement;
+import common.html.Paragraph;
+import common.html.Label;
 import dobby.io.request.RequestTypes;
 import hades.apidocs.RouteDocumentation;
 import hades.apidocs.annotations.ApiResponse;
-import hades.html.*;
 
 import java.util.List;
 
