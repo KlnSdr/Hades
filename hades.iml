@@ -9,7 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="thot-connector-1.0" level="project" />
-    <orderEntry type="library" name="dobby-2.0" level="project" />
     <orderEntry type="library" name="html-1.0" level="project" />
+    <orderEntry type="library" name="dobby-2.1" level="project" />
   </component>
 </module>
