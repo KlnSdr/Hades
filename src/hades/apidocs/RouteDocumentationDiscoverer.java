@@ -11,6 +11,7 @@ import dobby.Config;
 import dobby.util.RouteHelper;
 import dobby.util.Tupel;
 import common.logger.Logger;
+import hades.annotations.AuthorizedOnly;
 import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
 import hades.apidocs.annotations.ApiResponses;
@@ -94,6 +95,7 @@ public class RouteDocumentationDiscoverer extends Classloader<Object> {
             if (method.isAnnotationPresent(ApiResponse.class)) {
                 routeDocumentation.setApiResponses(new ApiResponse[]{method.getAnnotation(ApiResponse.class)});
             }
+            routeDocumentation.setAuthOnly(method.isAnnotationPresent(AuthorizedOnly.class));
 
             LOGGER.debug("Added route documentation for: " + processedRoute);
             final List<RouteDocumentation> routeDocs = routeDocumentationMap.getOrDefault(processedRoute, new ArrayList<>());

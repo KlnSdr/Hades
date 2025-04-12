@@ -43,10 +43,19 @@ public class RouteSection extends HtmlElement {
         final Label summaryLabel = new Label(routeDocumentation.getSummary());
         summaryLabel.addStyle("summaryLabel");
 
+        final Label spacer = new Label();
+        spacer.addStyle("spacer");
+
+        final Label lockLabel = new Label();
+        lockLabel.addStyle("fa");
+        lockLabel.addStyle("fa-" + (routeDocumentation.isAuthOnly() ? "" : "un") + "lock");
+
         details.setSummaryContent(List.of(
                 requestTypeLabel,
                 new Label(modifiedPath),
-                summaryLabel
+                summaryLabel,
+                spacer,
+                lockLabel
         ));
 
         final Paragraph description = new Paragraph(routeDocumentation.getDescription());

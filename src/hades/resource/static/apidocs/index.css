@@ -58,3 +58,21 @@ body {
 .deleteRoute .requestTypeLabel {
     background-color: #f83e3e;
 }
+
+.spacer {
+    visibility: hidden;
+    flex-grow: 1;
+}
+
+summary {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.fa-lock, .fa-unlock {
+    color: gray;
+}

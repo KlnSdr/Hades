@@ -78,6 +78,7 @@ public class BuildApiDocsPreFilter implements Filter {
         doc.setTitle("API Docs");
         doc.addChild(new Headline(1, "API Docs of " + Config.getInstance().getString("application.name", "\t&lt;APP_NAME\t&gt;")));
         doc.addStyle("{{CONTEXT}}/apidocs/index.css");
+        doc.addStyle("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 
         final List<String> baseUrls = new ArrayList<>(routeDocumentationMap.keySet());
         baseUrls.sort(String::compareTo);

@@ -11,6 +11,7 @@ public class RouteDocumentation {
     private ApiResponse[] apiResponses;
     private RequestTypes requestType;
     private List<String> params;
+    private boolean isAuthOnly;
 
     public RouteDocumentation() {
     }
@@ -29,6 +30,10 @@ public class RouteDocumentation {
 
     public void setApiResponses(ApiResponse[] apiResponses) {
         this.apiResponses = apiResponses;
+    }
+
+    public void setAuthOnly(boolean isAuthOnly) {
+        this.isAuthOnly = isAuthOnly;
     }
 
     public RequestTypes getRequestType() {
@@ -56,5 +61,9 @@ public class RouteDocumentation {
 
     public String getBaseUrl() {
         return apiDoc != null ? apiDoc.baseUrl() : "";
+    }
+
+    public boolean isAuthOnly() {
+        return isAuthOnly;
     }
 }
