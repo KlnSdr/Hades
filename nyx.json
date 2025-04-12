@@ -3,7 +3,7 @@
   "project": {
     "entry": "",
     "name": "hades",
-    "version": "2.1",
+    "version": "2.2-SNAPSHOT",
     "group": "dobby",
     "dependencies": [
       {
@@ -14,7 +14,7 @@
       {
         "group": "dobby",
         "name": "dobby",
-        "version": "2.1"
+        "version": "2.2-SNAPSHOT"
       },
       {
           "group": "common",

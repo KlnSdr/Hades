@@ -54,8 +54,7 @@ public class UserInfoPagePostFilter implements Filter {
 
             final StaticFile renderedFile = TemplateEngine.render(userPage, getUserInfoFromId(userId));
 
-            httpContext.getResponse().setHeader("Content-Type", userPage.getContentType());
-            httpContext.getResponse().setBody(renderedFile.getContent());
+            httpContext.getResponse().sendFile(renderedFile);
             httpContext.getResponse().setCode(ResponseCodes.OK);
         }
 

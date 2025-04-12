@@ -44,8 +44,7 @@ public class ContextPreFilter implements Filter {
 
             final StaticFile contextNotFoundFile = StaticFileService.getInstance().get("/error/ContextNotFound.html");
             if (contextNotFoundFile != null) {
-                httpContext.getResponse().setBody(TemplateEngine.render(contextNotFoundFile, data).getContent());
-                httpContext.getResponse().setHeader("Content-Type", contextNotFoundFile.getContentType());
+                httpContext.getResponse().sendFile(TemplateEngine.render(contextNotFoundFile, data));
             }
             return false;
         }
