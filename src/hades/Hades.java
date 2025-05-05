@@ -1,11 +1,11 @@
 package hades;
 
+import common.logger.Logger;
+import dobby.Config;
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
 import dobby.files.service.StaticFileService;
-import dobby.Config;
 import dobby.util.StaticContentDir;
-import common.logger.Logger;
 import hades.annotations.DisablePermissionCheck;
 import hades.authorized.HadesAnnotationDiscoverer;
 import hades.authorized.filter.HadesAuthorizedRedirectPreFilter;
@@ -13,6 +13,7 @@ import hades.authorized.service.PermissionService;
 import hades.filter.post.ReplaceContextInFilesObserver;
 import hades.messaging.Message;
 import hades.messaging.service.MessageService;
+import hades.security.service.SecurityService;
 import hades.update.service.UpdateService;
 import hades.user.User;
 import hades.user.service.UserService;
@@ -56,6 +57,7 @@ public class Hades implements DobbyEntryPoint {
         System.out.println("powered by Hades " + version);
         System.out.println();
 
+        warmupSecurityService();
         ensureThotIsRunning();
         registerStaticContentRoot();
         addUnAuthorizedRedirectPaths();
@@ -75,6 +77,16 @@ public class Hades implements DobbyEntryPoint {
 
         LOGGER.info("discovering protected routes...");
         HadesAnnotationDiscoverer.discoverRoutes("");
+    }
+
+    private void warmupSecurityService() {
+        try {
+            SecurityService.getInstance().init();
+        } catch (Exception e) {
+            LOGGER.error("Failed to initialize SecurityService");
+            LOGGER.trace(e);
+            System.exit(1);
+        }
     }
 
     private void addUnAuthorizedRedirectPaths() {
