@@ -1,4 +1,4 @@
-package hades.common;
+package hades.security;
 
 import common.logger.Logger;
 
@@ -9,8 +9,8 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
-public class Security {
-    private static final Logger LOGGER = new Logger(Security.class);
+public class PasswordHasher {
+    private static final Logger LOGGER = new Logger(PasswordHasher.class);
 
     // definitely not the best way to do this, but it works for now and is dependencies free
     public static String hashPassword(String password) {

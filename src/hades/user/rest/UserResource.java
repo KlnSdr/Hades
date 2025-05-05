@@ -19,7 +19,7 @@ import hades.apidocs.annotations.ApiResponse;
 import hades.authorized.Group;
 import hades.authorized.service.GroupService;
 import hades.common.ErrorResponses;
-import hades.common.Security;
+import hades.security.PasswordHasher;
 import hades.user.User;
 import hades.user.service.TokenLoginService;
 import hades.user.service.UserService;
@@ -150,7 +150,7 @@ public class UserResource {
             return;
         }
 
-        if (!Security.verifyPassword(loginUserDTO.getPassword(), user.getPassword())) {
+        if (!PasswordHasher.verifyPassword(loginUserDTO.getPassword(), user.getPassword())) {
             UserService.getInstance().incrementLoginAttempts(user.getId());
             UserResourceErrorResponses.wrongPassword(context.getResponse());
             return;
@@ -496,7 +496,7 @@ public class UserResource {
         final String password = body.getString("password");
         final String passwordRepeat = body.getString("passwordRepeat");
 
-        if (oldPassword == null || !Security.verifyPassword(oldPassword, user.getPassword())) {
+        if (oldPassword == null || !PasswordHasher.verifyPassword(oldPassword, user.getPassword())) {
             UserResourceErrorResponses.wrongPassword(context.getResponse());
             return;
         }
@@ -534,6 +534,6 @@ public class UserResource {
     }
 
     private String hashPassword(String password) {
-        return Security.hashPassword(password);
+        return PasswordHasher.hashPassword(password);
     }
 }

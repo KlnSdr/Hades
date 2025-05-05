@@ -8,7 +8,7 @@ import hades.user.service.UserService;
 
 import java.util.Arrays;
 
-import static hades.common.Security.hashPassword;
+import static hades.security.PasswordHasher.hashPassword;
 
 public class SetUserDefinedAdminPassword implements Update {
     private static final Logger LOGGER = new Logger(SetUserDefinedAdminPassword.class);

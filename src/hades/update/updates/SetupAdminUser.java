@@ -5,7 +5,7 @@ import hades.update.UpdateOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
-import static hades.common.Security.hashPassword;
+import static hades.security.PasswordHasher.hashPassword;
 
 public class SetupAdminUser implements Update {
     public boolean run() {
