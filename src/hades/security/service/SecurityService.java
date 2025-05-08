@@ -14,6 +14,7 @@ public class SecurityService {
     private static SecurityService instance;
     private static final UserEncryptionKeyService userEncryptionKeyService = UserEncryptionKeyService.getInstance();
     private static final Logger LOGGER = new Logger(SecurityService.class);
+    private UserEncryptionKey userEncryptionKey;
 
     private SecurityService() {
     }
@@ -36,20 +37,28 @@ public class SecurityService {
         return MASTER_KEY;
     }
 
-    public String encryptForUser(String data, UUID userId) {
-        UserEncryptionKey userEncryptionKey = userEncryptionKeyService.getUserEncryptionKey(userId);
-        if (userEncryptionKey == null) {
-            LOGGER.debug("User encryption key not found for user: " + userId);
-            userEncryptionKey = new UserEncryptionKey();
-            userEncryptionKey.setOwner(userId);
+    private void warmup(UUID userId) {
+        userEncryptionKey = userEncryptionKeyService.getUserEncryptionKey(userId);
 
-            userEncryptionKey.setEncryptionKey(generateNewUserKey());
-            if (!userEncryptionKeyService.saveUserEncryptionKey(userEncryptionKey)) {
-                LOGGER.error("Failed to save user encryption key for user: " + userId);
-                return null;
-            }
+        if (userEncryptionKey != null) {
+            return;
         }
 
+        LOGGER.debug("User encryption key not found for user: " + userId);
+        userEncryptionKey = new UserEncryptionKey();
+        userEncryptionKey.setOwner(userId);
+
+        userEncryptionKey.setEncryptionKey(generateNewUserKey());
+        if (!userEncryptionKeyService.saveUserEncryptionKey(userEncryptionKey)) {
+            LOGGER.error("Failed to save user encryption key for user: " + userId);
+            throw new RuntimeException("Failed to save user encryption key for user: " + userId);
+        }
+    }
+
+    public String encryptForUser(String data, UUID userId) {
+        if (userEncryptionKey == null) {
+            warmup(userId);
+        }
         return new Encryptor().encrypt(data, userEncryptionKey.getEncryptionKey()).orElse(null);
     }
 
@@ -58,12 +67,9 @@ public class SecurityService {
     }
 
     public String decryptForUser(String data, UUID userId) {
-        UserEncryptionKey userEncryptionKey = userEncryptionKeyService.getUserEncryptionKey(userId);
         if (userEncryptionKey == null) {
-            LOGGER.debug("User encryption key not found for user: " + userId);
-            return null;
+            warmup(userId);
         }
-
         return new Decryptor().decrypt(data, userEncryptionKey.getEncryptionKey()).orElse(null);
     }
 }
