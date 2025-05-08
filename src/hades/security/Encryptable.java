@@ -5,7 +5,7 @@ import hades.security.service.SecurityService;
 
 import java.util.UUID;
 
-public abstract class Encryptable<T> {
+public abstract class Encryptable {
     protected final SecurityService securityService;
     protected UUID uuid;
 
@@ -63,5 +63,5 @@ public abstract class Encryptable<T> {
 
     public abstract NewJson getEncrypted();
 
-    public abstract NewJson decrypt(NewJson data);
+    public abstract NewJson decrypt(NewJson data, UUID ownerUUID);
 }
