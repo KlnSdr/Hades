@@ -24,7 +24,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class Hades implements DobbyEntryPoint {
-    private static final String version = "v2.3-snapshot";
+    private static final String version = "v2.3";
     private static final Logger LOGGER = new Logger(Hades.class);
 
     public static String getVersion() {
