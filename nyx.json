@@ -1,9 +1,9 @@
 {
   "remoteRepoUrl": "https://repo.klnsdr.com",
   "project": {
-    "entry": "",
+    "entry": "poc.Main",
     "name": "hades",
-    "version": "2.3",
+    "version": "2.4-snapshot",
     "group": "dobby",
     "dependencies": [
       {
