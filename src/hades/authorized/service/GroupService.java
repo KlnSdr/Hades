@@ -1,5 +1,6 @@
 package hades.authorized.service;
 
+import common.inject.annotations.RegisterFor;
 import dobby.util.json.NewJson;
 import hades.authorized.Group;
 import hades.authorized.UserGroupAssociation;
@@ -8,19 +9,12 @@ import thot.connector.Connector;
 
 import java.util.UUID;
 
+@RegisterFor(GroupService.class)
 public class GroupService {
     public static final String GROUP_BUCKET = "hades_groups";
     public static final String USER_GROUP_ASSOCIATION_BUCKET = "hades_user_group_association";
-    private static GroupService instance;
 
-    private GroupService() {
-    }
-
-    public static GroupService getInstance() {
-        if (instance == null) {
-            instance = new GroupService();
-        }
-        return instance;
+    public GroupService() {
     }
 
     public boolean update(Group group) {

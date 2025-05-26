@@ -1,28 +1,21 @@
 package hades.messaging.service;
 
+import common.inject.annotations.RegisterFor;
 import dobby.util.json.NewJson;
 import hades.messaging.Message;
 import hades.user.service.UserService;
-import thot.janus.Janus;
 import thot.connector.Connector;
+import thot.janus.Janus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.UUID;
 
+@RegisterFor(MessageService.class)
 public class MessageService {
     public static final String MESSAGE_BUCKET = "hades_messages";
-    private static MessageService instance;
 
-    private MessageService() {
-    }
-
-    public static MessageService getInstance() {
-        if (instance == null) {
-            instance = new MessageService();
-        }
-
-        return instance;
+    public MessageService() {
     }
 
     public Message find(UUID id) {

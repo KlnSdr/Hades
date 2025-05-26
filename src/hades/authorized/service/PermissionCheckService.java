@@ -1,25 +1,19 @@
 package hades.authorized.service;
 
+import common.inject.annotations.RegisterFor;
 import dobby.util.RouteHelper;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RegisterFor(PermissionCheckService.class)
 public class PermissionCheckService {
     private static PermissionCheckService instance;
     private final HashSet<String> permissionCheckRoutes = new HashSet<>();
 
-    private PermissionCheckService() {
+    public PermissionCheckService() {
 
-    }
-
-    public static PermissionCheckService getInstance() {
-        if (instance == null) {
-            instance = new PermissionCheckService();
-        }
-
-        return instance;
     }
 
     public void addPermissionCheckRoute(String route) {

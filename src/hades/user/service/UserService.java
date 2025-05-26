@@ -1,31 +1,29 @@
 package hades.user.service;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.io.HttpContext;
+import dobby.session.ISession;
 import dobby.session.Session;
-import dobby.session.service.SessionService;
+import dobby.session.service.ISessionService;
 import dobby.util.json.NewJson;
 import hades.user.LoginAttempt;
 import hades.user.User;
-import thot.janus.Janus;
 import thot.connector.Connector;
+import thot.janus.Janus;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
+@RegisterFor(UserService.class)
 public class UserService {
     public static final String USER_BUCKET = "hades_users";
     public static final String LIMIT_LOGIN_BUCKET = "hades_limit_login";
-    private static UserService instance;
+    private final ISessionService sessionService;
 
-    private UserService() {
-    }
-
-    public static UserService getInstance() {
-        if (instance == null) {
-            instance = new UserService();
-        }
-
-        return instance;
+    @Inject
+    public UserService(ISessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
     public User find(UUID id) {
@@ -117,7 +115,7 @@ public class UserService {
     }
 
     public void logUserIn(User user, HttpContext context) {
-        final Session session = SessionService.getInstance().newSession();
+        final ISession session = sessionService.newSession();
         session.set("userId", user.getId().toString());
         context.setSession(session);
     }

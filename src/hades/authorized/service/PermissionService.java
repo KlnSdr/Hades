@@ -1,30 +1,25 @@
 package hades.authorized.service;
 
+import common.inject.annotations.RegisterFor;
 import dobby.io.request.RequestTypes;
 import dobby.util.json.NewJson;
 import hades.authorized.Permission;
-import thot.janus.Janus;
 import thot.connector.Connector;
+import thot.janus.Janus;
 
 import java.util.UUID;
 
+@RegisterFor(PermissionService.class)
 public class PermissionService {
     public static final String PERMISSION_BUCKET = "hades_permissions";
-    private static PermissionService instance;
     private boolean isEnabled = true;
-    private PermissionService() {
+
+    public PermissionService() {
 
     }
 
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
-    }
-
-    public static PermissionService getInstance() {
-        if (instance == null) {
-            instance = new PermissionService();
-        }
-        return instance;
     }
 
     public Permission find(String key) {

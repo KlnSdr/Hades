@@ -1,26 +1,18 @@
 package hades.authorized.service;
 
+import common.inject.annotations.RegisterFor;
 import dobby.util.RouteHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@RegisterFor(AuthorizedRoutesService.class)
 public class AuthorizedRoutesService {
-    private static AuthorizedRoutesService instance;
     private final List<String> authorizedRoutes = new ArrayList<>();
 
-    private AuthorizedRoutesService() {
+    public AuthorizedRoutesService() {
 
-    }
-
-    public static AuthorizedRoutesService getInstance() {
-        if (instance == null) {
-            instance = new AuthorizedRoutesService();
-        }
-
-        return instance;
     }
 
     public void addAuthorizedRoute(String route) {

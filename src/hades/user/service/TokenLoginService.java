@@ -1,23 +1,16 @@
 package hades.user.service;
 
+import common.inject.annotations.RegisterFor;
 import hades.user.User;
 import thot.connector.Connector;
 
 import java.util.UUID;
 
+@RegisterFor(TokenLoginService.class)
 public class TokenLoginService {
     public static final String BUCKET_NAME = "loginTokens";
 
-    private static TokenLoginService instance;
-
-    private TokenLoginService() {
-    }
-
-    public static TokenLoginService getInstance() {
-        if (instance == null) {
-            instance = new TokenLoginService();
-        }
-        return instance;
+    public TokenLoginService() {
     }
 
     public User findByToken(String token) {

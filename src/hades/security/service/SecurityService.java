@@ -1,29 +1,27 @@
 package hades.security.service;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
+import common.logger.Logger;
 import hades.security.Decryptor;
 import hades.security.Encryptor;
 import hades.security.SecurityCommon;
 import hades.security.UserEncryptionKey;
-import common.logger.Logger;
 
 import java.util.UUID;
 
+@RegisterFor(SecurityService.class)
 public class SecurityService {
     private String MASTER_KEY;
     private static final int KEY_SIZE = 64;
     private static SecurityService instance;
-    private static final UserEncryptionKeyService userEncryptionKeyService = UserEncryptionKeyService.getInstance();
+    private final UserEncryptionKeyService userEncryptionKeyService;
     private static final Logger LOGGER = new Logger(SecurityService.class);
     private UserEncryptionKey userEncryptionKey;
 
-    private SecurityService() {
-    }
-
-    public static SecurityService getInstance() {
-        if (instance == null) {
-            instance = new SecurityService();
-        }
-        return instance;
+    @Inject
+    public SecurityService(UserEncryptionKeyService userEncryptionKeyService) {
+        this.userEncryptionKeyService = userEncryptionKeyService;
     }
 
     public void init() {
@@ -33,12 +31,12 @@ public class SecurityService {
         }
     }
 
-    public String getMasterKey() {
+    private String getMasterKey() {
         return MASTER_KEY;
     }
 
     private void warmup(UUID userId) {
-        userEncryptionKey = userEncryptionKeyService.getUserEncryptionKey(userId);
+        userEncryptionKey = userEncryptionKeyService.getUserEncryptionKey(userId, getMasterKey());
 
         if (userEncryptionKey != null) {
             return;
@@ -49,7 +47,7 @@ public class SecurityService {
         userEncryptionKey.setOwner(userId);
 
         userEncryptionKey.setEncryptionKey(generateNewUserKey());
-        if (!userEncryptionKeyService.saveUserEncryptionKey(userEncryptionKey)) {
+        if (!userEncryptionKeyService.saveUserEncryptionKey(userEncryptionKey, getMasterKey())) {
             LOGGER.error("Failed to save user encryption key for user: " + userId);
             throw new RuntimeException("Failed to save user encryption key for user: " + userId);
         }
