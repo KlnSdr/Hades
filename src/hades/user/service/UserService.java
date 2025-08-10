@@ -4,7 +4,6 @@ import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import dobby.io.HttpContext;
 import dobby.session.ISession;
-import dobby.session.Session;
 import dobby.session.service.ISessionService;
 import dobby.util.json.NewJson;
 import hades.user.LoginAttempt;
@@ -96,7 +95,7 @@ public class UserService {
         Connector.delete(LIMIT_LOGIN_BUCKET, userId.toString());
     }
 
-    public boolean isLoggedIn(Session session) {
+    public boolean isLoggedIn(ISession session) {
         final String sessionUserId = session.get("userId");
 
         if (sessionUserId == null) {

@@ -1,5 +1,7 @@
 package hades.authorized.filter;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
@@ -18,7 +20,23 @@ import hades.user.service.UserService;
 
 import java.util.UUID;
 
+@RegisterFor(AutorizedRoutePreFilter.class)
 public class AutorizedRoutePreFilter implements Filter {
+    private final AuthorizedRoutesService authorizedRoutesService;
+    private final UserService userService;
+    private final PermissionCheckService permissionCheckService;
+    private final GroupService groupService;
+    private final PermissionService permissionService;
+
+    @Inject
+    public AutorizedRoutePreFilter(AuthorizedRoutesService authorizedRoutesService, UserService userService, PermissionCheckService permissionCheckService, GroupService groupService, PermissionService permissionService) {
+        this.authorizedRoutesService = authorizedRoutesService;
+        this.userService = userService;
+        this.permissionCheckService = permissionCheckService;
+        this.groupService = groupService;
+        this.permissionService = permissionService;
+    }
+
     @Override
     public String getName() {
         return "authorized-route-filter";
@@ -37,13 +55,13 @@ public class AutorizedRoutePreFilter implements Filter {
     @Override
     public boolean run(HttpContext httpContext) {
         final String path = httpContext.getRequest().getPath();
-        final String matchingRoute = AuthorizedRoutesService.getInstance().getMatching(path);
+        final String matchingRoute = authorizedRoutesService.getMatching(path);
 
         if (matchingRoute == null) {
             return true;
         }
 
-        if (!UserService.getInstance().isLoggedIn(httpContext.getSession())) {
+        if (!userService.isLoggedIn(httpContext.getSession())) {
             httpContext.getResponse().setCode(ResponseCodes.FORBIDDEN);
             new RemoveTemporaryFilesPostFilter().run(httpContext);
             return false;
@@ -64,14 +82,14 @@ public class AutorizedRoutePreFilter implements Filter {
             return false;
         }
 
-        if (PermissionCheckService.getInstance().getMatching(matchingRoute) == null) {
+        if (permissionCheckService.getMatching(matchingRoute) == null) {
             return true;
         }
 
 
         final RequestTypes requestMethod = httpContext.getRequest().getType();
 
-        final Group[] groups = GroupService.getInstance().findGroupsByUser(userId);
+        final Group[] groups = groupService.findGroupsByUser(userId);
         for (Group group : groups) {
             for (Permission permission : group.getPermissions()) {
                 if (permission.getRoute().equalsIgnoreCase(matchingRoute) && permission.hasPermission(requestMethod)) {
@@ -80,7 +98,7 @@ public class AutorizedRoutePreFilter implements Filter {
             }
         }
 
-        if (!PermissionService.getInstance().hasPermission(userId, matchingRoute, requestMethod)) {
+        if (!permissionService.hasPermission(userId, matchingRoute, requestMethod)) {
             httpContext.getResponse().setCode(ResponseCodes.FORBIDDEN);
             new RemoveTemporaryFilesPostFilter().run(httpContext);
             return false;

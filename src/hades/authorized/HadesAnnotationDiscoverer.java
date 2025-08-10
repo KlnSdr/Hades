@@ -1,5 +1,6 @@
 package hades.authorized;
 
+import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import common.util.Classloader;
 import dobby.annotations.Delete;
@@ -16,6 +17,7 @@ import hades.authorized.service.PermissionCheckService;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+@RegisterFor(HadesAnnotationDiscoverer.class)
 public class HadesAnnotationDiscoverer extends Classloader<Object> {
     private static final Logger LOGGER = new Logger(HadesAnnotationDiscoverer.class);
 

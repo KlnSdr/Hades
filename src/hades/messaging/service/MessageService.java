@@ -1,5 +1,6 @@
 package hades.messaging.service;
 
+import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import dobby.util.json.NewJson;
 import hades.messaging.Message;
@@ -14,8 +15,11 @@ import java.util.UUID;
 @RegisterFor(MessageService.class)
 public class MessageService {
     public static final String MESSAGE_BUCKET = "hades_messages";
+    private final UserService userService;
 
-    public MessageService() {
+    @Inject
+    public MessageService(UserService userService) {
+        this.userService = userService;
     }
 
     public Message find(UUID id) {
@@ -67,7 +71,7 @@ public class MessageService {
     public Message newSystemMessage(UUID to, String message) {
         final Message newMessage = new Message();
         newMessage.setTo(to);
-        newMessage.setFrom(UserService.getInstance().getSystemUser().getId());
+        newMessage.setFrom(userService.getSystemUser().getId());
         newMessage.setMessage(message);
         return newMessage;
     }
