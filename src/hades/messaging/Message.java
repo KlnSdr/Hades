@@ -27,9 +27,18 @@ public class Message implements DataClass {
     @JanusString("dateSent")
     private String dateSent;
 
+    private UserService userService;
+
     public Message() {
         id = UUID.randomUUID();
         dateSent = String.valueOf(System.currentTimeMillis());
+        this.userService = null;
+    }
+
+    public Message(UserService userService) {
+        id = UUID.randomUUID();
+        dateSent = String.valueOf(System.currentTimeMillis());
+        this.userService = userService;
     }
 
     public String getMessage() {
@@ -75,9 +84,9 @@ public class Message implements DataClass {
 
     @Override
     public NewJson toJson() {
-        final User toUser = UserService.getInstance().find(to);
+        final User toUser = userService.find(to);
 
-        final User fromUser = from == null ? UserService.getInstance().getSystemUser() : UserService.getInstance().find(from);
+        final User fromUser = from == null ? userService.getSystemUser() : userService.find(from);
 
         if (toUser == null || fromUser == null) {
             throw new RuntimeException("User not found");
@@ -102,5 +111,9 @@ public class Message implements DataClass {
         json.setString("didRead", String.valueOf(didRead));
         json.setString("dateSent", dateSent);
         return json;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

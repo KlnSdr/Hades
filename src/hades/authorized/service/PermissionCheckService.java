@@ -1,25 +1,18 @@
 package hades.authorized.service;
 
+import common.inject.annotations.RegisterFor;
 import dobby.util.RouteHelper;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@RegisterFor(PermissionCheckService.class)
 public class PermissionCheckService {
     private static PermissionCheckService instance;
     private final HashSet<String> permissionCheckRoutes = new HashSet<>();
 
-    private PermissionCheckService() {
+    public PermissionCheckService() {
 
-    }
-
-    public static PermissionCheckService getInstance() {
-        if (instance == null) {
-            instance = new PermissionCheckService();
-        }
-
-        return instance;
     }
 
     public void addPermissionCheckRoute(String route) {
@@ -34,7 +27,7 @@ public class PermissionCheckService {
         }
 
         List<String> patternPaths =
-                permissionCheckRoutes.stream().filter(p -> p.contains("*")).collect(Collectors.toList());
+                permissionCheckRoutes.stream().filter(p -> p.contains("*")).toList();
 
         for (String p : patternPaths) {
             if (RouteHelper.matches(route, p)) {

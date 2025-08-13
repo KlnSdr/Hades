@@ -1,12 +1,14 @@
 package hades.authorized.filter;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
+import dobby.Config;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
-import dobby.session.Session;
-import dobby.Config;
+import dobby.session.ISession;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
@@ -14,8 +16,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 
+@RegisterFor(HadesAuthorizedRedirectPreFilter.class)
 public class HadesAuthorizedRedirectPreFilter implements Filter {
     private static final ArrayList<String> redirectPaths = new ArrayList<>(Arrays.asList("/hades", "/hades/", "/hades/index.html"));
+
+    private final UserService userService;
+
+    @Inject
+    public HadesAuthorizedRedirectPreFilter(UserService userService) {
+        this.userService = userService;
+    }
 
     public static void addRedirectPath(String path) {
         redirectPaths.add(path);
@@ -43,9 +53,9 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
     @Override
     public boolean run(HttpContext httpContext) {
         final String path = httpContext.getRequest().getPath().toLowerCase();
-        final Session session = httpContext.getSession();
+        final ISession session = httpContext.getSession();
 
-        if (UserService.getInstance().isLoggedIn(session)) {
+        if (userService.isLoggedIn(session)) {
             return true;
         }
 

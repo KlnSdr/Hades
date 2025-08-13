@@ -1,0 +1,39 @@
+{
+  "dobby": {
+    "port": 3002,
+    "staticContent": {
+      "directory": "public",
+      "externalDocRoot": ""
+    },
+    "session": {
+      "store": "hades.session.HadesSessionStore"
+    },
+    "logLevel": "info"
+  },
+  "application": {
+    "devMode": true,
+    "dbHost": "thot-container"
+  },
+  "hades": {
+    "apidocs": {
+      "enabled": true,
+      "hideHadesRoutes": false
+    },
+    "disableWelcomeMessage": false,
+    "login": {
+      "tokenHeaderName": "Hades-Login-Token",
+      "maxAttempts": 5,
+      "lockDuration": 300000,
+      "redirect": {
+        "success": "/",
+        "successAdmin": "/hades/"
+      }
+    },
+    "unauthorizedRedirectTarget": "/hades/login",
+    "unauthorizedRedirectPaths": [
+      "/",
+      "/index.html"
+    ],
+    "context": "/local"
+  }
+}

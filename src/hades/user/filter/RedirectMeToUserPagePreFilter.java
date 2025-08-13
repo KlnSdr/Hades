@@ -1,5 +1,7 @@
 package hades.user.filter;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
@@ -8,7 +10,15 @@ import dobby.Config;
 import hades.filter.FilterOrder;
 import hades.user.service.UserService;
 
+@RegisterFor(RedirectMeToUserPagePreFilter.class)
 public class RedirectMeToUserPagePreFilter implements Filter {
+    private final UserService userService;
+
+    @Inject
+    public RedirectMeToUserPagePreFilter(UserService userService) {
+        this.userService = userService;
+    }
+
     @Override
     public String getName() {
         return "redirect-me-to-user-page-pre-filter";
@@ -31,7 +41,7 @@ public class RedirectMeToUserPagePreFilter implements Filter {
             return true;
         }
 
-        if (UserService.getInstance().isLoggedIn(httpContext.getSession())) {
+        if (userService.isLoggedIn(httpContext.getSession())) {
             httpContext.getRequest().setPath("/user/" + httpContext.getSession().get("userId"));
             return true;
         } else {

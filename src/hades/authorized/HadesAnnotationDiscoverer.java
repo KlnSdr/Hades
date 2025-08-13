@@ -1,13 +1,15 @@
 package hades.authorized;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
+import common.logger.Logger;
+import common.util.Classloader;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.annotations.Put;
 import dobby.io.HttpContext;
-import dobby.util.Classloader;
 import dobby.util.RouteHelper;
-import common.logger.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.authorized.service.AuthorizedRoutesService;
@@ -16,11 +18,23 @@ import hades.authorized.service.PermissionCheckService;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+@RegisterFor(HadesAnnotationDiscoverer.class)
 public class HadesAnnotationDiscoverer extends Classloader<Object> {
     private static final Logger LOGGER = new Logger(HadesAnnotationDiscoverer.class);
+    private final PermissionCheckService permissionCheckService;
+    private final AuthorizedRoutesService authorizedRoutesService;
 
-    private HadesAnnotationDiscoverer(String packageName) {
+    @Inject
+    public HadesAnnotationDiscoverer(PermissionCheckService permissionCheckService, AuthorizedRoutesService authorizedRoutesService) {
+        this.packageName = "";
+        this.permissionCheckService = permissionCheckService;
+        this.authorizedRoutesService = authorizedRoutesService;
+    }
+
+    private HadesAnnotationDiscoverer(String packageName, PermissionCheckService permissionCheckService, AuthorizedRoutesService authorizedRoutesService) {
         this.packageName = packageName;
+        this.permissionCheckService = permissionCheckService;
+        this.authorizedRoutesService = authorizedRoutesService;
     }
 
     /**
@@ -28,15 +42,19 @@ public class HadesAnnotationDiscoverer extends Classloader<Object> {
      *
      * @param rootPackage Root package
      */
-    public static void discoverRoutes(String rootPackage) {
+    public static void discoverRoutes(String rootPackage, PermissionCheckService permissionCheckService, AuthorizedRoutesService authorizedRoutesService) {
         if (rootPackage.startsWith(".")) {
             rootPackage = rootPackage.substring(1);
         }
-        HadesAnnotationDiscoverer discoverer = new HadesAnnotationDiscoverer(rootPackage);
+        HadesAnnotationDiscoverer discoverer = new HadesAnnotationDiscoverer(rootPackage, permissionCheckService, authorizedRoutesService);
         discoverer.loadClasses().forEach(discoverer::analyzeClassAndMethods);
         String finalRootPackage = rootPackage;
         discoverer.getPackages().forEach(subpackage -> HadesAnnotationDiscoverer.discoverRoutes(finalRootPackage +
-                "." + subpackage));
+                "." + subpackage, permissionCheckService, authorizedRoutesService));
+    }
+
+    public void discoverRoutes() {
+        discoverRoutes("", permissionCheckService, authorizedRoutesService);
     }
 
     private void analyzeClassAndMethods(Class<?> clazz) {
@@ -55,7 +73,7 @@ public class HadesAnnotationDiscoverer extends Classloader<Object> {
                 final String processedRoute = RouteHelper.extractPathParams(route)._1();
 
                 if (processedRoute != null) {
-                    AuthorizedRoutesService.getInstance().addAuthorizedRoute(processedRoute);
+                    authorizedRoutesService.addAuthorizedRoute(processedRoute);
                     LOGGER.debug("Added route to authorized only: " + processedRoute);
                 }
             }
@@ -68,7 +86,7 @@ public class HadesAnnotationDiscoverer extends Classloader<Object> {
                 final String processedRoute = RouteHelper.extractPathParams(route)._1();
 
                 if (processedRoute != null) {
-                    PermissionCheckService.getInstance().addPermissionCheckRoute(processedRoute);
+                    permissionCheckService.addPermissionCheckRoute(processedRoute);
                     LOGGER.debug("Added route to permission check: " + processedRoute);
                 }
             }

@@ -10,6 +10,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="thot-connector-1.0" level="project" />
     <orderEntry type="library" name="html-1.0" level="project" />
-    <orderEntry type="library" name="dobby-2.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="dobby-2.3-snapshot" level="project" />
   </component>
 </module>

@@ -1,5 +1,7 @@
 package hades.update.service;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import hades.update.Update;
 import hades.update.UpdateDiscoverer;
@@ -13,24 +15,18 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@RegisterFor(UpdateService.class)
 public class UpdateService {
     private static final Logger LOGGER = new Logger(UpdateService.class);
     public static final String BUCKET_NAME = "hades_updates";
-    private static UpdateService instance;
     private Boolean isInstalled = null;
 
     private static final List<Update> updates = new ArrayList<>();
 
-    private UpdateService() {
+    @Inject
+    public UpdateService() {
         UpdateDiscoverer.discoverRoutes("");
         sortUpdates();
-    }
-
-    public static UpdateService getInstance() {
-        if (instance == null) {
-            instance = new UpdateService();
-        }
-        return instance;
     }
 
     public static void addUpdate(Update update) {

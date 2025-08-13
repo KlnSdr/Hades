@@ -1,5 +1,7 @@
 package hades.apps.installer;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
@@ -8,9 +10,15 @@ import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
 import hades.update.service.UpdateService;
 
+@RegisterFor(InstallerResource.class)
 public class InstallerResource {
     private static final String BASE_PATH = "/installer";
-    private static final UpdateService updateService = UpdateService.getInstance();
+    private final UpdateService updateService;
+
+    @Inject
+    public InstallerResource(UpdateService updateService) {
+        this.updateService = updateService;
+    }
 
     @ApiDoc(
             summary = "Run installation procedure",
@@ -51,11 +59,11 @@ public class InstallerResource {
 
         final String adminPassword = body.getString("adminPassword");
 
-        final boolean updatesRanSuccessfully = UpdateService.getInstance().runUpdates(new String[]{"SetUserDefinedAdminPassword"}, new String[][]{new String[]{adminPassword}});
+        final boolean updatesRanSuccessfully = updateService.runUpdates(new String[]{"SetUserDefinedAdminPassword"}, new String[][]{new String[]{adminPassword}});
 
         if (updatesRanSuccessfully) {
             context.getResponse().setBody("Hades has been successfully installed.");
-            UpdateService.getInstance().setInstalled(true);
+            updateService.setInstalled(true);
         } else {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
             context.getResponse().setBody("Failed to install Hades.");

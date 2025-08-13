@@ -1,5 +1,7 @@
 package hades.authorized.rest;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
@@ -20,8 +22,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@RegisterFor(PermissionResource.class)
 public class PermissionResource {
     private static final String BASE_PATH = "/rest/permission";
+
+    private final PermissionCheckService permissionCheckService;
+    private final PermissionService permissionService;
+
+    @Inject
+    public PermissionResource(PermissionCheckService permissionCheckService, PermissionService permissionService) {
+        this.permissionCheckService = permissionCheckService;
+        this.permissionService = permissionService;
+    }
 
     @AuthorizedOnly
     @ApiDoc(
@@ -40,7 +52,7 @@ public class PermissionResource {
     @Get(BASE_PATH + "/checked-routes")
     public void getAllPermissionCheckedRoutes(HttpContext context) {
         final NewJson response = new NewJson();
-        response.setList("routes", PermissionCheckService.getInstance().getPermissionCheckRoutes());
+        response.setList("routes", permissionCheckService.getPermissionCheckRoutes());
         context.getResponse().setBody(response);
     }
 
@@ -70,7 +82,7 @@ public class PermissionResource {
             return;
         }
 
-        Permission[] permissions = PermissionService.getInstance().findByUser(userId);
+        Permission[] permissions = permissionService.findByUser(userId);
 
         final NewJson response = new NewJson();
         response.setList("permissions", List.of(Arrays.stream(permissions).map(Permission::toJson).toArray()));
@@ -125,7 +137,7 @@ public class PermissionResource {
         permission.setPermissionPUT(body.getInt("put").equals(1));
         permission.setPermissionDELETE(body.getInt("delete").equals(1));
 
-        final boolean success = PermissionService.getInstance().update(permission);
+        final boolean success = permissionService.update(permission);
 
         if (!success) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
@@ -168,7 +180,7 @@ public class PermissionResource {
 
         final String route = URLDecoder.decode(context.getRequest().getParam("route"), StandardCharsets.UTF_8);
 
-        final boolean success = PermissionService.getInstance().delete(userId, route);
+        final boolean success = permissionService.delete(userId, route);
 
         if (!success) {
             context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);

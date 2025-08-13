@@ -1,5 +1,7 @@
 package hades.update.updates;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
 import hades.update.Update;
@@ -12,10 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@RegisterFor(CreateDbExplorerPermissions.class)
 public class CreateDbExplorerPermissions implements Update {
+    private final UserService userService;
+    private final GroupService groupService;
+
+    @Inject
+    public CreateDbExplorerPermissions(UserService userService, GroupService groupService) {
+        this.userService = userService;
+        this.groupService = groupService;
+    }
+
     @Override
     public boolean run() {
-        final User[] adminRead = UserService.getInstance().findByName("admin");
+        final User[] adminRead = userService.findByName("admin");
 
         if (adminRead.length == 0) {
             return false;
@@ -30,11 +42,11 @@ public class CreateDbExplorerPermissions implements Update {
             dbExplorerGroup.addPermission(permission);
         }
 
-        if (!GroupService.getInstance().update(dbExplorerGroup)) {
+        if (!groupService.update(dbExplorerGroup)) {
             return false;
         }
 
-        return GroupService.getInstance().addUserToGroup(admin.getId().toString(), dbExplorerGroup.getKey());
+        return groupService.addUserToGroup(admin.getId().toString(), dbExplorerGroup.getKey());
     }
 
     private List<Permission> buildPermissions(UUID groupId) {

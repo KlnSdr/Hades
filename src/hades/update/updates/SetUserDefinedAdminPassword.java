@@ -1,5 +1,7 @@
 package hades.update.updates;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import hades.update.Update;
 import hades.update.UpdateOrder;
@@ -10,8 +12,16 @@ import java.util.Arrays;
 
 import static hades.security.PasswordHasher.hashPassword;
 
+@RegisterFor(SetUserDefinedAdminPassword.class)
 public class SetUserDefinedAdminPassword implements Update {
     private static final Logger LOGGER = new Logger(SetUserDefinedAdminPassword.class);
+
+    private final UserService userService;
+
+    @Inject
+    public SetUserDefinedAdminPassword(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean run(String[] args) {
@@ -37,16 +47,16 @@ public class SetUserDefinedAdminPassword implements Update {
     }
 
     private boolean runUpdate(String password) {
-        final User[] adminRead = UserService.getInstance().findByName("admin");
+        final User[] adminRead = userService.findByName("admin");
 
         if (adminRead.length == 0) {
             return false;
         }
         final User admin = adminRead[0];
 
-        admin.setPassword(hashPassword(new String(password)));
+        admin.setPassword(hashPassword(password));
 
-        return UserService.getInstance().update(admin);
+        return userService.update(admin);
     }
 
     @Override

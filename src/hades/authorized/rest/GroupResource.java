@@ -1,5 +1,7 @@
 package hades.authorized.rest;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
@@ -23,8 +25,18 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RegisterFor(GroupResource.class)
 public class GroupResource {
     private static final String BASE_PATH = "/rest/groups";
+
+    private final GroupService groupService;
+    private final UserService userService;
+
+    @Inject
+    public GroupResource(GroupService groupService, UserService userService) {
+        this.groupService = groupService;
+        this.userService = userService;
+    }
 
     @PermissionCheck
     @AuthorizedOnly
@@ -43,8 +55,6 @@ public class GroupResource {
     )
     @Get(BASE_PATH + "/all")
     public void getAllGroups(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
-
         final Group[] groups = groupService.findAll();
 
         final NewJson body = new NewJson();
@@ -84,8 +94,6 @@ public class GroupResource {
     )
     @Post(BASE_PATH)
     public void createGroup(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
-
         if (!validateCreateGroupRequest(context.getRequest().getBody())) {
             context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
             final NewJson response = new NewJson();
@@ -139,8 +147,6 @@ public class GroupResource {
     )
     @Get(BASE_PATH + "/id/{groupId}")
     public void getGroup(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
-
         final String groupId = context.getRequest().getParam("groupId");
 
         final Group group = groupService.find(groupId);
@@ -177,8 +183,6 @@ public class GroupResource {
     )
     @Delete(BASE_PATH + "/id/{groupId}")
     public void deleteGroup(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
-
         final String groupId = context.getRequest().getParam("groupId");
 
         if (!groupService.delete(groupId)) {
@@ -228,8 +232,6 @@ public class GroupResource {
             context.getResponse().setBody(response);
             return;
         }
-
-        final GroupService groupService = GroupService.getInstance();
 
         final String groupId = context.getRequest().getParam("groupId");
 
@@ -281,8 +283,6 @@ public class GroupResource {
     )
     @Get(BASE_PATH + "/user/{userId}")
     public void getGroupsForUser(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
-
         final String userId = context.getRequest().getParam("userId");
         final UUID userUUID;
 
@@ -334,8 +334,6 @@ public class GroupResource {
     )
     @Post(BASE_PATH + "/user/{userId}/group/{groupId}")
     public void addUserToGroup(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
-
         final String userId = context.getRequest().getParam("userId");
         final String groupId = context.getRequest().getParam("groupId");
 
@@ -352,7 +350,7 @@ public class GroupResource {
         }
 
         final Group group = groupService.find(groupId);
-        final User user = UserService.getInstance().find(userUUID);
+        final User user = userService.find(userUUID);
 
         if (group == null || user == null) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
@@ -398,7 +396,6 @@ public class GroupResource {
     )
     @Delete(BASE_PATH + "/group/{groupId}/permission/{permissionRoute}")
     public void deletePermissionFromGroup(HttpContext context) {
-        final GroupService groupService = GroupService.getInstance();
         final String route = URLDecoder.decode(context.getRequest().getParam("permissionRoute"),
                 StandardCharsets.UTF_8);
 

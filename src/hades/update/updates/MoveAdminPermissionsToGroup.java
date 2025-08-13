@@ -1,5 +1,7 @@
 package hades.update.updates;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
@@ -9,17 +11,29 @@ import hades.update.UpdateOrder;
 import hades.user.User;
 import hades.user.service.UserService;
 
+@RegisterFor(MoveAdminPermissionsToGroup.class)
 public class MoveAdminPermissionsToGroup implements Update {
+    private final UserService userService;
+    private final GroupService groupService;
+    private final PermissionService permissionService;
+
+    @Inject
+    public MoveAdminPermissionsToGroup(UserService userService, GroupService groupService, PermissionService permissionService) {
+        this.userService = userService;
+        this.groupService = groupService;
+        this.permissionService = permissionService;
+    }
+
     @Override
     public boolean run() {
-        final User[] adminRead = UserService.getInstance().findByName("admin");
+        final User[] adminRead = userService.findByName("admin");
 
         if (adminRead.length == 0) {
             return false;
         }
         final User admin = adminRead[0];
 
-        final Permission[] permissions = PermissionService.getInstance().findByUser(admin.getId());
+        final Permission[] permissions = permissionService.findByUser(admin.getId());
 
         if (permissions.length == 0) {
             return false;
@@ -29,16 +43,16 @@ public class MoveAdminPermissionsToGroup implements Update {
 
         for (Permission permission : permissions) {
             adminGroup.addPermission(permission);
-            if (!PermissionService.getInstance().delete(permission.getKey())) {
+            if (!permissionService.delete(permission.getKey())) {
                 return false;
             }
         }
 
-        if (!GroupService.getInstance().update(adminGroup)) {
+        if (!groupService.update(adminGroup)) {
             return false;
         }
 
-        return GroupService.getInstance().addUserToGroup(admin.getId().toString(), adminGroup.getKey());
+        return groupService.addUserToGroup(admin.getId().toString(), adminGroup.getKey());
     }
 
     @Override

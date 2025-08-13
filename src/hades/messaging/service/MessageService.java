@@ -1,32 +1,34 @@
 package hades.messaging.service;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.util.json.NewJson;
 import hades.messaging.Message;
 import hades.user.service.UserService;
-import thot.janus.Janus;
 import thot.connector.Connector;
+import thot.janus.Janus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.UUID;
 
+@RegisterFor(MessageService.class)
 public class MessageService {
     public static final String MESSAGE_BUCKET = "hades_messages";
-    private static MessageService instance;
+    private final UserService userService;
 
-    private MessageService() {
-    }
-
-    public static MessageService getInstance() {
-        if (instance == null) {
-            instance = new MessageService();
-        }
-
-        return instance;
+    @Inject
+    public MessageService(UserService userService) {
+        this.userService = userService;
     }
 
     public Message find(UUID id) {
-        return Janus.parse(Connector.read(MESSAGE_BUCKET, id.toString(), NewJson.class), Message.class);
+        final Message message = Janus.parse(Connector.read(MESSAGE_BUCKET, id.toString(), NewJson.class), Message.class);
+        if (message == null) {
+            return null;
+        }
+        message.setUserService(userService);
+        return message;
     }
 
     public boolean delete(UUID id) {
@@ -51,6 +53,7 @@ public class MessageService {
         final ArrayList<Message> unreadMessages = new ArrayList<>();
         for (Message message : messages) {
             if (message.getTo().equals(userId) && !message.didRead()) {
+                message.setUserService(userService);
                 unreadMessages.add(message);
             }
         }
@@ -60,11 +63,11 @@ public class MessageService {
     }
 
     public Message newMessage() {
-        return new Message();
+        return new Message(userService);
     }
 
     public Message newMessage(UUID to, UUID from, String message) {
-        final Message newMessage = new Message();
+        final Message newMessage = new Message(userService);
         newMessage.setTo(to);
         newMessage.setFrom(from);
         newMessage.setMessage(message);
@@ -72,9 +75,9 @@ public class MessageService {
     }
 
     public Message newSystemMessage(UUID to, String message) {
-        final Message newMessage = new Message();
+        final Message newMessage = new Message(userService);
         newMessage.setTo(to);
-        newMessage.setFrom(UserService.getInstance().getSystemUser().getId());
+        newMessage.setFrom(userService.getSystemUser().getId());
         newMessage.setMessage(message);
         return newMessage;
     }

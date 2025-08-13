@@ -3,10 +3,12 @@ package hades.apidocs.filter;
 import common.html.Document;
 import common.html.Headline;
 import common.html.HtmlElement;
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import dobby.Config;
 import dobby.files.StaticFile;
-import dobby.files.service.StaticFileService;
+import dobby.files.service.IStaticFileService;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
@@ -20,9 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RegisterFor(BuildApiDocsPreFilter.class)
 public class BuildApiDocsPreFilter implements Filter {
-    private static final StaticFileService staticFileService = StaticFileService.getInstance();
+    private final IStaticFileService staticFileService;
     private static final Logger LOGGER = new Logger(BuildApiDocsPreFilter.class);
+
+    @Inject
+    public BuildApiDocsPreFilter(IStaticFileService staticFileService) {
+        this.staticFileService = staticFileService;
+    }
 
     @Override
     public String getName() {

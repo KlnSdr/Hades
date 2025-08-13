@@ -1,5 +1,7 @@
 package hades.update.updates;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
@@ -10,10 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@RegisterFor(AddConfigFilePermission.class)
 public class AddConfigFilePermission implements Update {
+    private final GroupService groupService;
+
+    @Inject
+    public AddConfigFilePermission(GroupService groupService) {
+        this.groupService = groupService;
+    }
+
     @Override
     public boolean run() {
-        final Group group = GroupService.getInstance().findByName("admin");
+        final Group group = groupService.findByName("admin");
 
         if (group == null) {
             return false;
@@ -25,7 +35,7 @@ public class AddConfigFilePermission implements Update {
             group.addPermission(permission);
         }
 
-        return GroupService.getInstance().update(group);
+        return groupService.update(group);
     }
 
     private List<Permission> buildPermissions(UUID groupId) {
