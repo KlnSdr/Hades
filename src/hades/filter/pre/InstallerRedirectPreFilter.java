@@ -1,5 +1,7 @@
 package hades.filter.pre;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
@@ -8,7 +10,15 @@ import dobby.Config;
 import hades.filter.FilterOrder;
 import hades.update.service.UpdateService;
 
+@RegisterFor(InstallerRedirectPreFilter.class)
 public class InstallerRedirectPreFilter implements Filter {
+    private final UpdateService updateService;
+
+    @Inject
+    public InstallerRedirectPreFilter(UpdateService updateService) {
+        this.updateService = updateService;
+    }
+
     @Override
     public String getName() {
         return "InstallerRedirectPreFilter";
@@ -26,7 +36,7 @@ public class InstallerRedirectPreFilter implements Filter {
 
     @Override
     public boolean run(HttpContext httpContext) {
-        if (UpdateService.getInstance().isInstalled()) {
+        if (updateService.isInstalled()) {
             return true;
         }
 

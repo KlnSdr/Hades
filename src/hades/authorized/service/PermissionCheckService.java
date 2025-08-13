@@ -5,7 +5,6 @@ import dobby.util.RouteHelper;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RegisterFor(PermissionCheckService.class)
 public class PermissionCheckService {
@@ -28,7 +27,7 @@ public class PermissionCheckService {
         }
 
         List<String> patternPaths =
-                permissionCheckRoutes.stream().filter(p -> p.contains("*")).collect(Collectors.toList());
+                permissionCheckRoutes.stream().filter(p -> p.contains("*")).toList();
 
         for (String p : patternPaths) {
             if (RouteHelper.matches(route, p)) {

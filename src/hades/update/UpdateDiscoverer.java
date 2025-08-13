@@ -1,13 +1,15 @@
 package hades.update;
 
-import dobby.util.Classloader;
+import common.inject.InjectorService;
 import common.logger.Logger;
+import common.util.Classloader;
 import hades.update.service.UpdateService;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class UpdateDiscoverer extends Classloader<Update> {
     private static final Logger LOGGER = new Logger(UpdateDiscoverer.class);
+    private static final InjectorService injectorService = InjectorService.getInstance();
 
     private UpdateDiscoverer(String packageName) {
         this.packageName = packageName;
@@ -25,6 +27,11 @@ public class UpdateDiscoverer extends Classloader<Update> {
         UpdateDiscoverer discoverer = new UpdateDiscoverer(rootPackage);
         discoverer.loadClasses().forEach(update -> {
             try {
+                final Update updateInstance = injectorService.getInstanceNullable(update);
+                if (updateInstance != null) {
+                    UpdateService.addUpdate(updateInstance);
+                    return;
+                }
                 UpdateService.addUpdate(update.getDeclaredConstructor().newInstance());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException e) {

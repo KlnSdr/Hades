@@ -1,5 +1,7 @@
 package hades.messaging.rest;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
@@ -21,9 +23,17 @@ import java.util.stream.Collectors;
 
 import static hades.user.rest.UserResource.uuidFromString;
 
+@RegisterFor(MessageResource.class)
 public class MessageResource {
     private static final Logger LOGGER = new Logger(MessageResource.class);
     private static final String BASE_PATH = "/rest/messages";
+
+    private final MessageService messageService;
+
+    @Inject
+    public MessageResource(MessageService messageService) {
+        this.messageService = messageService;
+    }
 
     @AuthorizedOnly
     @ApiDoc(
@@ -52,7 +62,7 @@ public class MessageResource {
             return;
         }
 
-        final Message[] unreadMessages = MessageService.getInstance().findUnreadMessages(userId);
+        final Message[] unreadMessages = messageService.findUnreadMessages(userId);
 
         final NewJson response = new NewJson();
         response.setList("messages", Arrays.stream(unreadMessages).map(Message::toJson).collect(Collectors.toList()));
@@ -97,7 +107,7 @@ public class MessageResource {
             return;
         }
 
-        final Message message = MessageService.getInstance().find(messageId);
+        final Message message = messageService.find(messageId);
 
         if (message == null || !message.getTo().equals(userId)) {
             sendMessageNotFound(messageId, context);
@@ -145,7 +155,7 @@ public class MessageResource {
             return;
         }
 
-        final Message message = MessageService.getInstance().find(messageId);
+        final Message message = messageService.find(messageId);
 
         if (message == null) {
             sendMessageNotFound(messageId, context);
@@ -159,7 +169,7 @@ public class MessageResource {
 
         message.setDidRead(true);
 
-        MessageService.getInstance().update(message);
+        messageService.update(message);
     }
 
     @AuthorizedOnly
@@ -203,14 +213,14 @@ public class MessageResource {
             return;
         }
 
-        final Message message = MessageService.getInstance().find(messageId);
+        final Message message = messageService.find(messageId);
 
         if (message == null || !message.getTo().equals(userId)) {
             sendMessageNotFound(messageId, context);
             return;
         }
 
-        final boolean success = MessageService.getInstance().delete(messageId);
+        final boolean success = messageService.delete(messageId);
 
         if (!success) {
             final NewJson response = new NewJson();
@@ -274,9 +284,9 @@ public class MessageResource {
         final UUID userToId = uuidFromString(userToIdString, context);
         final UUID userFromId = uuidFromString(userFromIdString, context);
 
-        final Message message = MessageService.getInstance().newMessage(userToId, userFromId, messageContent);
+        final Message message = messageService.newMessage(userToId, userFromId, messageContent);
 
-        final boolean success = MessageService.getInstance().update(message);
+        final boolean success = messageService.update(message);
 
         if (!success) {
             final NewJson response = new NewJson();

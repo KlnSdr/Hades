@@ -1,5 +1,9 @@
 package hades.user.rest;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
+import common.logger.Logger;
+import dobby.Config;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
@@ -8,10 +12,8 @@ import dobby.io.HttpContext;
 import dobby.io.request.Request;
 import dobby.io.response.Response;
 import dobby.io.response.ResponseCodes;
-import dobby.session.Session;
-import dobby.Config;
+import dobby.session.ISession;
 import dobby.util.json.NewJson;
-import common.logger.Logger;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.apidocs.annotations.ApiDoc;
@@ -28,12 +30,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@RegisterFor(UserResource.class)
 public class UserResource {
     private static final Logger LOGGER = new Logger(UserResource.class);
     private static final String ROUTE_PREFIX = "/rest/users";
 
     private static String normalLoginRedirect = null;
     private static String adminLoginRedirect = null;
+
+    private final UserService userService;
+    private final TokenLoginService tokenLoginService;
+    private final GroupService groupService;
+
+    @Inject
+    public UserResource(UserService userService, TokenLoginService tokenLoginService, GroupService groupService) {
+        this.userService = userService;
+        this.tokenLoginService = tokenLoginService;
+        this.groupService = groupService;
+    }
 
     private static String getNormalLoginRedirect() {
         if (normalLoginRedirect == null) {
@@ -73,14 +87,14 @@ public class UserResource {
             return;
         }
 
-        if (UserService.getInstance().findByName(createUserDTO.getDisplayName()).length > 0) {
+        if (userService.findByName(createUserDTO.getDisplayName()).length > 0) {
             UserResourceErrorResponses.displayNameAlreadyTaken(context.getResponse(), createUserDTO.getDisplayName());
             return;
         }
 
         final User user = createUserDTO.toUser();
 
-        final boolean userNameAlreadyTaken = UserService.getInstance().findByName(user.getDisplayName()).length > 0;
+        final boolean userNameAlreadyTaken = userService.findByName(user.getDisplayName()).length > 0;
 
         if (userNameAlreadyTaken) {
             UserResourceErrorResponses.displayNameAlreadyTaken(context.getResponse(), user.getDisplayName());
@@ -94,7 +108,7 @@ public class UserResource {
         }
         user.setPassword(hashedPassword);
 
-        final boolean didStore = UserService.getInstance().update(user);
+        final boolean didStore = userService.update(user);
 
         final Response response = context.getResponse();
 
@@ -103,8 +117,8 @@ public class UserResource {
             return;
         }
 
-        UserService.getInstance().logUserIn(user, context);
-        TokenLoginService.getInstance().setTokenForUser(user, TokenLoginService.getInstance().generateTokenForUser());
+        userService.logUserIn(user, context);
+        tokenLoginService.setTokenForUser(user, tokenLoginService.generateTokenForUser());
 
         response.setCode(ResponseCodes.CREATED);
         final NewJson resPayload = new NewJson();
@@ -135,7 +149,7 @@ public class UserResource {
 
         final LoginUserDTO loginUserDTO = LoginUserDTO.fromRequest(request);
 
-        final User[] users = UserService.getInstance().findByName(loginUserDTO.getDisplayName());
+        final User[] users = userService.findByName(loginUserDTO.getDisplayName());
 
         if (users.length == 0) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), loginUserDTO.getDisplayName());
@@ -143,7 +157,7 @@ public class UserResource {
         }
 
         final User user = users[0];
-        boolean isLocked = UserService.getInstance().isLocked(user.getId());
+        boolean isLocked = userService.isLocked(user.getId());
 
         if (isLocked) {
             UserResourceErrorResponses.userIsLocked(context.getResponse());
@@ -151,18 +165,18 @@ public class UserResource {
         }
 
         if (!PasswordHasher.verifyPassword(loginUserDTO.getPassword(), user.getPassword())) {
-            UserService.getInstance().incrementLoginAttempts(user.getId());
+            userService.incrementLoginAttempts(user.getId());
             UserResourceErrorResponses.wrongPassword(context.getResponse());
             return;
         }
 
-        UserService.getInstance().logUserIn(user, context);
-        UserService.getInstance().resetLoginAttempts(user.getId());
+        userService.logUserIn(user, context);
+        userService.resetLoginAttempts(user.getId());
 
         final NewJson resPayload = new NewJson();
         resPayload.setJson("user", user.toJson());
 
-        final Group[] groups = GroupService.getInstance().findGroupsByUser(user.getId());
+        final Group[] groups = groupService.findGroupsByUser(user.getId());
         boolean isAdmin = false;
         for (Group group : groups) {
             if (group.getName().equals("admin")) {
@@ -190,7 +204,7 @@ public class UserResource {
     @ApiResponse(code = 200, message = "User logged out")
     @Get(ROUTE_PREFIX + "/logout")
     public void doLogout(HttpContext context) {
-        final Session session = context.getSession();
+        final ISession session = context.getSession();
         if (session == null) {
             return;
         }
@@ -220,7 +234,7 @@ public class UserResource {
             return;
         }
 
-        final User user = UserService.getInstance().find(id);
+        final User user = userService.find(id);
 
         if (user == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
@@ -252,7 +266,7 @@ public class UserResource {
             return;
         }
 
-        final boolean didDelete = UserService.getInstance().delete(id);
+        final boolean didDelete = userService.delete(id);
 
         if (!didDelete) {
             UserResourceErrorResponses.couldNotDelete(context.getResponse(), idString);
@@ -271,7 +285,7 @@ public class UserResource {
     @ApiResponse(code = 404, message = "The user was not found")
     @Get(ROUTE_PREFIX + "/loginUserInfo")
     public void getLoginUserInfo(HttpContext context) {
-        final Session session = context.getSession();
+        final ISession session = context.getSession();
         if (session == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), "unknown");
             return;
@@ -283,7 +297,7 @@ public class UserResource {
             return;
         }
 
-        final User user = UserService.getInstance().find(UUID.fromString(userId));
+        final User user = userService.find(UUID.fromString(userId));
         if (user == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), userId);
             return;
@@ -303,7 +317,7 @@ public class UserResource {
     @ApiResponse(code = 403, message = "User does not have permission to access this resource")
     @Get(ROUTE_PREFIX + "/all")
     public void getAllUsers(HttpContext context) {
-        final User[] users = UserService.getInstance().findAll();
+        final User[] users = userService.findAll();
 
         final NewJson response = new NewJson();
         response.setList("users", List.of(Arrays.stream(users).map(User::toJson).toArray()));
@@ -331,7 +345,7 @@ public class UserResource {
             return;
         }
 
-        final User user = UserService.getInstance().find(id);
+        final User user = userService.find(id);
 
         if (user == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
@@ -350,7 +364,7 @@ public class UserResource {
 
         user.setMail(mail);
 
-        final boolean didUpdate = UserService.getInstance().update(user);
+        final boolean didUpdate = userService.update(user);
 
         if (!didUpdate) {
             UserResourceErrorResponses.couldNotSaveUser(context.getResponse(), user.getDisplayName());
@@ -380,24 +394,24 @@ public class UserResource {
             return;
         }
 
-        final User user = UserService.getInstance().find(id);
+        final User user = userService.find(id);
 
         if (user == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
             return;
         }
 
-        final String newToken = TokenLoginService.getInstance().generateTokenForUser();
-        final String oldToken = TokenLoginService.getInstance().findTokenForUser(user);
+        final String newToken = tokenLoginService.generateTokenForUser();
+        final String oldToken = tokenLoginService.findTokenForUser(user);
 
         if (!oldToken.isEmpty()) {
-            if (!TokenLoginService.getInstance().delete(oldToken)) {
+            if (!tokenLoginService.delete(oldToken)) {
                 ErrorResponses.internalError(context.getResponse(), "Could not delete old token");
                 return;
             }
         }
 
-        final boolean didSave = TokenLoginService.getInstance().setTokenForUser(user, newToken);
+        final boolean didSave = tokenLoginService.setTokenForUser(user, newToken);
         if (!didSave) {
             ErrorResponses.internalError(context.getResponse(), "Could not save new token");
             return;
@@ -428,7 +442,7 @@ public class UserResource {
             return;
         }
 
-        final User user = UserService.getInstance().find(id);
+        final User user = userService.find(id);
 
         if (user == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
@@ -445,14 +459,14 @@ public class UserResource {
             return;
         }
 
-        if (UserService.getInstance().findByName(name).length > 0) {
+        if (userService.findByName(name).length > 0) {
             UserResourceErrorResponses.displayNameAlreadyTaken(context.getResponse(), name);
             return;
         }
 
         user.setDisplayName(name);
 
-        final boolean didUpdate = UserService.getInstance().update(user);
+        final boolean didUpdate = userService.update(user);
 
         if (!didUpdate) {
             UserResourceErrorResponses.couldNotSaveUser(context.getResponse(), user.getDisplayName());
@@ -482,7 +496,7 @@ public class UserResource {
             return;
         }
 
-        final User user = UserService.getInstance().find(id);
+        final User user = userService.find(id);
 
         if (user == null) {
             UserResourceErrorResponses.userNotFound(context.getResponse(), idString);
@@ -514,7 +528,7 @@ public class UserResource {
 
         user.setPassword(hashedPassword);
 
-        final boolean didUpdate = UserService.getInstance().update(user);
+        final boolean didUpdate = userService.update(user);
 
         if (!didUpdate) {
             UserResourceErrorResponses.couldNotSaveUser(context.getResponse(), user.getDisplayName());

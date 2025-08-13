@@ -6,11 +6,11 @@ import hades.security.service.SecurityService;
 import java.util.UUID;
 
 public abstract class Encryptable {
-    protected final SecurityService securityService;
+    protected SecurityService securityService;
     protected UUID uuid;
 
-    protected Encryptable() {
-        this.securityService = SecurityService.getInstance();
+    public Encryptable(SecurityService securityService) {
+        this.securityService = securityService;
     }
 
     protected String encrypt(String value) {

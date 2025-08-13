@@ -1,15 +1,17 @@
 package hades.template;
 
+import common.inject.annotations.RegisterFor;
 import dobby.files.StaticFile;
 import dobby.util.json.NewJson;
 
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+@RegisterFor(TemplateEngine.class)
 public class TemplateEngine {
     private static final Pattern VARIABLE_PATTER = Pattern.compile("\\{\\{[a-zA-Z]+}}");
 
-    public static StaticFile render(StaticFile template, NewJson data) {
+    public StaticFile render(StaticFile template, NewJson data) {
         final StaticFile renderedTemplate = new StaticFile();
         renderedTemplate.setContentType(template.getContentType());
 

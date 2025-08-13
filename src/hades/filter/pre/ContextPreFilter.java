@@ -1,17 +1,29 @@
 package hades.filter.pre;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
+import dobby.Config;
 import dobby.files.StaticFile;
-import dobby.files.service.StaticFileService;
+import dobby.files.service.IStaticFileService;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
-import dobby.Config;
 import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
 import hades.template.TemplateEngine;
 
+@RegisterFor(ContextPreFilter.class)
 public class ContextPreFilter implements Filter {
+    private final IStaticFileService staticFileService;
+    private final TemplateEngine templateEngine;
+
+    @Inject
+    public ContextPreFilter(IStaticFileService staticFileService, TemplateEngine templateEngine) {
+        this.staticFileService = staticFileService;
+        this.templateEngine = templateEngine;
+    }
+
     @Override
     public String getName() {
         return "ContextPreFilter";
@@ -42,9 +54,9 @@ public class ContextPreFilter implements Filter {
             data.setString("INVALIDCONTEXT", getContextFromPath(path.toLowerCase()));
             httpContext.getResponse().setCode(ResponseCodes.NOT_FOUND);
 
-            final StaticFile contextNotFoundFile = StaticFileService.getInstance().get("/error/ContextNotFound.html");
+            final StaticFile contextNotFoundFile = staticFileService.get("/error/ContextNotFound.html");
             if (contextNotFoundFile != null) {
-                httpContext.getResponse().sendFile(TemplateEngine.render(contextNotFoundFile, data));
+                httpContext.getResponse().sendFile(templateEngine.render(contextNotFoundFile, data));
             }
             return false;
         }

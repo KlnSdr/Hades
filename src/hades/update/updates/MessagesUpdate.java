@@ -1,5 +1,7 @@
 package hades.update.updates;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import hades.authorized.Group;
 import hades.authorized.Permission;
@@ -13,7 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@RegisterFor(MessagesUpdate.class)
 public class MessagesUpdate implements Update {
+    private final GroupService groupService;
+
+    @Inject
+    public MessagesUpdate(GroupService groupService) {
+        this.groupService = groupService;
+    }
+
     private static final Logger LOGGER = new Logger(MessagesUpdate.class);
     @Override
     public boolean run() {
@@ -23,7 +33,7 @@ public class MessagesUpdate implements Update {
             return false;
         }
 
-        final Group group = GroupService.getInstance().findByName("admin");
+        final Group group = groupService.findByName("admin");
 
         if (group == null) {
             LOGGER.error("Failed to find admin user");
@@ -36,7 +46,7 @@ public class MessagesUpdate implements Update {
             group.addPermission(permission);
         }
 
-        if (!GroupService.getInstance().update(group)) {
+        if (!groupService.update(group)) {
             LOGGER.error("Failed to update group");
             return false;
         }

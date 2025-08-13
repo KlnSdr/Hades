@@ -1,5 +1,6 @@
 package hades.user.service;
 
+import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import hades.user.User;
 import thot.connector.Connector;
@@ -9,8 +10,11 @@ import java.util.UUID;
 @RegisterFor(TokenLoginService.class)
 public class TokenLoginService {
     public static final String BUCKET_NAME = "loginTokens";
+    public UserService userService;
 
-    public TokenLoginService() {
+    @Inject
+    public TokenLoginService(UserService userService) {
+        this.userService = userService;
     }
 
     public User findByToken(String token) {
@@ -19,7 +23,7 @@ public class TokenLoginService {
             return null;
         }
 
-        return UserService.getInstance().find(UUID.fromString(userId));
+        return userService.find(UUID.fromString(userId));
     }
 
     public boolean setTokenForUser(User user, String token) {

@@ -1,9 +1,13 @@
 package hades;
 
+import common.inject.InjectorService;
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import dobby.Config;
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
+import dobby.files.service.IStaticFileService;
 import dobby.files.service.StaticFileService;
 import dobby.util.StaticContentDir;
 import hades.annotations.DisablePermissionCheck;
@@ -23,16 +27,60 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+@RegisterFor(Hades.class)
 public class Hades implements DobbyEntryPoint {
     private static final String version = "v2.4-snapshot";
     private static final Logger LOGGER = new Logger(Hades.class);
+    private static final InjectorService injectorService = InjectorService.getInstance();
+    private final PermissionService permissionService;
+    private final UpdateService updateService;
+    private final UserService userService;
+    private final MessageService messageService;
+    private final SecurityService securityService;
+    private final IStaticFileService staticFileService;
+    private final HadesAnnotationDiscoverer hadesAnnotationDiscoverer;
+    private final ReplaceContextInFilesObserver replaceContextInFilesObserver;
+
+    public Hades(HadesDependencyProvider hadesDependencyProvider) {
+        if (hadesDependencyProvider == null) {
+            LOGGER.error("HadesDependencyProvider is null. Please ensure it is properly injected.");
+            System.exit(1);
+        }
+        this.permissionService = hadesDependencyProvider.getPermissionService();
+        this.updateService = hadesDependencyProvider.getUpdateService();
+        this.userService = hadesDependencyProvider.getUserService();
+        this.messageService = hadesDependencyProvider.getMessageService();
+        this.securityService = hadesDependencyProvider.getSecurityService();
+        this.staticFileService = hadesDependencyProvider.getStaticFileService();
+        this.hadesAnnotationDiscoverer = hadesDependencyProvider.getHadesAnnotationDiscoverer();
+        this.replaceContextInFilesObserver = hadesDependencyProvider.getReplaceContextInFilesObserver();
+    }
+
+    @Inject
+    public Hades(PermissionService permissionService,
+                 UpdateService updateService,
+                 UserService userService,
+                 MessageService messageService,
+                 SecurityService securityService,
+                 IStaticFileService staticFileService,
+                 HadesAnnotationDiscoverer hadesAnnotationDiscoverer,
+                 ReplaceContextInFilesObserver replaceContextInFilesObserver) {
+        this.permissionService = permissionService;
+        this.updateService = updateService;
+        this.userService = userService;
+        this.messageService = messageService;
+        this.securityService = securityService;
+        this.staticFileService = staticFileService;
+        this.hadesAnnotationDiscoverer = hadesAnnotationDiscoverer;
+        this.replaceContextInFilesObserver = replaceContextInFilesObserver;
+    }
 
     public static String getVersion() {
         return version;
     }
 
     public static void main(String[] args) {
-        new Hades().startApplication(Hades.class);
+        injectorService.getInstance(Hades.class).startApplication(Hades.class);
     }
 
     public void startApplication(Class<?> clazz) {
@@ -64,24 +112,24 @@ public class Hades implements DobbyEntryPoint {
         addObservers();
 
         if (Dobby.getMainClass().isAnnotationPresent(DisablePermissionCheck.class)) {
-            PermissionService.getInstance().setEnabled(false);
+            permissionService.setEnabled(false);
             LOGGER.info("Permission check is disabled.");
         }
 
-        if (UpdateService.getInstance().isInstalled()) {
+        if (updateService.isInstalled()) {
             LOGGER.info("running updates...");
-            if (!UpdateService.getInstance().runUpdates()) {
+            if (!updateService.runUpdates()) {
                 System.exit(1);
             }
         }
 
         LOGGER.info("discovering protected routes...");
-        HadesAnnotationDiscoverer.discoverRoutes("");
+        hadesAnnotationDiscoverer.discoverRoutes();
     }
 
     private void warmupSecurityService() {
         try {
-            SecurityService.getInstance().init();
+            securityService.init();
         } catch (Exception e) {
             LOGGER.error("Failed to initialize SecurityService");
             LOGGER.trace(e);
@@ -99,7 +147,7 @@ public class Hades implements DobbyEntryPoint {
 
     private void addObservers() {
         LOGGER.info("registering observers...");
-        StaticFileService.getInstance().addObserver(new ReplaceContextInFilesObserver());
+        ((StaticFileService)staticFileService).addObserver(replaceContextInFilesObserver);
     }
 
     private void registerStaticContentRoot() {
@@ -108,7 +156,7 @@ public class Hades implements DobbyEntryPoint {
 
     @Override
     public void postStart() {
-        if (UpdateService.getInstance().isInstalled()) {
+        if (updateService.isInstalled()) {
             sendWelcomeMessage();
         } else {
             LOGGER.error("Hades is not installed. Please run the installer:");
@@ -121,8 +169,7 @@ public class Hades implements DobbyEntryPoint {
             return;
         }
 
-        final MessageService messageService = MessageService.getInstance();
-        final User admin = UserService.getInstance().getAdminUser();
+        final User admin = userService.getAdminUser();
         final String content = "Hades " + version + " started on the " + LocalDate.now() + " at " + LocalTime.now();
 
         if (admin == null) {

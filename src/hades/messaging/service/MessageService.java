@@ -23,7 +23,12 @@ public class MessageService {
     }
 
     public Message find(UUID id) {
-        return Janus.parse(Connector.read(MESSAGE_BUCKET, id.toString(), NewJson.class), Message.class);
+        final Message message = Janus.parse(Connector.read(MESSAGE_BUCKET, id.toString(), NewJson.class), Message.class);
+        if (message == null) {
+            return null;
+        }
+        message.setUserService(userService);
+        return message;
     }
 
     public boolean delete(UUID id) {
@@ -48,6 +53,7 @@ public class MessageService {
         final ArrayList<Message> unreadMessages = new ArrayList<>();
         for (Message message : messages) {
             if (message.getTo().equals(userId) && !message.didRead()) {
+                message.setUserService(userService);
                 unreadMessages.add(message);
             }
         }
@@ -57,11 +63,11 @@ public class MessageService {
     }
 
     public Message newMessage() {
-        return new Message();
+        return new Message(userService);
     }
 
     public Message newMessage(UUID to, UUID from, String message) {
-        final Message newMessage = new Message();
+        final Message newMessage = new Message(userService);
         newMessage.setTo(to);
         newMessage.setFrom(from);
         newMessage.setMessage(message);
@@ -69,7 +75,7 @@ public class MessageService {
     }
 
     public Message newSystemMessage(UUID to, String message) {
-        final Message newMessage = new Message();
+        final Message newMessage = new Message(userService);
         newMessage.setTo(to);
         newMessage.setFrom(userService.getSystemUser().getId());
         newMessage.setMessage(message);

@@ -1,5 +1,7 @@
 package hades.user.filter;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
@@ -10,8 +12,16 @@ import hades.user.service.UserService;
 
 import java.util.regex.Pattern;
 
+@RegisterFor(ReplaceDisplayNamePreFilter.class)
 public class ReplaceDisplayNamePreFilter implements Filter {
     private static final Pattern UUID_PATTER = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+    private final UserService userService;
+
+    @Inject
+    public ReplaceDisplayNamePreFilter(UserService userService) {
+        this.userService = userService;
+    }
+
     @Override
     public String getName() {
         return "replace-display-name";
@@ -58,7 +68,7 @@ public class ReplaceDisplayNamePreFilter implements Filter {
             return true;
         }
 
-        final User[] user = UserService.getInstance().findByName(id);
+        final User[] user = userService.findByName(id);
         if (user.length != 1) {
             return true;
         }
