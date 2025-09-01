@@ -20,6 +20,7 @@
       "hideHadesRoutes": false
     },
     "disableWelcomeMessage": false,
+    "enableEncryption": false,
     "login": {
       "tokenHeaderName": "Hades-Login-Token",
       "maxAttempts": 5,

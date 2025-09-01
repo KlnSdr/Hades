@@ -105,7 +105,9 @@ public class Hades implements DobbyEntryPoint {
         System.out.println("powered by Hades " + version);
         System.out.println();
 
-        warmupSecurityService();
+        if (Config.getInstance().getBoolean("hades.enableEncryption", false)) {
+            warmupSecurityService();
+        }
         ensureThotIsRunning();
         registerStaticContentRoot();
         addUnAuthorizedRedirectPaths();

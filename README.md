@@ -31,6 +31,7 @@ placing a `style.css` file in the static content directory of your project in a 
 ## Configuration
 - `hades.context`: The context path of the Hades web interface. Default: `/`
 - `hades.disableWelcomeMessage`: Don't send a message indicating when the system was (re)started to the admin user.
+- `hades.enableEncryption`: Enable the encryption password that can be used to encrypt sensitive data. Default: `false` (if set to `true` the `MASTER_KEY` environment variable must be set)
 - `hades.login.maxAttempts`: The maximum number of login attempts before the user is locked out. Default: `5`
 - `hades.login.lockDuration`: The duration in milliseconds a user is locked out after reaching the maximum number of login
   attempts. Default: `300000`
