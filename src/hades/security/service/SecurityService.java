@@ -17,7 +17,7 @@ public class SecurityService {
     private static SecurityService instance;
     private final UserEncryptionKeyService userEncryptionKeyService;
     private static final Logger LOGGER = new Logger(SecurityService.class);
-    private UserEncryptionKey userEncryptionKey;
+    private final ThreadLocal<UserEncryptionKey> userEncryptionKey = new ThreadLocal<>();
 
     @Inject
     public SecurityService(UserEncryptionKeyService userEncryptionKeyService) {
@@ -36,28 +36,29 @@ public class SecurityService {
     }
 
     private void warmup(UUID userId) {
-        userEncryptionKey = userEncryptionKeyService.getUserEncryptionKey(userId, getMasterKey());
+        userEncryptionKey.set(userEncryptionKeyService.getUserEncryptionKey(userId, getMasterKey()));
 
-        if (userEncryptionKey != null) {
+        if (userEncryptionKey.get() != null) {
             return;
         }
 
         LOGGER.debug("User encryption key not found for user: " + userId);
-        userEncryptionKey = new UserEncryptionKey();
-        userEncryptionKey.setOwner(userId);
+        final UserEncryptionKey tmp = new UserEncryptionKey();
+        tmp.setOwner(userId);
 
-        userEncryptionKey.setEncryptionKey(generateNewUserKey());
-        if (!userEncryptionKeyService.saveUserEncryptionKey(userEncryptionKey, getMasterKey())) {
+        tmp.setEncryptionKey(generateNewUserKey());
+        if (!userEncryptionKeyService.saveUserEncryptionKey(tmp, getMasterKey())) {
             LOGGER.error("Failed to save user encryption key for user: " + userId);
             throw new RuntimeException("Failed to save user encryption key for user: " + userId);
         }
+        userEncryptionKey.set(tmp);
     }
 
     public String encryptForUser(String data, UUID userId) {
         if (userEncryptionKey == null) {
             warmup(userId);
         }
-        return new Encryptor().encrypt(data, userEncryptionKey.getEncryptionKey()).orElse(null);
+        return new Encryptor().encrypt(data, userEncryptionKey.get().getEncryptionKey()).orElse(null);
     }
 
     private String generateNewUserKey() {
@@ -68,6 +69,6 @@ public class SecurityService {
         if (userEncryptionKey == null) {
             warmup(userId);
         }
-        return new Decryptor().decrypt(data, userEncryptionKey.getEncryptionKey()).orElse(null);
+        return new Decryptor().decrypt(data, userEncryptionKey.get().getEncryptionKey()).orElse(null);
     }
 }
