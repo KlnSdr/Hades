@@ -80,10 +80,10 @@ public class Hades implements DobbyEntryPoint {
     }
 
     public static void main(String[] args) {
-        injectorService.getInstance(Hades.class).startApplication(Hades.class);
+        startApplication(Hades.class);
     }
 
-    public void startApplication(Class<?> clazz) {
+    public static void startApplication(Class<?> clazz) {
         if (clazz == null) {
             LOGGER.error("No class provided to start the application.");
             System.exit(1);
