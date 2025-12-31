@@ -6,7 +6,7 @@ import common.html.HtmlElement;
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
-import dobby.Config;
+import dobby.IConfig;
 import dobby.files.StaticFile;
 import dobby.files.service.IStaticFileService;
 import dobby.filter.Filter;
@@ -25,11 +25,13 @@ import java.util.Map;
 @RegisterFor(BuildApiDocsPreFilter.class)
 public class BuildApiDocsPreFilter implements Filter {
     private final IStaticFileService staticFileService;
+    private final IConfig config;
     private static final Logger LOGGER = new Logger(BuildApiDocsPreFilter.class);
 
     @Inject
-    public BuildApiDocsPreFilter(IStaticFileService staticFileService) {
+    public BuildApiDocsPreFilter(IStaticFileService staticFileService, IConfig config) {
         this.staticFileService = staticFileService;
+        this.config = config;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class BuildApiDocsPreFilter implements Filter {
         final String docsPath = "/apidocs/index.html";
         final String requestUri = httpContext.getRequest().getPath();
 
-        if (!Config.getInstance().getBoolean("hades.apidocs.enabled", false)) {
+        if (!config.getBoolean("hades.apidocs.enabled", false)) {
             return true;
         }
 
@@ -84,7 +86,7 @@ public class BuildApiDocsPreFilter implements Filter {
 
         final Document doc = new Document();
         doc.setTitle("API Docs");
-        doc.addChild(new Headline(1, "API Docs of " + Config.getInstance().getString("application.name", "\t&lt;APP_NAME\t&gt;")));
+        doc.addChild(new Headline(1, "API Docs of " + config.getString("application.name", "\t&lt;APP_NAME\t&gt;")));
         doc.addStyle("{{CONTEXT}}/apidocs/index.css");
         doc.addStyle("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 

@@ -2,7 +2,7 @@ package hades.authorized.filter;
 
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
-import dobby.Config;
+import dobby.IConfig;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
@@ -21,10 +21,12 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
     private static final ArrayList<String> redirectPaths = new ArrayList<>(Arrays.asList("/hades", "/hades/", "/hades/index.html"));
 
     private final UserService userService;
+    private final IConfig config;
 
     @Inject
-    public HadesAuthorizedRedirectPreFilter(UserService userService) {
+    public HadesAuthorizedRedirectPreFilter(UserService userService, IConfig config) {
         this.userService = userService;
+        this.config = config;
     }
 
     public static void addRedirectPath(String path) {
@@ -61,8 +63,8 @@ public class HadesAuthorizedRedirectPreFilter implements Filter {
 
         if (redirectPaths.contains(path)) {
             final Response response = httpContext.getResponse();
-            final String context = Config.getInstance().getString("hades.context", "");
-            String targetPath = Config.getInstance().getString("hades.unauthorizedRedirectTarget", "/hades/login");
+            final String context = config.getString("hades.context", "");
+            String targetPath = config.getString("hades.unauthorizedRedirectTarget", "/hades/login");
 
             if (targetPath.equals("/hades/login")) {
                 targetPath += "?src=" + Base64.getEncoder().encodeToString((context + path).getBytes());

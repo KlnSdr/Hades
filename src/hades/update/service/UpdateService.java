@@ -6,7 +6,7 @@ import common.logger.Logger;
 import hades.update.Update;
 import hades.update.UpdateDiscoverer;
 import hades.update.updates.HadesInstalledUpdate;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,11 +20,13 @@ public class UpdateService {
     private static final Logger LOGGER = new Logger(UpdateService.class);
     public static final String BUCKET_NAME = "hades_updates";
     private Boolean isInstalled = null;
+    private final IConnector connector;
 
     private static final List<Update> updates = new ArrayList<>();
 
     @Inject
-    public UpdateService() {
+    public UpdateService(IConnector connector) {
+        this.connector = connector;
         UpdateDiscoverer.discoverRoutes("");
         sortUpdates();
     }
@@ -38,7 +40,7 @@ public class UpdateService {
     }
 
     private boolean checkIfInstalled() {
-        return didUpdateRun(new HadesInstalledUpdate());
+        return didUpdateRun(new HadesInstalledUpdate(connector));
     }
 
     public boolean isInstalled() {
@@ -95,13 +97,13 @@ public class UpdateService {
     }
 
     private void markUpdateRan(Update update) {
-        Connector.write(BUCKET_NAME, update.getName(), true);
+        connector.write(BUCKET_NAME, update.getName(), true);
     }
 
     private boolean didUpdateRun(Update update) {
         final String updateName = update.getName();
 
-        final Object didRun = Connector.read(BUCKET_NAME, updateName, Object.class);
+        final Object didRun = connector.read(BUCKET_NAME, updateName, Object.class);
 
         return didRun != null;
     }

@@ -5,7 +5,7 @@ import common.inject.annotations.RegisterFor;
 import dobby.util.json.NewJson;
 import hades.messaging.Message;
 import hades.user.service.UserService;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 import thot.janus.Janus;
 
 import java.util.ArrayList;
@@ -16,14 +16,16 @@ import java.util.UUID;
 public class MessageService {
     public static final String MESSAGE_BUCKET = "hades_messages";
     private final UserService userService;
+    private final IConnector connector;
 
     @Inject
-    public MessageService(UserService userService) {
+    public MessageService(UserService userService, IConnector connector) {
         this.userService = userService;
+        this.connector = connector;
     }
 
     public Message find(UUID id) {
-        final Message message = Janus.parse(Connector.read(MESSAGE_BUCKET, id.toString(), NewJson.class), Message.class);
+        final Message message = Janus.parse(connector.read(MESSAGE_BUCKET, id.toString(), NewJson.class), Message.class);
         if (message == null) {
             return null;
         }
@@ -32,15 +34,15 @@ public class MessageService {
     }
 
     public boolean delete(UUID id) {
-        return Connector.delete(MESSAGE_BUCKET, id.toString());
+        return connector.delete(MESSAGE_BUCKET, id.toString());
     }
 
     public boolean update(Message message) {
-        return Connector.write(MESSAGE_BUCKET, message.getKey(), message.toStoreJson());
+        return connector.write(MESSAGE_BUCKET, message.getKey(), message.toStoreJson());
     }
 
     public Message[] findUnreadMessages(UUID userId) {
-        final NewJson[] result = Connector.readPattern(MESSAGE_BUCKET, ".*", NewJson.class);
+        final NewJson[] result = connector.readPattern(MESSAGE_BUCKET, ".*", NewJson.class);
         if (result == null) {
             return new Message[0];
         }

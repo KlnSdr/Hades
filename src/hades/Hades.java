@@ -1,12 +1,11 @@
 package hades;
 
-import common.inject.InjectorService;
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
-import dobby.Config;
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
+import dobby.IConfig;
 import dobby.files.service.IStaticFileService;
 import dobby.files.service.StaticFileService;
 import dobby.util.StaticContentDir;
@@ -21,7 +20,7 @@ import hades.security.service.SecurityService;
 import hades.update.service.UpdateService;
 import hades.user.User;
 import hades.user.service.UserService;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,7 +30,6 @@ import java.util.List;
 public class Hades implements DobbyEntryPoint {
     private static final String version = "v2.4-snapshot";
     private static final Logger LOGGER = new Logger(Hades.class);
-    private static final InjectorService injectorService = InjectorService.getInstance();
     private final PermissionService permissionService;
     private final UpdateService updateService;
     private final UserService userService;
@@ -40,6 +38,9 @@ public class Hades implements DobbyEntryPoint {
     private final IStaticFileService staticFileService;
     private final HadesAnnotationDiscoverer hadesAnnotationDiscoverer;
     private final ReplaceContextInFilesObserver replaceContextInFilesObserver;
+    private final StaticContentDir staticContentDir;
+    private final IConfig config;
+    private final IConnector connector;
 
     public Hades(HadesDependencyProvider hadesDependencyProvider) {
         if (hadesDependencyProvider == null) {
@@ -54,6 +55,9 @@ public class Hades implements DobbyEntryPoint {
         this.staticFileService = hadesDependencyProvider.getStaticFileService();
         this.hadesAnnotationDiscoverer = hadesDependencyProvider.getHadesAnnotationDiscoverer();
         this.replaceContextInFilesObserver = hadesDependencyProvider.getReplaceContextInFilesObserver();
+        this.staticContentDir = hadesDependencyProvider.getStaticContentDir();
+        this.config = hadesDependencyProvider.getConfig();
+        this.connector = hadesDependencyProvider.getConnector();
     }
 
     @Inject
@@ -64,7 +68,10 @@ public class Hades implements DobbyEntryPoint {
                  SecurityService securityService,
                  IStaticFileService staticFileService,
                  HadesAnnotationDiscoverer hadesAnnotationDiscoverer,
-                 ReplaceContextInFilesObserver replaceContextInFilesObserver) {
+                 ReplaceContextInFilesObserver replaceContextInFilesObserver,
+                 StaticContentDir staticContentDir,
+                 IConfig config,
+                 IConnector connector) {
         this.permissionService = permissionService;
         this.updateService = updateService;
         this.userService = userService;
@@ -73,6 +80,9 @@ public class Hades implements DobbyEntryPoint {
         this.staticFileService = staticFileService;
         this.hadesAnnotationDiscoverer = hadesAnnotationDiscoverer;
         this.replaceContextInFilesObserver = replaceContextInFilesObserver;
+        this.staticContentDir = staticContentDir;
+        this.config = config;
+        this.connector = connector;
     }
 
     public static String getVersion() {
@@ -92,7 +102,7 @@ public class Hades implements DobbyEntryPoint {
     }
 
     private void ensureThotIsRunning() {
-        final boolean isThotUp = Connector.write("system", "isRunning", true);
+        final boolean isThotUp = connector.write("system", "isRunning", true);
 
         if (!isThotUp) {
             LOGGER.error("Thot is not running. Please start Thot.");
@@ -105,7 +115,7 @@ public class Hades implements DobbyEntryPoint {
         System.out.println("powered by Hades " + version);
         System.out.println();
 
-        if (Config.getInstance().getBoolean("hades.enableEncryption", false)) {
+        if (config.getBoolean("hades.enableEncryption", false)) {
             warmupSecurityService();
         }
         ensureThotIsRunning();
@@ -140,7 +150,7 @@ public class Hades implements DobbyEntryPoint {
     }
 
     private void addUnAuthorizedRedirectPaths() {
-        final List<Object> redirectPaths = Config.getInstance().getList("hades.unauthorizedRedirectPaths", List.of());
+        final List<Object> redirectPaths = config.getList("hades.unauthorizedRedirectPaths", List.of());
 
         for (Object path : redirectPaths) {
             HadesAuthorizedRedirectPreFilter.addRedirectPath(path.toString());
@@ -153,7 +163,7 @@ public class Hades implements DobbyEntryPoint {
     }
 
     private void registerStaticContentRoot() {
-        StaticContentDir.appendToContentDir(Hades.class, "static");
+        staticContentDir.appendToContentDir(Hades.class, "static");
     }
 
     @Override
@@ -162,12 +172,12 @@ public class Hades implements DobbyEntryPoint {
             sendWelcomeMessage();
         } else {
             LOGGER.error("Hades is not installed. Please run the installer:");
-            LOGGER.error("access the installer at: http://localhost:" + Config.getInstance().getInt("dobby.port", 3000) + "/hades/installer");
+            LOGGER.error("access the installer at: http://localhost:" + config.getInt("dobby.port", 3000) + "/hades/installer");
         }
     }
 
     private void sendWelcomeMessage() {
-        if (Config.getInstance().getBoolean("hades.disableWelcomeMessage", false)) {
+        if (config.getBoolean("hades.disableWelcomeMessage", false)) {
             return;
         }
 

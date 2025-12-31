@@ -2,21 +2,23 @@ package hades.filter.pre;
 
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
+import dobby.IConfig;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
-import dobby.Config;
 import hades.filter.FilterOrder;
 import hades.update.service.UpdateService;
 
 @RegisterFor(InstallerRedirectPreFilter.class)
 public class InstallerRedirectPreFilter implements Filter {
     private final UpdateService updateService;
+    private final IConfig config;
 
     @Inject
-    public InstallerRedirectPreFilter(UpdateService updateService) {
+    public InstallerRedirectPreFilter(UpdateService updateService, IConfig config) {
         this.updateService = updateService;
+        this.config = config;
     }
 
     @Override
@@ -45,7 +47,7 @@ public class InstallerRedirectPreFilter implements Filter {
         }
 
         httpContext.getResponse().setCode(ResponseCodes.FOUND);
-        httpContext.getResponse().setHeader("Location", Config.getInstance().getString("hades.context", "") + "/hades/installer");
+        httpContext.getResponse().setHeader("Location", config.getString("hades.context", "") + "/hades/installer");
         return false;
     }
 }

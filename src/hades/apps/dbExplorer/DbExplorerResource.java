@@ -1,5 +1,7 @@
 package hades.apps.dbExplorer;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
@@ -10,15 +12,22 @@ import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static dobby.util.JsonConverter.convert;
 
+@RegisterFor(DbExplorerResource.class)
 public class DbExplorerResource {
     private static final String BASE_PATH = "/dbExplorer";
+    private final IConnector connector;
+
+    @Inject
+    public DbExplorerResource(IConnector connector) {
+        this.connector = connector;
+    }
 
     @PermissionCheck
     @AuthorizedOnly
@@ -37,7 +46,7 @@ public class DbExplorerResource {
     )
     @Get(BASE_PATH + "/buckets")
     public void getBuckets(HttpContext context) {
-        final String[] bucketNames = Connector.getBuckets();
+        final String[] bucketNames = connector.getBuckets();
 
 
         final NewJson response = new NewJson();
@@ -74,7 +83,7 @@ public class DbExplorerResource {
         }
 
         final String bucketName = body.getString("bucket");
-        final String[] keys = Connector.getKeys(bucketName);
+        final String[] keys = connector.getKeys(bucketName);
 
         final NewJson response = new NewJson();
         response.setList("keys", Arrays.stream(keys).map(key -> (Object) key).collect(Collectors.toList()));
@@ -115,7 +124,7 @@ public class DbExplorerResource {
 
         final String bucketName = body.getString("bucket");
         final String key = body.getString("key");
-        final Object[] value = Connector.readPattern(bucketName, key, Object.class);
+        final Object[] value = connector.readPattern(bucketName, key, Object.class);
 
         if (value == null || value.length == 0) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
@@ -190,7 +199,7 @@ public class DbExplorerResource {
         final String bucketName = body.getString("bucket");
         final String key = body.getString("key");
 
-        if (!Connector.delete(bucketName, key)) {
+        if (!connector.delete(bucketName, key)) {
             context.getResponse().setCode(ResponseCodes.NOT_FOUND);
             return;
         }

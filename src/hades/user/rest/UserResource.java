@@ -3,7 +3,7 @@ package hades.user.rest;
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
-import dobby.Config;
+import dobby.IConfig;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
@@ -41,24 +41,26 @@ public class UserResource {
     private final UserService userService;
     private final TokenLoginService tokenLoginService;
     private final GroupService groupService;
+    private final IConfig config;
 
     @Inject
-    public UserResource(UserService userService, TokenLoginService tokenLoginService, GroupService groupService) {
+    public UserResource(UserService userService, TokenLoginService tokenLoginService, GroupService groupService, IConfig config) {
         this.userService = userService;
         this.tokenLoginService = tokenLoginService;
         this.groupService = groupService;
+        this.config = config;
     }
 
-    private static String getNormalLoginRedirect() {
+    private String getNormalLoginRedirect() {
         if (normalLoginRedirect == null) {
-            normalLoginRedirect = Config.getInstance().getString("hades.login.redirect.success", "/");
+            normalLoginRedirect = config.getString("hades.login.redirect.success", "/");
         }
         return normalLoginRedirect;
     }
 
-    private static String getAdminLoginRedirect() {
+    private String getAdminLoginRedirect() {
         if (adminLoginRedirect == null) {
-            adminLoginRedirect = Config.getInstance().getString("hades.login.redirect.successAdmin", getNormalLoginRedirect());
+            adminLoginRedirect = config.getString("hades.login.redirect.successAdmin", getNormalLoginRedirect());
         }
         return adminLoginRedirect;
     }
@@ -124,7 +126,7 @@ public class UserResource {
         final NewJson resPayload = new NewJson();
         resPayload.setJson("user", user.toJson());
         resPayload.setString("redirectTo",
-                Config.getInstance().getString("hades.context", "") + getNormalLoginRedirect());
+                config.getString("hades.context", "") + getNormalLoginRedirect());
 
         context.getResponse().setBody(resPayload);
     }
@@ -185,7 +187,7 @@ public class UserResource {
             }
         }
 
-        final String appContext = Config.getInstance().getString("hades.context", "");
+        final String appContext = config.getString("hades.context", "");
 
         if (isAdmin) {
             resPayload.setString("redirectTo", appContext + getAdminLoginRedirect());

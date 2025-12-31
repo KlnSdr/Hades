@@ -1,19 +1,22 @@
 package hades.user;
 
-import dobby.Config;
+import common.inject.InjectorService;
+import dobby.IConfig;
 import dobby.util.json.NewJson;
 import hades.user.service.UserService;
+import thot.api.annotations.v2.Bucket;
 import thot.janus.DataClass;
 import thot.janus.annotations.JanusBoolean;
 import thot.janus.annotations.JanusInteger;
 import thot.janus.annotations.JanusString;
 import thot.janus.annotations.JanusUUID;
-import thot.api.annotations.v2.Bucket;
 
 import java.util.UUID;
 
 @Bucket(UserService.LIMIT_LOGIN_BUCKET)
 public class LoginAttempt implements DataClass {
+    private static int MAX_LOGIN_ATTEMPTS;
+    private static int LOCK_DURATION;
     @JanusUUID("userId")
     private UUID userId;
     @JanusInteger("loginAttempts")
@@ -26,9 +29,13 @@ public class LoginAttempt implements DataClass {
     private String lockedUntil;
 
     public LoginAttempt() {
+        final IConfig config = InjectorService.getInstance().getInstance(IConfig.class);
+        MAX_LOGIN_ATTEMPTS = config.getInt("maxLoginAttempts", 5);
+        LOCK_DURATION = config.getInt("lockDuration", 300000);
     }
 
     public LoginAttempt(UUID userId, Integer loginAttempts) {
+        this();
         this.userId = userId;
         this.loginAttempts = loginAttempts;
     }
@@ -36,8 +43,8 @@ public class LoginAttempt implements DataClass {
     public void incrementLoginAttempts() {
         loginAttempts++;
 
-        if (loginAttempts >= Config.getInstance().getInt("maxLoginAttempts", 5)) {
-            lockForDuration(Config.getInstance().getInt("lockDuration", 300000));
+        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+            lockForDuration(LOCK_DURATION);
         }
     }
 

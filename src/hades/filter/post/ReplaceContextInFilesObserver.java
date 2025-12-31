@@ -2,7 +2,7 @@ package hades.filter.post;
 
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
-import dobby.Config;
+import dobby.IConfig;
 import dobby.files.StaticFile;
 import dobby.files.service.IStaticFileService;
 import dobby.observer.Event;
@@ -16,11 +16,13 @@ import hades.template.TemplateEngine;
 public class ReplaceContextInFilesObserver implements Observer<Tupel<String, StaticFile>> {
     private final IStaticFileService staticFileService;
     private final TemplateEngine templateEngine;
+    private final IConfig config;
 
     @Inject
-    public ReplaceContextInFilesObserver(IStaticFileService staticFileService, TemplateEngine templateEngine) {
+    public ReplaceContextInFilesObserver(IStaticFileService staticFileService, TemplateEngine templateEngine, IConfig config) {
         this.staticFileService = staticFileService;
         this.templateEngine = templateEngine;
+        this.config = config;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class ReplaceContextInFilesObserver implements Observer<Tupel<String, Sta
         }
 
         final NewJson json = new NewJson();
-        json.setString("CONTEXT", Config.getInstance().getString("hades.context", ""));
+        json.setString("CONTEXT", config.getString("hades.context", ""));
 
         final StaticFile renderedFile = templateEngine.render(file, json);
 

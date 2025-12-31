@@ -3,6 +3,7 @@ package hades.filter.pre;
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import dobby.Config;
+import dobby.IConfig;
 import dobby.files.StaticFile;
 import dobby.files.service.IStaticFileService;
 import dobby.filter.Filter;
@@ -17,11 +18,13 @@ import hades.template.TemplateEngine;
 public class ContextPreFilter implements Filter {
     private final IStaticFileService staticFileService;
     private final TemplateEngine templateEngine;
+    private final IConfig config;
 
     @Inject
-    public ContextPreFilter(IStaticFileService staticFileService, TemplateEngine templateEngine) {
+    public ContextPreFilter(IStaticFileService staticFileService, TemplateEngine templateEngine, IConfig config) {
         this.staticFileService = staticFileService;
         this.templateEngine = templateEngine;
+        this.config = config;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ContextPreFilter implements Filter {
     @Override
     public boolean run(HttpContext httpContext) {
         final String path = httpContext.getRequest().getPath();
-        String appContext = Config.getInstance().getString("hades.context", null);
+        String appContext = config.getString("hades.context", null);
 
         if (appContext == null) {
             return true;

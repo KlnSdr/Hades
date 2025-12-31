@@ -1,12 +1,13 @@
 package hades.security.service;
 
+import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import common.logger.Logger;
 import dobby.util.json.NewJson;
 import hades.security.Decryptor;
 import hades.security.Encryptor;
 import hades.security.UserEncryptionKey;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 import thot.janus.Janus;
 
 import java.util.Optional;
@@ -16,12 +17,15 @@ import java.util.UUID;
 public class UserEncryptionKeyService {
     public static final String BUCKET_NAME = "ciclops_user_encryption_key";
     private static final Logger LOGGER = new Logger(UserEncryptionKeyService.class);
+    private final IConnector connector;
 
-    public UserEncryptionKeyService() {
+    @Inject
+    public UserEncryptionKeyService(IConnector connector) {
+        this.connector = connector;
     }
 
     public UserEncryptionKey getUserEncryptionKey(UUID userId, String masterKey) {
-        final UserEncryptionKey key = Janus.parse(Connector.read(BUCKET_NAME, userId.toString(), NewJson.class), UserEncryptionKey.class);
+        final UserEncryptionKey key = Janus.parse(connector.read(BUCKET_NAME, userId.toString(), NewJson.class), UserEncryptionKey.class);
         if (key == null) {
             LOGGER.debug("User encryption key not found for user: " + userId);
             return null;
@@ -50,6 +54,6 @@ public class UserEncryptionKeyService {
         encryptedUserEncryptionKey.setOwner(userEncryptionKey.getOwner());
         encryptedUserEncryptionKey.setEncryptionKey(encryptedKey);
 
-        return Connector.write(BUCKET_NAME, userEncryptionKey.getKey(), encryptedUserEncryptionKey.toJson());
+        return connector.write(BUCKET_NAME, userEncryptionKey.getKey(), encryptedUserEncryptionKey.toJson());
     }
 }

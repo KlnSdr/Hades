@@ -1,14 +1,24 @@
 package hades.update.updates;
 
+import common.inject.annotations.Inject;
+import common.inject.annotations.RegisterFor;
 import hades.update.Update;
 import hades.update.UpdateOrder;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 
+@RegisterFor(AddLimitLoginTable.class)
 public class AddLimitLoginTable implements Update {
+    private final IConnector connector;
+
+    @Inject
+    public AddLimitLoginTable(IConnector connector) {
+        this.connector = connector;
+    }
+
     @Override
     public boolean run() {
         final String bucketName = "hades_limit_login";
-        return Connector.write(bucketName, "TEST", "") && Connector.delete(bucketName, "TEST");
+        return connector.write(bucketName, "TEST", "") && connector.delete(bucketName, "TEST");
     }
 
     @Override

@@ -1,8 +1,9 @@
 package hades.apidocs;
 
+import common.inject.InjectorService;
 import common.logger.Logger;
 import common.util.Classloader;
-import dobby.Config;
+import dobby.IConfig;
 import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
@@ -45,7 +46,7 @@ public class RouteDocumentationDiscoverer extends Classloader<Object> {
             rootPackage = rootPackage.substring(1);
         }
 
-        if (Config.getInstance().getBoolean("hades.apidocs.hideHadesRoutes", false) && rootPackage.startsWith("hades")) {
+        if (InjectorService.getInstance().getInstance(IConfig.class).getBoolean("hades.apidocs.hideHadesRoutes", false) && rootPackage.startsWith("hades")) {
             return;
         }
 

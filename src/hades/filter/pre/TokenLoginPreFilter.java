@@ -2,10 +2,10 @@ package hades.filter.pre;
 
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
+import dobby.IConfig;
 import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
-import dobby.Config;
 import hades.common.Util;
 import hades.filter.FilterOrder;
 import hades.user.User;
@@ -14,13 +14,15 @@ import hades.user.service.UserService;
 
 @RegisterFor(TokenLoginPreFilter.class)
 public class TokenLoginPreFilter implements Filter {
-    private TokenLoginService tokenLoginService;
-    private UserService userService;
+    private final TokenLoginService tokenLoginService;
+    private final UserService userService;
+    private final IConfig config;
 
     @Inject
-    public TokenLoginPreFilter(TokenLoginService tokenLoginService, UserService userService) {
+    public TokenLoginPreFilter(TokenLoginService tokenLoginService, UserService userService, IConfig config) {
         this.tokenLoginService = tokenLoginService;
         this.userService = userService;
+        this.config = config;
     }
 
     @Override
@@ -40,7 +42,7 @@ public class TokenLoginPreFilter implements Filter {
 
     @Override
     public boolean run(HttpContext httpContext) {
-        final String headerName = Config.getInstance().getString("hades.login.tokenHeaderName", "Hades-Auth-Token");
+        final String headerName = config.getString("hades.login.tokenHeaderName", "Hades-Auth-Token");
 
         if (!Util.requestHasHeader(httpContext.getRequest(), headerName)) {
             return true;

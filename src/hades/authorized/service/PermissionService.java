@@ -1,10 +1,11 @@
 package hades.authorized.service;
 
+import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
 import dobby.io.request.RequestTypes;
 import dobby.util.json.NewJson;
 import hades.authorized.Permission;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 import thot.janus.Janus;
 
 import java.util.UUID;
@@ -13,9 +14,11 @@ import java.util.UUID;
 public class PermissionService {
     public static final String PERMISSION_BUCKET = "hades_permissions";
     private boolean isEnabled = true;
+    private final IConnector connector;
 
-    public PermissionService() {
-
+    @Inject
+    public PermissionService(IConnector connector) {
+        this.connector = connector;
     }
 
     public void setEnabled(boolean isEnabled) {
@@ -23,11 +26,11 @@ public class PermissionService {
     }
 
     public Permission find(String key) {
-        return Janus.parse(Connector.read(PERMISSION_BUCKET, key, NewJson.class), Permission.class);
+        return Janus.parse(connector.read(PERMISSION_BUCKET, key, NewJson.class), Permission.class);
     }
 
     public Permission[] findByUser(UUID userId) {
-        final NewJson[] result = Connector.readPattern(PERMISSION_BUCKET, userId.toString() + "_.*", NewJson.class);
+        final NewJson[] result = connector.readPattern(PERMISSION_BUCKET, userId.toString() + "_.*", NewJson.class);
         final Permission[] permissions = new Permission[result.length];
 
         for (int i = 0; i < result.length; i++) {
@@ -41,11 +44,11 @@ public class PermissionService {
     }
 
     public boolean delete(String key) {
-        return Connector.delete(PERMISSION_BUCKET, key);
+        return connector.delete(PERMISSION_BUCKET, key);
     }
 
     public boolean update(Permission permission) {
-        return Connector.write(PERMISSION_BUCKET, permission.getKey(), permission.toStoreJson());
+        return connector.write(PERMISSION_BUCKET, permission.getKey(), permission.toStoreJson());
     }
 
     public boolean hasPermission(UUID userId, String route, RequestTypes requestMethod) {
@@ -53,7 +56,7 @@ public class PermissionService {
             return true;
         }
 
-        final NewJson result = Connector.read(PERMISSION_BUCKET, userId + "_" + route, NewJson.class);
+        final NewJson result = connector.read(PERMISSION_BUCKET, userId + "_" + route, NewJson.class);
 
         if (result == null) {
             return false;

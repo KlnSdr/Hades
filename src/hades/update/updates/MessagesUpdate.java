@@ -9,7 +9,7 @@ import hades.authorized.service.GroupService;
 import hades.messaging.service.MessageService;
 import hades.update.Update;
 import hades.update.UpdateOrder;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,17 +18,19 @@ import java.util.UUID;
 @RegisterFor(MessagesUpdate.class)
 public class MessagesUpdate implements Update {
     private final GroupService groupService;
+    private final IConnector connector;
 
     @Inject
-    public MessagesUpdate(GroupService groupService) {
+    public MessagesUpdate(GroupService groupService, IConnector connector) {
         this.groupService = groupService;
+        this.connector = connector;
     }
 
     private static final Logger LOGGER = new Logger(MessagesUpdate.class);
     @Override
     public boolean run() {
         final String bucket = MessageService.MESSAGE_BUCKET;
-        if (!(Connector.write(bucket, "TEST", "") && Connector.delete(bucket, "TEST"))) {
+        if (!(connector.write(bucket, "TEST", "") && connector.delete(bucket, "TEST"))) {
             LOGGER.error("Failed to create messages bucket");
             return false;
         }

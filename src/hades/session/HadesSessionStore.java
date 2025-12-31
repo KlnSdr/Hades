@@ -8,7 +8,7 @@ import dobby.session.ISessionStore;
 import dobby.session.Session;
 import dobby.session.SessionWrapper;
 import dobby.session.service.ISessionService;
-import thot.connector.Connector;
+import thot.connector.IConnector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,15 +19,17 @@ public class HadesSessionStore implements ISessionStore {
     private static final Logger LOGGER = new Logger(HadesSessionStore.class);
     private static final String BUCKET_NAME = "dobbySession";
     private final ISessionService sessionService;
+    private final IConnector connector;
 
     @Inject
-    public HadesSessionStore(ISessionService sessionService) {
+    public HadesSessionStore(ISessionService sessionService, IConnector connector) {
         this.sessionService = sessionService;
+        this.connector = connector;
     }
 
     @Override
     public Optional<ISession> find(String sessionId) {
-        final Session session = Connector.read(BUCKET_NAME, sessionId, Session.class);
+        final Session session = connector.read(BUCKET_NAME, sessionId, Session.class);
         if (session == null) {
             return Optional.empty();
         }
@@ -38,17 +40,17 @@ public class HadesSessionStore implements ISessionStore {
 
     @Override
     public void update(ISession session) {
-        Connector.writeCreateVolatile(BUCKET_NAME, session.getId(), session.getSession());
+        connector.writeCreateVolatile(BUCKET_NAME, session.getId(), session.getSession());
     }
 
     @Override
     public void remove(String sessionId) {
-        Connector.delete(BUCKET_NAME, sessionId);
+        connector.delete(BUCKET_NAME, sessionId);
     }
 
     @Override
     public Map<String, Long> getSessionAges() {
-        final Session[] sessions = Connector.readPattern(BUCKET_NAME, ".*", Session.class);
+        final Session[] sessions = connector.readPattern(BUCKET_NAME, ".*", Session.class);
 
         final Map<String, Long> lastAccessed = new HashMap<>();
 
