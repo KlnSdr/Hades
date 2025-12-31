@@ -2,6 +2,7 @@ package hades;
 
 import common.inject.annotations.Inject;
 import common.inject.annotations.RegisterFor;
+import common.logger.LogLevel;
 import common.logger.Logger;
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
@@ -98,6 +99,7 @@ public class Hades implements DobbyEntryPoint {
             LOGGER.error("No class provided to start the application.");
             System.exit(1);
         }
+        Logger.setMaxLogLevel(LogLevel.INFO);
         Dobby.startApplication(clazz);
     }
 
