@@ -8,7 +8,6 @@ import java.util.List;
 
 @RegisterFor(PermissionCheckService.class)
 public class PermissionCheckService {
-    private static PermissionCheckService instance;
     private final HashSet<String> permissionCheckRoutes = new HashSet<>();
 
     public PermissionCheckService() {

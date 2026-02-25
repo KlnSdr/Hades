@@ -14,7 +14,6 @@ import java.util.UUID;
 public class SecurityService {
     private String MASTER_KEY;
     private static final int KEY_SIZE = 64;
-    private static SecurityService instance;
     private final UserEncryptionKeyService userEncryptionKeyService;
     private static final Logger LOGGER = new Logger(SecurityService.class);
     private final ThreadLocal<UserEncryptionKey> userEncryptionKey = new ThreadLocal<>();
@@ -55,7 +54,7 @@ public class SecurityService {
     }
 
     public String encryptForUser(String data, UUID userId) {
-        if (userEncryptionKey == null) {
+        if (userEncryptionKey.get() == null) {
             warmup(userId);
         }
         return new Encryptor().encrypt(data, userEncryptionKey.get().getEncryptionKey()).orElse(null);
@@ -66,7 +65,7 @@ public class SecurityService {
     }
 
     public String decryptForUser(String data, UUID userId) {
-        if (userEncryptionKey == null) {
+        if (userEncryptionKey.get() == null) {
             warmup(userId);
         }
         return new Decryptor().decrypt(data, userEncryptionKey.get().getEncryptionKey()).orElse(null);
