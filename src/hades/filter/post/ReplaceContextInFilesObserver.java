@@ -1,7 +1,8 @@
 package hades.filter.post;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
+import common.util.TemplateEngine;
 import dobby.IConfig;
 import dobby.files.StaticFile;
 import dobby.files.service.IStaticFileService;
@@ -10,7 +11,8 @@ import dobby.observer.EventType;
 import dobby.observer.Observer;
 import dobby.util.Tupel;
 import dobby.util.json.NewJson;
-import hades.template.TemplateEngine;
+
+import java.nio.charset.StandardCharsets;
 
 @RegisterFor(ReplaceContextInFilesObserver.class)
 public class ReplaceContextInFilesObserver implements Observer<Tupel<String, StaticFile>> {
@@ -41,8 +43,9 @@ public class ReplaceContextInFilesObserver implements Observer<Tupel<String, Sta
         final NewJson json = new NewJson();
         json.setString("CONTEXT", config.getString("hades.context", ""));
 
-        final StaticFile renderedFile = templateEngine.render(file, json);
+        final String renderedContent = templateEngine.render(new String(file.getContent()), json);
+        file.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
 
-        staticFileService.storeFileNoEvent(path, renderedFile);
+        staticFileService.storeFileNoEvent(path, file);
     }
 }

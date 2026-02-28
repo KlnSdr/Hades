@@ -2,7 +2,7 @@
   "dobby": {
     "port": 3002,
     "staticContent": {
-      "directory": "public",
+      "directory": "static",
       "externalDocRoot": ""
     },
     "session": {
@@ -34,7 +34,6 @@
     "unauthorizedRedirectPaths": [
       "/",
       "/index.html"
-    ],
-    "context": "/local"
+    ]
   }
 }

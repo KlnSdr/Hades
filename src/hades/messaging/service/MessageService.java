@@ -1,14 +1,16 @@
 package hades.messaging.service;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import dobby.util.json.NewJson;
+import hades.messaging.DiscordMessageWebhookPayload;
 import hades.messaging.Message;
 import hades.user.service.UserService;
 import thot.connector.IConnector;
 import thot.janus.Janus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.UUID;
 
@@ -17,11 +19,13 @@ public class MessageService {
     public static final String MESSAGE_BUCKET = "hades_messages";
     private final UserService userService;
     private final IConnector connector;
+    private final WebhookService webhookService;
 
     @Inject
-    public MessageService(UserService userService, IConnector connector) {
+    public MessageService(UserService userService, IConnector connector, WebhookService webhookService) {
         this.userService = userService;
         this.connector = connector;
+        this.webhookService = webhookService;
     }
 
     public Message find(UUID id) {
@@ -38,6 +42,13 @@ public class MessageService {
     }
 
     public boolean update(Message message) {
+        Arrays.stream(webhookService.findByOwner(message.getTo()))
+                .findFirst()
+                .ifPresent(
+                        webhookConfig ->
+                        webhookService.publishWebhook(webhookConfig, new DiscordMessageWebhookPayload(message, userService))
+                );
+
         return connector.write(MESSAGE_BUCKET, message.getKey(), message.toStoreJson());
     }
 

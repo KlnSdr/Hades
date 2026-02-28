@@ -1,8 +1,8 @@
 package hades.filter.pre;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
-import dobby.Config;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
+import common.util.TemplateEngine;
 import dobby.IConfig;
 import dobby.files.StaticFile;
 import dobby.files.service.IStaticFileService;
@@ -12,7 +12,8 @@ import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
-import hades.template.TemplateEngine;
+
+import java.nio.charset.StandardCharsets;
 
 @RegisterFor(ContextPreFilter.class)
 public class ContextPreFilter implements Filter {
@@ -59,7 +60,9 @@ public class ContextPreFilter implements Filter {
 
             final StaticFile contextNotFoundFile = staticFileService.get("/error/ContextNotFound.html");
             if (contextNotFoundFile != null) {
-                httpContext.getResponse().sendFile(templateEngine.render(contextNotFoundFile, data));
+                final String renderedContent = templateEngine.render(new String(contextNotFoundFile.getContent()), data);
+                contextNotFoundFile.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
+                httpContext.getResponse().sendFile(contextNotFoundFile);
             }
             return false;
         }

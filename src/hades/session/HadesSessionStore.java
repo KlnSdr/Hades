@@ -1,7 +1,7 @@
 package hades.session;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import common.logger.Logger;
 import dobby.session.ISession;
 import dobby.session.ISessionStore;

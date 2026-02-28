@@ -1,7 +1,8 @@
 package hades.user.filter;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
+import common.util.TemplateEngine;
 import dobby.files.StaticFile;
 import dobby.files.service.IStaticFileService;
 import dobby.filter.Filter;
@@ -10,11 +11,14 @@ import dobby.io.HttpContext;
 import dobby.io.response.ResponseCodes;
 import dobby.util.json.NewJson;
 import hades.filter.FilterOrder;
-import hades.template.TemplateEngine;
+import hades.messaging.WebhookConfig;
+import hades.messaging.service.WebhookService;
 import hades.user.User;
 import hades.user.service.TokenLoginService;
 import hades.user.service.UserService;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -25,13 +29,15 @@ public class UserInfoPagePostFilter implements Filter {
     private final UserService userService;
     private final TokenLoginService tokenLoginService;
     private final TemplateEngine templateEngine;
+    private final WebhookService webhookService;
 
     @Inject
-    public UserInfoPagePostFilter(IStaticFileService staticFileService, UserService userService, TokenLoginService tokenLoginService, TemplateEngine templateEngine) {
+    public UserInfoPagePostFilter(IStaticFileService staticFileService, UserService userService, TokenLoginService tokenLoginService, TemplateEngine templateEngine, WebhookService webhookService) {
         this.staticFileService = staticFileService;
         this.userService = userService;
         this.tokenLoginService = tokenLoginService;
         this.templateEngine = templateEngine;
+        this.webhookService = webhookService;
     }
 
     @Override
@@ -67,9 +73,10 @@ public class UserInfoPagePostFilter implements Filter {
                 return false;
             }
 
-            final StaticFile renderedFile = templateEngine.render(userPage, getUserInfoFromId(userId));
+            final String renderedContent = templateEngine.render(new String(userPage.getContent()), getUserInfoFromId(userId));
+            userPage.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
 
-            httpContext.getResponse().sendFile(renderedFile);
+            httpContext.getResponse().sendFile(userPage);
             httpContext.getResponse().setCode(ResponseCodes.OK);
         }
 
@@ -80,6 +87,12 @@ public class UserInfoPagePostFilter implements Filter {
         final NewJson userInfo = new NewJson();
 
         final User user = userService.find(UUID.fromString(userId));
+        final WebhookConfig webhookConfig = Arrays.stream(webhookService.findByOwner(UUID.fromString(userId))).findFirst().orElse(null);
+        if (webhookConfig != null) {
+            userInfo.setString("DISCORDWEBHOOK", webhookConfig.getUrl());
+        } else {
+            userInfo.setString("DISCORDWEBHOOK", "");
+        }
 
         if (user == null) {
             return new NewJson();

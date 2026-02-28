@@ -1,7 +1,7 @@
 package hades.authorized;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import common.logger.Logger;
 import common.util.Classloader;
 import dobby.annotations.Delete;

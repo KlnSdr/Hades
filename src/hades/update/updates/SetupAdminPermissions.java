@@ -1,7 +1,7 @@
 package hades.update.updates;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import hades.authorized.Permission;
 import hades.authorized.service.PermissionService;
 import hades.update.Update;

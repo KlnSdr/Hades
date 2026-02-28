@@ -1,6 +1,6 @@
 package hades.authorized.service;
 
-import common.inject.annotations.RegisterFor;
+import common.inject.api.RegisterFor;
 import dobby.util.RouteHelper;
 
 import java.util.ArrayList;

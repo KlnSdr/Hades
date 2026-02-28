@@ -1,7 +1,7 @@
 package hades;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import dobby.IConfig;
 import dobby.files.service.IStaticFileService;
 import dobby.util.StaticContentDir;

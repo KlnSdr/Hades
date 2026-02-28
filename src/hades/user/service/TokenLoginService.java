@@ -1,7 +1,7 @@
 package hades.user.service;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import hades.user.User;
 import thot.connector.IConnector;
 

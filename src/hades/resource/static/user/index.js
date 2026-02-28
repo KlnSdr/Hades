@@ -14,6 +14,22 @@ function updateMail() {
     });
 }
 
+function updateDiscordWebhook() {
+    const webhookUrl = document.getElementById('discordWebhook').value;
+
+    fetch(`{{CONTEXT}}/rest/webhook`, {
+        method: 'PUT', headers: {
+            'Content-Type': 'application/json',
+        }, body: JSON.stringify({url: webhookUrl}),
+    }).then((response) => {
+        if (response.ok) {
+            alert('Webhook updated');
+        } else {
+            alert('Error updating webhook');
+        }
+    });
+}
+
 function updateName() {
     const displayName = document.getElementById('username').value;
 

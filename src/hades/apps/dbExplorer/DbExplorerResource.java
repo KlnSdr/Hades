@@ -1,7 +1,7 @@
 package hades.apps.dbExplorer;
 
-import common.inject.annotations.Inject;
-import common.inject.annotations.RegisterFor;
+import common.inject.api.Inject;
+import common.inject.api.RegisterFor;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;

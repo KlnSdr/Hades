@@ -15,7 +15,8 @@ public enum UpdateOrder {
     ADD_ADMIN_LOGIN_TOKEN(11),
     ADD_CONFIG_FILE_PERMISSION(12),
     MESSAGES_UPDATE(13),
-    HADES_INSTALLED(14)
+    HADES_INSTALLED(14),
+    CREATE_WEBHOOK_CONFIG_BUCKET(15)
     ;
 
     private final int i;
