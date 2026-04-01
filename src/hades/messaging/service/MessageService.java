@@ -42,12 +42,16 @@ public class MessageService {
     }
 
     public boolean update(Message message) {
-        Arrays.stream(webhookService.findByOwner(message.getTo()))
-                .findFirst()
-                .ifPresent(
-                        webhookConfig ->
-                        webhookService.publishWebhook(webhookConfig, new DiscordMessageWebhookPayload(message, userService))
-                );
+        message.setMessage(message.getMessage().replace("\n", "\\n").replace("\r", "\\n").replace("\"", "'"));
+        if (!message.didRead()) {
+            Arrays.stream(webhookService.findByOwner(message.getTo()))
+                    .findFirst()
+                    .ifPresent(
+                            webhookConfig ->
+                                    webhookService.publishWebhook(webhookConfig, new DiscordMessageWebhookPayload(message, userService))
+                    );
+        }
+
 
         return connector.write(MESSAGE_BUCKET, message.getKey(), message.toStoreJson());
     }

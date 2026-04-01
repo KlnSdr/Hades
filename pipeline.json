@@ -7,9 +7,11 @@
       "nyx push"
     ],
     "release": [
+      "nyx release",
       "nyx build",
       "printf 'https://repo.klnsdr.com\\n${NYX_REPO_KLNSDR_COM_PASSWORD}' | nyx login",
-      "nyx push"
+      "nyx push",
+      "nyx snapshot"
     ]
   }
 }
