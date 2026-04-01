@@ -51,7 +51,7 @@ public class SystemInfoResource {
         response.setString("java_version", System.getProperty("java.version"));
         response.setString("java_home", System.getProperty("java.home"));
         response.setString("hades_version", Hades.getVersion());
-        response.setString("dobby_version", "v" + getDobbyVersion());
+        response.setString("dobby_version", "v" + getDobbyVersion().replace("-snapshot", "")); // replace -snapshot with empty string because i forgot to remove it in the release, whoops
         response.setString("app_name", config.getString("application.name", "<APP_NAME>"));
         response.setString("app_version", config.getString("application.version", "<APP_VERSION>"));
         response.setString("app_context", config.getString("hades.context", "/"));
