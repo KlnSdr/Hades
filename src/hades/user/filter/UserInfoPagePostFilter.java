@@ -74,9 +74,11 @@ public class UserInfoPagePostFilter implements Filter {
             }
 
             final String renderedContent = templateEngine.render(new String(userPage.getContent()), getUserInfoFromId(userId));
-            userPage.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
+            final StaticFile renderedUserPage = new StaticFile();
+            renderedUserPage.setContentType(userPage.getContentType());
+            renderedUserPage.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
 
-            httpContext.getResponse().sendFile(userPage);
+            httpContext.getResponse().sendFile(renderedUserPage);
             httpContext.getResponse().setCode(ResponseCodes.OK);
         }
 

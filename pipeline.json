@@ -1,5 +1,5 @@
 {
-  "image": "docker.klnsdr.com/nyx-cli:1.4",
+  "image": "docker.klnsdr.com/nyx-cli:1.5",
   "pipeline": {
     "default": [
       "nyx build",

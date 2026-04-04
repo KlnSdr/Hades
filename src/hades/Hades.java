@@ -29,7 +29,7 @@ import java.util.List;
 
 @RegisterFor(Hades.class)
 public class Hades implements DobbyEntryPoint {
-    private static final String version = "v2.4";
+    private static final String version = "v${PROJECT_VERSION}";
     private static final Logger LOGGER = new Logger(Hades.class);
     private final PermissionService permissionService;
     private final UpdateService updateService;

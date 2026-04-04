@@ -44,8 +44,10 @@ public class ReplaceContextInFilesObserver implements Observer<Tupel<String, Sta
         json.setString("CONTEXT", config.getString("hades.context", ""));
 
         final String renderedContent = templateEngine.render(new String(file.getContent()), json);
-        file.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
+        final StaticFile renderedFile = new StaticFile();
+        renderedFile.setContentType(file.getContentType());
+        renderedFile.setContent(renderedContent.getBytes(StandardCharsets.UTF_8));
 
-        staticFileService.storeFileNoEvent(path, file);
+        staticFileService.storeFileNoEvent(path, renderedFile);
     }
 }
