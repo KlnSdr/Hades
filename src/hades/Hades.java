@@ -4,6 +4,10 @@ import common.inject.api.Inject;
 import common.inject.api.RegisterFor;
 import common.logger.LogLevel;
 import common.logger.Logger;
+import common.sql.IDatabaseService;
+import common.sql.exceptions.SqlException;
+import common.sql.statement.interfaces.BuildableStatement;
+import common.sql.util.Pair;
 import dobby.Dobby;
 import dobby.DobbyEntryPoint;
 import dobby.IConfig;
@@ -29,6 +33,7 @@ import java.util.List;
 
 @RegisterFor(Hades.class)
 public class Hades implements DobbyEntryPoint {
+    private static boolean SQL_DATABASE_CONFIGURED = false;
     private static final String version = "v${PROJECT_VERSION}";
     private static final Logger LOGGER = new Logger(Hades.class);
     private final PermissionService permissionService;
@@ -42,6 +47,7 @@ public class Hades implements DobbyEntryPoint {
     private final StaticContentDir staticContentDir;
     private final IConfig config;
     private final IConnector connector;
+    private final IDatabaseService databaseService;
 
     public Hades(HadesDependencyProvider hadesDependencyProvider) {
         if (hadesDependencyProvider == null) {
@@ -59,6 +65,7 @@ public class Hades implements DobbyEntryPoint {
         this.staticContentDir = hadesDependencyProvider.getStaticContentDir();
         this.config = hadesDependencyProvider.getConfig();
         this.connector = hadesDependencyProvider.getConnector();
+        this.databaseService = hadesDependencyProvider.getDatabaseService();
     }
 
     @Inject
@@ -72,7 +79,9 @@ public class Hades implements DobbyEntryPoint {
                  ReplaceContextInFilesObserver replaceContextInFilesObserver,
                  StaticContentDir staticContentDir,
                  IConfig config,
-                 IConnector connector) {
+                 IConnector connector,
+                 IDatabaseService databaseService
+    ) {
         this.permissionService = permissionService;
         this.updateService = updateService;
         this.userService = userService;
@@ -84,6 +93,7 @@ public class Hades implements DobbyEntryPoint {
         this.staticContentDir = staticContentDir;
         this.config = config;
         this.connector = connector;
+        this.databaseService = databaseService;
     }
 
     public static String getVersion() {
@@ -120,6 +130,7 @@ public class Hades implements DobbyEntryPoint {
         if (config.getBoolean("hades.enableEncryption", false)) {
             warmupSecurityService();
         }
+        configureSqlDatabase();
         ensureThotIsRunning();
         registerStaticContentRoot();
         addUnAuthorizedRedirectPaths();
@@ -139,6 +150,47 @@ public class Hades implements DobbyEntryPoint {
 
         LOGGER.info("discovering protected routes...");
         hadesAnnotationDiscoverer.discoverRoutes();
+        if (SQL_DATABASE_CONFIGURED) {
+            Logger.setEnableLoggingToDatabase(true);
+        }
+    }
+
+    private void configureSqlDatabase() {
+        final String sqlHost = config.getString("application.sql.host", null);
+        final int sqlPort = config.getInt("application.sql.port", -1);
+        final String sqlUser = config.getString("application.sql.user", null);
+        final String sqlPassword = config.getString("application.sql.password", null);
+        final String sqlDatabase = config.getString("application.sql.database", null);
+
+        if (sqlHost != null && sqlPort != -1 && sqlUser != null && sqlPassword != null && sqlDatabase != null) {
+            databaseService.configure("mariadb", sqlHost, sqlPort, sqlDatabase, sqlUser, sqlPassword);
+            SQL_DATABASE_CONFIGURED = true;
+            LOGGER.info("SQL database configured successfully.");
+            ensureSqlDbIsRunning();
+        } else {
+            LOGGER.warn("SQL database configuration is incomplete. Skipping SQL database setup.");
+        }
+    }
+
+    private void ensureSqlDbIsRunning() {
+        try {
+            databaseService.query(new BuildableStatement() {
+                @Override
+                public String buildStatement() {
+                    return "SELECT 1";
+                }
+
+                @Override
+                public Pair<String, List<Object>> buildPreparedStatement() {
+                    return new Pair<>("SELECT 1", List.of());
+                }
+            });
+        } catch (SqlException e) {
+            LOGGER.error("Failed to connect to database.");
+            LOGGER.trace(e);
+            System.exit(1);
+        }
+
     }
 
     private void warmupSecurityService() {
@@ -193,5 +245,9 @@ public class Hades implements DobbyEntryPoint {
 
         final Message message = messageService.newSystemMessage(admin.getId(), content);
         messageService.update(message);
+    }
+
+    public static boolean isSqlDatabaseConfigured() {
+        return SQL_DATABASE_CONFIGURED;
     }
 }

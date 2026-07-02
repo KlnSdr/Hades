@@ -5,6 +5,7 @@ import common.inject.api.RegisterFor;
 import common.logger.Logger;
 import hades.update.Update;
 import hades.update.UpdateDiscoverer;
+import hades.update.UpdateSkippedException;
 import hades.update.updates.HadesInstalledUpdate;
 import thot.connector.IConnector;
 
@@ -69,18 +70,22 @@ public class UpdateService {
             if (!didUpdateRun(update)) {
                 LOGGER.info("Running update: " + update.getName());
                 boolean updateRanSuccessfully;
-                if (updateNames.contains(update.getName())) {
-                    updateRanSuccessfully = update.run(updateArgs.get(updateNames.indexOf(update.getName())));
-                } else {
-                    updateRanSuccessfully = runUpdate(update);
-                }
-                if (updateRanSuccessfully) {
-                    markUpdateRan(update);
-                    updatesRan.getAndIncrement();
-                    LOGGER.info("done");
-                } else {
-                    LOGGER.error("Failed to run update: " + update.getName());
-                    ranSuccessfully.set(false);
+                try {
+                    if (updateNames.contains(update.getName())) {
+                        updateRanSuccessfully = update.run(updateArgs.get(updateNames.indexOf(update.getName())));
+                    } else {
+                        updateRanSuccessfully = runUpdate(update);
+                    }
+                    if (updateRanSuccessfully) {
+                        markUpdateRan(update);
+                        updatesRan.getAndIncrement();
+                        LOGGER.info("done");
+                    } else {
+                        LOGGER.error("Failed to run update: " + update.getName());
+                        ranSuccessfully.set(false);
+                    }
+                } catch (UpdateSkippedException ignore) {
+                    LOGGER.warn("Skipped update: " + update.getName());
                 }
             }
         });
@@ -92,7 +97,7 @@ public class UpdateService {
         return runUpdates(new String[0], new String[0][0]);
     }
 
-    private boolean runUpdate(Update update) {
+    private boolean runUpdate(Update update) throws UpdateSkippedException {
         return update.run();
     }
 
