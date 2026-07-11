@@ -13,11 +13,14 @@ import dobby.filter.Filter;
 import dobby.filter.FilterType;
 import dobby.io.HttpContext;
 import dobby.io.dto.Serializer;
+import dobby.util.Tupel;
 import dobby.util.json.NewJson;
 import hades.apidocs.RouteDocumentation;
 import hades.apidocs.RouteDocumentationDiscoverer;
 import hades.apidocs.annotations.ApiResponse;
 import hades.apidocs.annotations.NoResponseBody;
+import hades.apidocs.data.ApiDocumentation;
+import hades.apidocs.data.ApiRoute;
 import hades.apidocs.ui.JsonSchemaFormatter;
 import hades.apidocs.ui.RouteSection;
 import hades.filter.FilterOrder;
@@ -26,13 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RegisterFor(BuildApiDocsPreFilter.class)
 public class BuildApiDocsPreFilter implements Filter {
@@ -64,32 +61,49 @@ public class BuildApiDocsPreFilter implements Filter {
     @Override
     public boolean run(HttpContext httpContext) {
         final String docsPath = "/apidocs/index.html";
+        final String jsonDocsPath = "/apidocs/api-docs.json";
         final String requestUri = httpContext.getRequest().getPath();
 
         if (!config.getBoolean("hades.apidocs.enabled", false)) {
             return true;
         }
 
-        if (!requestUri.equalsIgnoreCase(docsPath)) {
+        if (!requestUri.equalsIgnoreCase(docsPath) && !requestUri.equalsIgnoreCase(jsonDocsPath)) {
             return true;
         }
 
-        final StaticFile docsFile = staticFileService.get(docsPath);
+        final boolean requestedHtmlDocs = requestUri.equalsIgnoreCase(docsPath);
+        final boolean requestedJsonDocs = requestUri.equalsIgnoreCase(jsonDocsPath);
 
-        if (docsFile != null) {
+        final StaticFile docsFile = staticFileService.get(docsPath);
+        final StaticFile jsonDocsFile = staticFileService.get(jsonDocsPath);
+
+        if (requestedHtmlDocs && docsFile != null) {
+            return true;
+        }
+
+        if (requestedJsonDocs && jsonDocsFile != null) {
             return true;
         }
 
         LOGGER.info("building api docs");
 
-        final StaticFile apiDocs = buildApiDocs();
+        final Tupel<StaticFile, ApiDocumentation> apiDocs = buildApiDocs();
 
-        staticFileService.storeFile(docsPath, apiDocs);
+        staticFileService.storeFile(docsPath, apiDocs._1());
 
+        final StaticFile jsonDocs = new StaticFile();
+        jsonDocs.setContentType("application/json");
+        jsonDocs.setContent(apiDocs._2().toJson().toString().getBytes());
+        staticFileService.storeFile(jsonDocsPath, jsonDocs);
         return true;
     }
 
-    private StaticFile buildApiDocs() {
+    private Tupel<StaticFile, ApiDocumentation> buildApiDocs() {
+        final ApiDocumentation apiDocumentation = new ApiDocumentation();
+        apiDocumentation.setVersion("1.0.0");
+        apiDocumentation.setTitle(config.getString("application.name", "<APP_NAME>"));
+
         final StaticFile file = new StaticFile();
         file.setContentType("text/html");
 
@@ -120,7 +134,7 @@ public class BuildApiDocsPreFilter implements Filter {
                         collectSchemas(apiResponse.responseBody(), schemas, visitedTypes);
                     }
                 }
-                doc.addAllChildren(buildRouteElements(entry.getKey(), entry.getValue()));
+                doc.addAllChildren(buildRouteElements(entry.getKey(), entry.getValue(), apiDocumentation));
             }
         }
 
@@ -130,11 +144,12 @@ public class BuildApiDocsPreFilter implements Filter {
         for (String name : schemaNames) {
             doc.addChild(new Headline(3, name));
             doc.addChild(JsonSchemaFormatter.toHtmlElement(schemas.get(name)));
+            apiDocumentation.addSchema(name, schemas.get(name));
         }
 
         file.setContent(doc.toHtml().getBytes());
 
-        return file;
+        return new Tupel<>(file, apiDocumentation);
     }
 
     private void collectSchemas(Class<?> type, Map<String, NewJson> schemas, Set<Class<?>> visitedTypes) {
@@ -200,11 +215,27 @@ public class BuildApiDocsPreFilter implements Filter {
         return sortedMap;
     }
 
-    private List<HtmlElement> buildRouteElements(String path, List<RouteDocumentation> routeDocumentations) {
+    private List<HtmlElement> buildRouteElements(String path, List<RouteDocumentation> routeDocumentations, ApiDocumentation apiDocumentation) {
         final List<HtmlElement> elements = new ArrayList<>();
 
         for (RouteDocumentation routeDocumentation : routeDocumentations) {
             elements.add(new RouteSection(path, routeDocumentation));
+
+            final ApiRoute apiRoute = new ApiRoute();
+            apiRoute.setPath(path);
+            apiRoute.setMethod(routeDocumentation.getRequestType().name());
+            apiRoute.setSummary(routeDocumentation.getSummary());
+            apiRoute.setDescription(routeDocumentation.getDescription());
+
+            for (ApiResponse response : routeDocumentation.getApiResponses()) {
+                final hades.apidocs.data.ApiResponse apiResponse = new hades.apidocs.data.ApiResponse();
+                apiResponse.setStatusCode(response.code());
+                apiResponse.setDescription(response.message());
+                apiResponse.setSchema(response.responseBody().getSimpleName());
+                apiRoute.addResponse(apiResponse);
+            }
+
+            apiDocumentation.addRoute(apiRoute);
         }
 
         return elements;
