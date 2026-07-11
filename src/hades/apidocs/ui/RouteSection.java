@@ -1,14 +1,14 @@
 package hades.apidocs.ui;
 
-import common.html.Details;
-import common.html.Headline;
-import common.html.HtmlElement;
-import common.html.Paragraph;
-import common.html.Label;
+import common.html.*;
+import dobby.io.dto.Serializer;
 import dobby.io.request.RequestTypes;
+import dobby.util.json.NewJson;
 import hades.apidocs.RouteDocumentation;
 import hades.apidocs.annotations.ApiResponse;
+import hades.apidocs.annotations.NoResponseBody;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class RouteSection extends HtmlElement {
@@ -64,11 +64,23 @@ public class RouteSection extends HtmlElement {
         final Headline responsesHeadline = new Headline(3, "Responses");
         details.addChild(responsesHeadline);
 
+        final Table responseTable = new Table(List.of("Code", "Description"));
+
         for (ApiResponse apiResponse : routeDocumentation.getApiResponses()) {
-            final Paragraph responseParagraph = new Paragraph();
-            responseParagraph.setValue(apiResponse.code() + " - " + apiResponse.message());
-            details.addChild(responseParagraph);
+            NewJson responseBody = null;
+
+            try {
+                responseBody = apiResponse.responseBody() != null && apiResponse.responseBody() != NoResponseBody.class
+                        ? new Serializer().getJsonType(apiResponse.responseBody().getDeclaredConstructor().newInstance())
+                        : null;
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
+                     NoSuchMethodException ignored) {
+            }
+            final ResponseRow responseRow = new ResponseRow(Integer.toString(apiResponse.code()), apiResponse.message(), responseBody);
+
+            responseTable.addChild(responseRow.toRow());
         }
+        details.addChild(responseTable);
 
         return details.toHtml();
     }

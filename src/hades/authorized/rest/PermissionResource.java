@@ -6,7 +6,6 @@ import dobby.annotations.Delete;
 import dobby.annotations.Get;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
-import dobby.io.response.ResponseCodes;
 import dobby.util.json.NewJson;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
@@ -15,12 +14,15 @@ import hades.apidocs.annotations.ApiResponse;
 import hades.authorized.Permission;
 import hades.authorized.service.PermissionCheckService;
 import hades.authorized.service.PermissionService;
+import hades.common.ErrorResponse;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
+
+import static hades.common.ErrorResponses.badRequest;
+import static hades.common.ErrorResponses.internalError;
 
 @RegisterFor(PermissionResource.class)
 public class PermissionResource {
@@ -43,17 +45,17 @@ public class PermissionResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns a list of all routes that have permission checks enabled"
+            message = "Returns a list of all routes that have permission checks enabled",
+            responseBody = GetCheckedRoutesDTO.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @Get(BASE_PATH + "/checked-routes")
     public void getAllPermissionCheckedRoutes(HttpContext context) {
-        final NewJson response = new NewJson();
-        response.setList("routes", permissionCheckService.getPermissionCheckRoutes());
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new GetCheckedRoutesDTO(permissionCheckService.getPermissionCheckRoutes()));
     }
 
     @PermissionCheck
@@ -65,15 +67,18 @@ public class PermissionResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns a list of all permissions for a user"
+            message = "Returns a list of all permissions for a user",
+            responseBody = GetPermissionsDTO.class
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid userId"
+            message = "Invalid userId",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @Get(BASE_PATH + "/user/{userId}")
     public void getPermissionsByUserId(HttpContext context) {
@@ -83,11 +88,7 @@ public class PermissionResource {
         }
 
         Permission[] permissions = permissionService.findByUser(userId);
-
-        final NewJson response = new NewJson();
-        response.setList("permissions", List.of(Arrays.stream(permissions).map(Permission::toJson).toArray()));
-
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new GetPermissionsDTO(Arrays.stream(permissions).toList()));
     }
 
     @PermissionCheck
@@ -103,24 +104,24 @@ public class PermissionResource {
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid request"
+            message = "Invalid request",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Could not add permission"
+            message = "Could not add permission",
+            responseBody = ErrorResponse.class
     )
     @Post(BASE_PATH + "/user/{userId}")
     public void addPermissionToUser(HttpContext context) {
         final NewJson body = context.getRequest().getBody();
         if (!validateAddPermissionRequest(body)) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Invalid request");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Invalid request");
             return;
         }
 
@@ -140,10 +141,7 @@ public class PermissionResource {
         final boolean success = permissionService.update(permission);
 
         if (!success) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Could not add permission");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Could not add permission");
         }
     }
 
@@ -160,15 +158,18 @@ public class PermissionResource {
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid userId"
+            message = "Invalid userId",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Could not delete permission"
+            message = "Could not delete permission",
+            responseBody = ErrorResponse.class
     )
     @Delete(BASE_PATH + "/user/{userId}/route/{route}")
     public void deletePermission(HttpContext context) {
@@ -183,10 +184,7 @@ public class PermissionResource {
         final boolean success = permissionService.delete(userId, route);
 
         if (!success) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Could not delete permission");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Could not delete permission");
         }
     }
 
@@ -194,10 +192,7 @@ public class PermissionResource {
         try {
             return UUID.fromString(idString);
         } catch (IllegalArgumentException e) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Invalid userId");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Invalid userId");
             return null;
         }
     }

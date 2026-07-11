@@ -20,6 +20,7 @@ import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
 import hades.authorized.Group;
 import hades.authorized.service.GroupService;
+import hades.common.ErrorResponse;
 import hades.common.ErrorResponses;
 import hades.security.PasswordHasher;
 import hades.user.User;
@@ -27,7 +28,6 @@ import hades.user.service.TokenLoginService;
 import hades.user.service.UserService;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 @RegisterFor(UserResource.class)
@@ -70,10 +70,10 @@ public class UserResource {
             description = "Create a new user with the given display name, mail, and password",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 201, message = "User created successfully")
-    @ApiResponse(code = 400, message = "Malformed request")
-    @ApiResponse(code = 409, message = "Display name already taken")
-    @ApiResponse(code = 500, message = "Could not save user")
+    @ApiResponse(code = 201, message = "User created successfully", responseBody = CreateUserSuccessResponseDTO.class)
+    @ApiResponse(code = 400, message = "Malformed request", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 409, message = "Display name already taken", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 500, message = "Could not save user", responseBody = ErrorResponse.class)
     @Post(ROUTE_PREFIX)
     public void createUser(HttpContext context) {
         final Request request = context.getRequest();
@@ -123,12 +123,7 @@ public class UserResource {
         tokenLoginService.setTokenForUser(user, tokenLoginService.generateTokenForUser());
 
         response.setCode(ResponseCodes.CREATED);
-        final NewJson resPayload = new NewJson();
-        resPayload.setJson("user", user.toJson());
-        resPayload.setString("redirectTo",
-                config.getString("hades.context", "") + getNormalLoginRedirect());
-
-        context.getResponse().setBody(resPayload);
+        context.getResponse().setBody(new CreateUserSuccessResponseDTO(GetUserDTO.fromUser(user), config.getString("hades.context", "") + getNormalLoginRedirect()));
     }
 
     @ApiDoc(
@@ -136,11 +131,11 @@ public class UserResource {
             description = "Login a user with the given display name and password",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "User logged in successfully")
-    @ApiResponse(code = 400, message = "Malformed request")
-    @ApiResponse(code = 404, message = "User not found")
-    @ApiResponse(code = 409, message = "User is locked")
-    @ApiResponse(code = 500, message = "Could not verify password")
+    @ApiResponse(code = 200, message = "User logged in successfully", responseBody = CreateUserSuccessResponseDTO.class)
+    @ApiResponse(code = 400, message = "Malformed request", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "User not found", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 409, message = "User is locked", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 500, message = "Could not verify password", responseBody = ErrorResponse.class)
     @Post(ROUTE_PREFIX + "/login")
     public void doLogin(HttpContext context) {
         final Request request = context.getRequest();
@@ -175,9 +170,6 @@ public class UserResource {
         userService.logUserIn(user, context);
         userService.resetLoginAttempts(user.getId());
 
-        final NewJson resPayload = new NewJson();
-        resPayload.setJson("user", user.toJson());
-
         final Group[] groups = groupService.findGroupsByUser(user.getId());
         boolean isAdmin = false;
         for (Group group : groups) {
@@ -188,14 +180,15 @@ public class UserResource {
         }
 
         final String appContext = config.getString("hades.context", "");
+        final String redirectTo;
 
         if (isAdmin) {
-            resPayload.setString("redirectTo", appContext + getAdminLoginRedirect());
+            redirectTo = appContext + getAdminLoginRedirect();
         } else {
-            resPayload.setString("redirectTo", appContext + getNormalLoginRedirect());
+            redirectTo = appContext + getNormalLoginRedirect();
         }
 
-        context.getResponse().setBody(resPayload);
+        context.getResponse().setBody(new CreateUserSuccessResponseDTO(GetUserDTO.fromUser(user), redirectTo));
     }
 
     @ApiDoc(
@@ -219,10 +212,10 @@ public class UserResource {
             description = "Returns a user based on the given id",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The user was found and its data is returned")
-    @ApiResponse(code = 400, message = "The id is not a valid UUID")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
-    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 200, message = "The user was found and its data is returned", responseBody = GetUserDTO.class)
+    @ApiResponse(code = 400, message = "The id is not a valid UUID", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
     @PermissionCheck
     @AuthorizedOnly
     @Get(ROUTE_PREFIX + "/id/{id}")
@@ -243,7 +236,7 @@ public class UserResource {
             return;
         }
 
-        context.getResponse().setBody(user.toJson());
+        context.getResponse().setBody(GetUserDTO.fromUser(user));
     }
 
     @PermissionCheck
@@ -254,9 +247,9 @@ public class UserResource {
             baseUrl = ROUTE_PREFIX
     )
     @ApiResponse(code = 204, message = "The user was deleted")
-    @ApiResponse(code = 400, message = "The id is not a valid UUID")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
-    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 400, message = "The id is not a valid UUID", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
     @Delete(ROUTE_PREFIX + "/id/{id}")
     public void deleteUser(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -283,8 +276,8 @@ public class UserResource {
             description = "Returns the user that is currently logged in",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The user was found and its data is returned")
-    @ApiResponse(code = 404, message = "The user was not found")
+    @ApiResponse(code = 200, message = "The user was found and its data is returned", responseBody = GetUserDTO.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
     @Get(ROUTE_PREFIX + "/loginUserInfo")
     public void getLoginUserInfo(HttpContext context) {
         final ISession session = context.getSession();
@@ -305,7 +298,7 @@ public class UserResource {
             return;
         }
 
-        context.getResponse().setBody(user.toJson());
+        context.getResponse().setBody(GetUserDTO.fromUser(user));
     }
 
     @PermissionCheck
@@ -315,16 +308,13 @@ public class UserResource {
             description = "Returns a list containing all users",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The users were found and their data is returned")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
+    @ApiResponse(code = 200, message = "The users were found and their data is returned", responseBody = GetUsersDTO.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
     @Get(ROUTE_PREFIX + "/all")
     public void getAllUsers(HttpContext context) {
         final User[] users = userService.findAll();
 
-        final NewJson response = new NewJson();
-        response.setList("users", List.of(Arrays.stream(users).map(User::toJson).toArray()));
-
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new GetUsersDTO(Arrays.stream(users).map(GetUserDTO::fromUser).toList()));
     }
 
     @AuthorizedOnly
@@ -333,11 +323,11 @@ public class UserResource {
             description = "Update the mail of a user based on the given id",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The user was found and its data is returned")
-    @ApiResponse(code = 400, message = "Malformed request")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
-    @ApiResponse(code = 404, message = "The user was not found")
-    @ApiResponse(code = 500, message = "Could not save user")
+    @ApiResponse(code = 200, message = "The user was found and its data is returned", responseBody = GetUserDTO.class)
+    @ApiResponse(code = 400, message = "Malformed request", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 500, message = "Could not save user", responseBody = ErrorResponse.class)
     @Put(ROUTE_PREFIX + "/id/{id}/update/mail")
     public void updateMail(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -373,7 +363,7 @@ public class UserResource {
             return;
         }
 
-        context.getResponse().setBody(user.toJson());
+        context.getResponse().setBody(GetUserDTO.fromUser(user));
     }
 
     @AuthorizedOnly
@@ -382,11 +372,11 @@ public class UserResource {
             description = "Update the login token of a user based on the given id",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The user was found and its data is returned")
-    @ApiResponse(code = 400, message = "Malformed request")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
-    @ApiResponse(code = 404, message = "The user was not found")
-    @ApiResponse(code = 500, message = "Could not save user")
+    @ApiResponse(code = 200, message = "The user was found and its data is returned", responseBody = GetTokenResponseDTO.class)
+    @ApiResponse(code = 400, message = "Malformed request", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 500, message = "Could not save user", responseBody = ErrorResponse.class)
     @Put(ROUTE_PREFIX + "/id/{id}/update/token")
     public void regenerateToken(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -419,9 +409,7 @@ public class UserResource {
             return;
         }
 
-        final NewJson response = new NewJson();
-        response.setString("token", newToken);
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new GetTokenResponseDTO(newToken));
     }
 
     @AuthorizedOnly
@@ -430,11 +418,11 @@ public class UserResource {
             description = "Update the name of a user based on the given id",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The user was found and its data is returned")
-    @ApiResponse(code = 400, message = "Malformed request")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
-    @ApiResponse(code = 404, message = "The user was not found")
-    @ApiResponse(code = 500, message = "Could not save user")
+    @ApiResponse(code = 200, message = "The user was found and its data is returned", responseBody = GetUserDTO.class)
+    @ApiResponse(code = 400, message = "Malformed request", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 500, message = "Could not save user", responseBody = ErrorResponse.class)
     @Put(ROUTE_PREFIX + "/id/{id}/update/name")
     public void updateDisplayName(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -475,7 +463,7 @@ public class UserResource {
             return;
         }
 
-        context.getResponse().setBody(user.toJson());
+        context.getResponse().setBody(GetUserDTO.fromUser(user));
     }
 
     @AuthorizedOnly
@@ -484,11 +472,11 @@ public class UserResource {
             description = "Update the password of a user based on the given id",
             baseUrl = ROUTE_PREFIX
     )
-    @ApiResponse(code = 200, message = "The user was found and its data is returned")
-    @ApiResponse(code = 400, message = "Malformed request")
-    @ApiResponse(code = 403, message = "User does not have permission to access this resource")
-    @ApiResponse(code = 404, message = "The user was not found")
-    @ApiResponse(code = 500, message = "Could not save user")
+    @ApiResponse(code = 200, message = "The user was found and its data is returned", responseBody = GetUserDTO.class)
+    @ApiResponse(code = 400, message = "Malformed request", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 403, message = "User does not have permission to access this resource", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 404, message = "The user was not found", responseBody = ErrorResponse.class)
+    @ApiResponse(code = 500, message = "Could not save user", responseBody = ErrorResponse.class)
     @Put(ROUTE_PREFIX + "/id/{id}/update/password")
     public void updatePassword(HttpContext context) {
         final String idString = context.getRequest().getParam("id");
@@ -537,7 +525,7 @@ public class UserResource {
             return;
         }
 
-        context.getResponse().setBody(user.toJson());
+        context.getResponse().setBody(GetUserDTO.fromUser(user));
     }
 
     public static UUID uuidFromString(String idString, HttpContext context) {

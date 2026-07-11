@@ -16,6 +16,7 @@ import hades.apidocs.annotations.ApiResponse;
 import hades.authorized.Group;
 import hades.authorized.Permission;
 import hades.authorized.service.GroupService;
+import hades.common.ErrorResponse;
 import hades.user.User;
 import hades.user.service.UserService;
 
@@ -23,7 +24,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static hades.common.ErrorResponses.*;
 
 @RegisterFor(GroupResource.class)
 public class GroupResource {
@@ -47,22 +49,19 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns a list of all groups"
+            message = "Returns a list of all groups",
+            responseBody = GetGroupsDTO.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @Get(BASE_PATH + "/all")
     public void getAllGroups(HttpContext context) {
         final Group[] groups = groupService.findAll();
 
-        final NewJson body = new NewJson();
-
-        body.setList("groups", Arrays.stream(groups).map(Group::toJson).collect(Collectors.toList()));
-
-        context.getResponse().setBody(body);
-
+        context.getResponse().setBody(new GetGroupsDTO(Arrays.stream(groups).toList()));
     }
 
     @PermissionCheck
@@ -74,31 +73,33 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 201,
-            message = "Group created"
+            message = "Group created",
+            responseBody = Group.class
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid request"
+            message = "Invalid request",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 409,
-            message = "Group already exists"
+            message = "Group already exists",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Failed to create group"
+            message = "Failed to create group",
+            responseBody = ErrorResponse.class
     )
     @Post(BASE_PATH)
     public void createGroup(HttpContext context) {
         if (!validateCreateGroupRequest(context.getRequest().getBody())) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Invalid request");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Invalid request");
             return;
         }
 
@@ -106,24 +107,19 @@ public class GroupResource {
 
 
         if (groupService.findByName(groupName) != null) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Group already exists");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Group already exists");
             return;
         }
 
         final Group group = new Group(groupName);
 
         if (!groupService.update(group)) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Failed to create group");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Failed to create group");
             return;
         }
 
         context.getResponse().setCode(ResponseCodes.CREATED);
+        context.getResponse().setBody(group);
     }
 
     @PermissionCheck
@@ -135,15 +131,18 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns the group"
+            message = "Returns the group",
+            responseBody = Group.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 404,
-            message = "Group not found"
+            message = "Group not found",
+            responseBody = ErrorResponse.class
     )
     @Get(BASE_PATH + "/id/{groupId}")
     public void getGroup(HttpContext context) {
@@ -152,14 +151,11 @@ public class GroupResource {
         final Group group = groupService.find(groupId);
 
         if (group == null) {
-            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Group not found");
-            context.getResponse().setBody(response);
+            notFound(context.getResponse(), "Group not found");
             return;
         }
 
-        context.getResponse().setBody(group.toJson());
+        context.getResponse().setBody(group);
     }
 
     @PermissionCheck
@@ -175,21 +171,20 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Failed to delete group"
+            message = "Failed to delete group",
+            responseBody = ErrorResponse.class
     )
     @Delete(BASE_PATH + "/id/{groupId}")
     public void deleteGroup(HttpContext context) {
         final String groupId = context.getRequest().getParam("groupId");
 
         if (!groupService.delete(groupId)) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Failed to delete group");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Failed to delete group");
             return;
         }
 
@@ -209,27 +204,28 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid request"
+            message = "Invalid request",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 404,
-            message = "Group or permission not found"
+            message = "Group or permission not found",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Failed to add permission to group"
+            message = "Failed to add permission to group",
+            responseBody = ErrorResponse.class
     )
     @Put(BASE_PATH + "/id/{groupId}/permission")
     public void addPermissionToGroup(HttpContext context) {
         if (!validateAddPermissionToGroupRequest(context.getRequest().getBody())) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Invalid request");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Invalid request");
             return;
         }
 
@@ -238,10 +234,7 @@ public class GroupResource {
         final Group group = groupService.find(groupId);
 
         if (group == null) {
-            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Group or permission not found");
-            context.getResponse().setBody(response);
+            notFound(context.getResponse(), "Group or permission not found");
             return;
         }
 
@@ -252,10 +245,7 @@ public class GroupResource {
         group.addPermission(permission);
 
         if (!groupService.update(group)) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Failed to add permission to group");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Failed to add permission to group");
             return;
         }
 
@@ -271,15 +261,18 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns a list of groups"
+            message = "Returns a list of groups",
+            responseBody = GetGroupsDTO.class
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid user id"
+            message = "Invalid user id",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @Get(BASE_PATH + "/user/{userId}")
     public void getGroupsForUser(HttpContext context) {
@@ -289,20 +282,13 @@ public class GroupResource {
         try {
             userUUID = UUID.fromString(userId);
         } catch (Exception e) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Invalid user id");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Invalid user id");
             return;
         }
 
         final Group[] groups = groupService.findGroupsByUser(userUUID);
 
-        final NewJson body = new NewJson();
-
-        body.setList("groups", Arrays.stream(groups).map(Group::toJson).collect(Collectors.toList()));
-
-        context.getResponse().setBody(body);
+        context.getResponse().setBody(new GetGroupsDTO(Arrays.stream(groups).toList()));
     }
 
     @PermissionCheck
@@ -318,19 +304,23 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 400,
-            message = "Invalid user id"
+            message = "Invalid user id",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 404,
-            message = "Group or user not found"
+            message = "Group or user not found",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Failed to add user to group"
+            message = "Failed to add user to group",
+            responseBody = ErrorResponse.class
     )
     @Post(BASE_PATH + "/user/{userId}/group/{groupId}")
     public void addUserToGroup(HttpContext context) {
@@ -342,10 +332,7 @@ public class GroupResource {
         try {
             userUUID = UUID.fromString(userId);
         } catch (Exception e) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Invalid user id");
-            context.getResponse().setBody(response);
+            badRequest(context.getResponse(), "Invalid user id");
             return;
         }
 
@@ -353,18 +340,12 @@ public class GroupResource {
         final User user = userService.find(userUUID);
 
         if (group == null || user == null) {
-            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Group or user not found");
-            context.getResponse().setBody(response);
+            notFound(context.getResponse(), "Group or user not found");
             return;
         }
 
         if (!groupService.addUserToGroup(userId, groupId)) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Failed to add user to group");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Failed to add user to group");
             return;
         }
 
@@ -384,15 +365,18 @@ public class GroupResource {
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 404,
-            message = "Group or permission not found"
+            message = "Group or permission not found",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Failed to delete permission from group"
+            message = "Failed to delete permission from group",
+            responseBody = ErrorResponse.class
     )
     @Delete(BASE_PATH + "/group/{groupId}/permission/{permissionRoute}")
     public void deletePermissionFromGroup(HttpContext context) {
@@ -404,10 +388,7 @@ public class GroupResource {
         final Group group = groupService.find(groupId);
 
         if (group == null) {
-            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Group not found");
-            context.getResponse().setBody(response);
+            notFound(context.getResponse(), "Group not found");
             return;
         }
 
@@ -415,20 +396,14 @@ public class GroupResource {
 
 
         if (permission == null) {
-            context.getResponse().setCode(ResponseCodes.NOT_FOUND);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Permission not found");
-            context.getResponse().setBody(response);
+            notFound(context.getResponse(), "Permission not found");
             return;
         }
 
         group.removePermission(permission);
 
         if (!groupService.update(group)) {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            final NewJson response = new NewJson();
-            response.setString("msg", "Failed to delete permission from group");
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Failed to delete permission from group");
             return;
         }
 

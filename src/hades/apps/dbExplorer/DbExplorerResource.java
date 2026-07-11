@@ -12,10 +12,10 @@ import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
+import hades.common.ErrorResponse;
 import thot.connector.IConnector;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static dobby.util.JsonConverter.convert;
 
@@ -38,7 +38,8 @@ public class DbExplorerResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns a list of all buckets"
+            message = "Returns a list of all buckets",
+            responseBody = GetBucketsDTO.class
     )
     @ApiResponse(
             code = 403,
@@ -48,11 +49,7 @@ public class DbExplorerResource {
     public void getBuckets(HttpContext context) {
         final String[] bucketNames = connector.getBuckets();
 
-
-        final NewJson response = new NewJson();
-        response.setList("buckets", Arrays.stream(bucketNames).map(bucketName -> (Object) bucketName).collect(Collectors.toList()));
-
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new GetBucketsDTO(Arrays.asList(bucketNames)));
     }
 
     @PermissionCheck
@@ -64,11 +61,13 @@ public class DbExplorerResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns a list of all keys in the bucket"
+            message = "Returns a list of all keys in the bucket",
+            responseBody = GetKeysDTO.class
     )
     @ApiResponse(
             code = 400,
-            message = "No Bucket was specified"
+            message = "No Bucket was specified",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
@@ -84,11 +83,7 @@ public class DbExplorerResource {
 
         final String bucketName = body.getString("bucket");
         final String[] keys = connector.getKeys(bucketName);
-
-        final NewJson response = new NewJson();
-        response.setList("keys", Arrays.stream(keys).map(key -> (Object) key).collect(Collectors.toList()));
-
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new GetKeysDTO(Arrays.asList(keys)));
     }
 
     @PermissionCheck
@@ -104,7 +99,8 @@ public class DbExplorerResource {
     )
     @ApiResponse(
             code = 400,
-            message = "No Bucket or Key was specified"
+            message = "No Bucket or Key was specified",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
@@ -112,7 +108,8 @@ public class DbExplorerResource {
     )
     @ApiResponse(
             code = 404,
-            message = "Key not found"
+            message = "Key not found",
+            responseBody = ErrorResponse.class
     )
     @Post(BASE_PATH + "/read")
     public void getValue(HttpContext context) {
@@ -178,15 +175,18 @@ public class DbExplorerResource {
     )
     @ApiResponse(
             code = 400,
-            message = "No Bucket or Key was specified"
+            message = "No Bucket or Key was specified",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 404,
-            message = "Key not found"
+            message = "Key not found",
+            responseBody = ErrorResponse.class
     )
     @Post(BASE_PATH + "/delete")
     public void deleteValue(HttpContext context) {

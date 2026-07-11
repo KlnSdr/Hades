@@ -4,11 +4,13 @@ import common.inject.api.Inject;
 import common.inject.api.RegisterFor;
 import dobby.annotations.Post;
 import dobby.io.HttpContext;
-import dobby.io.response.ResponseCodes;
 import dobby.util.json.NewJson;
 import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
+import hades.common.ErrorResponse;
 import hades.update.service.UpdateService;
+
+import static hades.common.ErrorResponses.*;
 
 @RegisterFor(InstallerResource.class)
 public class InstallerResource {
@@ -31,29 +33,30 @@ public class InstallerResource {
     )
     @ApiResponse(
             code = 400,
-            message = "Missing admin password"
+            message = "Missing admin password",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 409,
-            message = "Hades is already installed"
+            message = "Hades is already installed",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Failed to install Hades"
+            message = "Failed to install Hades",
+            responseBody = ErrorResponse.class
     )
     @Post(BASE_PATH + "/run")
     public void runInstallationProcedure(HttpContext context) {
         if (updateService.isInstalled()) {
-            context.getResponse().setCode(ResponseCodes.CONFLICT);
-            context.getResponse().setBody("Hades is already installed.");
+            conflict(context.getResponse(), "Hades is already installed.");
             return;
         }
 
         final NewJson body = context.getRequest().getBody();
 
         if (!body.hasKeys("adminPassword")) {
-            context.getResponse().setCode(ResponseCodes.BAD_REQUEST);
-            context.getResponse().setBody("Missing admin password.");
+            badRequest(context.getResponse(), "Missing admin password.");
             return;
         }
 
@@ -65,8 +68,7 @@ public class InstallerResource {
             context.getResponse().setBody("Hades has been successfully installed.");
             updateService.setInstalled(true);
         } else {
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            context.getResponse().setBody("Failed to install Hades.");
+            internalError(context.getResponse(), "Failed to install Hades.");
         }
     }
 }

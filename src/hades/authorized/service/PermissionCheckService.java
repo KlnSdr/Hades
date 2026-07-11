@@ -36,7 +36,7 @@ public class PermissionCheckService {
         return null;
     }
 
-    public List<Object> getPermissionCheckRoutes() {
-        return List.of(permissionCheckRoutes.toArray());
+    public List<String> getPermissionCheckRoutes() {
+        return List.of(permissionCheckRoutes.toArray(String[]::new));
     }
 }

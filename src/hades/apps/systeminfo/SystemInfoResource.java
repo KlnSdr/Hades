@@ -2,21 +2,23 @@ package hades.apps.systeminfo;
 
 import common.inject.api.Inject;
 import common.inject.api.RegisterFor;
+import common.logger.Logger;
+import dobby.Config;
 import dobby.Dobby;
 import dobby.IConfig;
 import dobby.annotations.Get;
 import dobby.io.HttpContext;
-import dobby.io.response.ResponseCodes;
-import dobby.Config;
 import dobby.util.json.NewJson;
-import common.logger.Logger;
 import hades.Hades;
 import hades.annotations.AuthorizedOnly;
 import hades.annotations.PermissionCheck;
 import hades.apidocs.annotations.ApiDoc;
 import hades.apidocs.annotations.ApiResponse;
+import hades.common.ErrorResponse;
 
 import java.lang.reflect.Field;
+
+import static hades.common.ErrorResponses.internalError;
 
 @RegisterFor(SystemInfoResource.class)
 public class SystemInfoResource {
@@ -36,32 +38,33 @@ public class SystemInfoResource {
     )
     @ApiResponse(
             code = 200,
-            message = "Returns system information"
+            message = "Returns system information",
+            responseBody = SystemInfoDTO.class
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @Get("/systeminfo")
     public void getSystemInfo(HttpContext context) {
-        final NewJson response = new NewJson();
-        response.setString("os", System.getProperty("os.name"));
-        response.setString("os_version", System.getProperty("os.version"));
-        response.setString("os_arch", System.getProperty("os.arch"));
-        response.setString("java_version", System.getProperty("java.version"));
-        response.setString("java_home", System.getProperty("java.home"));
-        response.setString("hades_version", Hades.getVersion());
-        response.setString("dobby_version", "v" + getDobbyVersion().replace("-snapshot", "")); // replace -snapshot with empty string because i forgot to remove it in the release, whoops
-        response.setString("app_name", config.getString("application.name", "<APP_NAME>"));
-        response.setString("app_version", config.getString("application.version", "<APP_VERSION>"));
-        response.setString("app_context", config.getString("hades.context", "/"));
-        response.setString("heap_max", formatSize(Runtime.getRuntime().maxMemory()));
-        response.setString("heap_total", formatSize(Runtime.getRuntime().totalMemory()));
-        response.setString("heap_free", formatSize(Runtime.getRuntime().freeMemory()));
-        response.setString("heap_used", formatSize(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-        response.setString("cpu_cores", String.valueOf(Runtime.getRuntime().availableProcessors()));
-
-        context.getResponse().setBody(response);
+        context.getResponse().setBody(new SystemInfoDTO(
+                System.getProperty("os.name"),
+                System.getProperty("os.version"),
+                System.getProperty("os.arch"),
+                System.getProperty("java.version"),
+                System.getProperty("java.home"),
+                Hades.getVersion(),
+                "v" + getDobbyVersion(),
+                config.getString("application.name", "<APP_NAME>"),
+                config.getString("application.version", "<APP_VERSION>"),
+                config.getString("hades.context", "/"),
+                formatSize(Runtime.getRuntime().maxMemory()),
+                formatSize(Runtime.getRuntime().totalMemory()),
+                formatSize(Runtime.getRuntime().freeMemory()),
+                formatSize(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()),
+                String.valueOf(Runtime.getRuntime().availableProcessors())
+        ));
     }
 
     private static String getDobbyVersion() {
@@ -80,22 +83,20 @@ public class SystemInfoResource {
     )
     @ApiResponse(
             code = 403,
-            message = "User does not have permission to access this resource"
+            message = "User does not have permission to access this resource",
+            responseBody = ErrorResponse.class
     )
     @ApiResponse(
             code = 500,
-            message = "Could not get config file"
+            message = "Could not get config file",
+            responseBody = ErrorResponse.class
     )
     @Get("/configFile")
     public void getConfigContent(HttpContext context) {
         final NewJson configContent = getConfigFileAsJson();
 
         if (configContent == null) {
-            final NewJson response = new NewJson();
-            response.setString("msg", "Could not get config file.");
-
-            context.getResponse().setCode(ResponseCodes.INTERNAL_SERVER_ERROR);
-            context.getResponse().setBody(response);
+            internalError(context.getResponse(), "Could not get config file.");
             return;
         }
 

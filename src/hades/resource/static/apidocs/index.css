@@ -76,3 +76,25 @@ summary {
 .fa-lock, .fa-unlock {
     color: gray;
 }
+
+table {
+    text-align: left;
+}
+
+table tr td div p {
+    margin: 0;
+}
+
+table tr td {
+    vertical-align: top;
+}
+
+.json-schema { font-family: monospace; }
+.schema-row { display: flex; gap: 8px; padding: 2px 0; }
+.schema-key { font-weight: 600; }
+.type-string { color: #2b8a3e; }
+.type-number { color: #1971c2; }
+.type-bool   { color: #e8590c; }
+.type-list   { color: #9c36b5; }
+.type-custom { color: #c92a2a; }
+.schema-nested { margin-left: 16px; }

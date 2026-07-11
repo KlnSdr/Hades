@@ -9,4 +9,5 @@ import java.lang.annotation.*;
 public @interface ApiResponse {
     int code();
     String message();
+    Class<?> responseBody() default NoResponseBody.class;
 }
