@@ -1,7 +1,9 @@
 package hades.messaging;
 
+import dobby.io.dto.JsonIgnore;
 import dobby.util.json.NewJson;
 import hades.messaging.service.MessageService;
+import hades.user.User;
 import hades.user.service.UserService;
 import thot.api.annotations.v2.Bucket;
 import thot.janus.DataClass;
@@ -17,27 +19,32 @@ public class Message implements DataClass {
     private UUID id;
     @JanusString("message")
     private String message;
+    @JsonIgnore
     @JanusUUID("to")
-    private UUID to;
+    private UUID toId;
+    private String to;
+    @JsonIgnore
     @JanusUUID("from")
-    private UUID from;
+    private UUID fromId;
+    private String from;
     @JanusBoolean("didRead")
     private boolean didRead;
     @JanusString("dateSent")
     private String dateSent;
 
-//    private UserService userService;
+    @JsonIgnore
+    private UserService userService;
 
     public Message() {
         id = UUID.randomUUID();
         dateSent = String.valueOf(System.currentTimeMillis());
-//        this.userService = null;
+        this.userService = null;
     }
 
     public Message(UserService userService) {
         id = UUID.randomUUID();
         dateSent = String.valueOf(System.currentTimeMillis());
-//        this.userService = userService;
+        this.userService = userService;
     }
 
     public String getMessage() {
@@ -49,19 +56,19 @@ public class Message implements DataClass {
     }
 
     public UUID getFrom() {
-        return from;
+        return fromId;
     }
 
     public void setFrom(UUID from) {
-        this.from = from;
+        this.fromId = from;
     }
 
     public UUID getTo() {
-        return to;
+        return toId;
     }
 
     public void setTo(UUID to) {
-        this.to = to;
+        this.toId = to;
     }
 
     public boolean didRead() {
@@ -83,21 +90,19 @@ public class Message implements DataClass {
 
     @Override
     public NewJson toJson() {
-//        final User toUser = userService.find(to);
+        final User toUser = userService.find(toId);
 
-//        final User fromUser = from == null ? userService.getSystemUser() : userService.find(from);
+        final User fromUser = from == null ? userService.getSystemUser() : userService.find(fromId);
 
-//        if (toUser == null || fromUser == null) {
-//            throw new RuntimeException("User not found");
-//        }
+        if (toUser == null || fromUser == null) {
+            throw new RuntimeException("User not found");
+        }
 
         final NewJson json = new NewJson();
         json.setString("id", id.toString());
         json.setString("message", message);
-//        json.setString("to", toUser.getDisplayName());
-        json.setString("to", to.toString());
-//        json.setString("from", fromUser.getDisplayName());
-        json.setString("from", from.toString());
+        json.setString("to", toUser.getDisplayName());
+        json.setString("from", fromUser.getDisplayName());
         json.setBoolean("didRead", didRead);
         json.setString("dateSent", dateSent);
         return json;
@@ -107,14 +112,19 @@ public class Message implements DataClass {
         final NewJson json = new NewJson();
         json.setString("id", id.toString());
         json.setString("message", message);
-        json.setString("to", to.toString());
-        json.setString("from", from.toString());
+        json.setString("to", toId.toString());
+        json.setString("from", fromId.toString());
         json.setString("didRead", String.valueOf(didRead));
         json.setString("dateSent", dateSent);
         return json;
     }
 
     public void setUserService(UserService userService) {
-//        this.userService = userService;
+        this.userService = userService;
+        final User toUser = userService.find(toId);
+
+        final User fromUser = from == null ? userService.getSystemUser() : userService.find(fromId);
+        this.to = toUser == null ? "Unknown" : toUser.getDisplayName();
+        this.from = fromUser == null ? "Unknown" : fromUser.getDisplayName();
     }
 }
