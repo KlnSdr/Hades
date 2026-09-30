@@ -2,7 +2,6 @@ package hades;
 
 import common.inject.api.Inject;
 import common.inject.api.RegisterFor;
-import common.sql.IDatabaseService;
 import dobby.IConfig;
 import dobby.files.service.IStaticFileService;
 import dobby.util.StaticContentDir;
@@ -28,10 +27,9 @@ public class HadesDependencyProvider {
     private final StaticContentDir staticContentDir;
     private final IConfig config;
     private final IConnector connector;
-    private final IDatabaseService databaseService;
 
     @Inject
-    public HadesDependencyProvider(PermissionService permissionService, UpdateService updateService, UserService userService, MessageService messageService, SecurityService securityService, IStaticFileService staticFileService, HadesAnnotationDiscoverer hadesAnnotationDiscoverer, ReplaceContextInFilesObserver replaceContextInFilesObserver, StaticContentDir staticContentDir, IConfig config, IConnector connector, IDatabaseService databaseService) {
+    public HadesDependencyProvider(PermissionService permissionService, UpdateService updateService, UserService userService, MessageService messageService, SecurityService securityService, IStaticFileService staticFileService, HadesAnnotationDiscoverer hadesAnnotationDiscoverer, ReplaceContextInFilesObserver replaceContextInFilesObserver, StaticContentDir staticContentDir, IConfig config, IConnector connector) {
         this.permissionService = permissionService;
         this.updateService = updateService;
         this.userService = userService;
@@ -43,7 +41,6 @@ public class HadesDependencyProvider {
         this.staticContentDir = staticContentDir;
         this.config = config;
         this.connector = connector;
-        this.databaseService = databaseService;
     }
 
     public PermissionService getPermissionService() {
@@ -88,9 +85,5 @@ public class HadesDependencyProvider {
 
     public IConnector getConnector() {
         return connector;
-    }
-
-    public IDatabaseService getDatabaseService() {
-        return databaseService;
     }
 }

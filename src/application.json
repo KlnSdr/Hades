@@ -1,6 +1,6 @@
 {
   "dobby": {
-    "port": 3002,
+    "port": 4077,
     "staticContent": {
       "directory": "static",
       "externalDocRoot": ""
@@ -12,14 +12,21 @@
   },
   "application": {
     "devMode": true,
-    "dbHost": "thot-container"
+    "dbHost": "thot-container",
+    "psql": {
+      "host": "localhost",
+      "port": 3306,
+      "user": "root",
+      "password": "secret",
+      "database": "hades"
+    }
   },
   "hades": {
     "apidocs": {
       "enabled": true,
       "hideHadesRoutes": false
     },
-    "disableWelcomeMessage": false,
+    "disableWelcomeMessage": true,
     "enableEncryption": false,
     "login": {
       "tokenHeaderName": "Hades-Login-Token",
