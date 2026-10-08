@@ -58,10 +58,10 @@ public class SetupAdminPermissions implements Update {
             final Permission permission = new Permission();
             permission.setOwner(adminId);
             permission.setRoute(routes.get(i));
-            permission.setPermissionGET(methods.get(i)[0]);
-            permission.setPermissionPOST(methods.get(i)[1]);
-            permission.setPermissionPUT(methods.get(i)[2]);
-            permission.setPermissionDELETE(methods.get(i)[3]);
+            permission.setGET(methods.get(i)[0]);
+            permission.setPOST(methods.get(i)[1]);
+            permission.setPUT(methods.get(i)[2]);
+            permission.setDELETE(methods.get(i)[3]);
             permissions.add(permission);
         }
 

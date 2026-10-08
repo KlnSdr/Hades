@@ -8,8 +8,50 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="thot-connector-1.0" level="project" />
-    <orderEntry type="library" name="html-1.0" level="project" />
-    <orderEntry type="library" name="dobby-2.3-snapshot" level="project" />
+    <orderEntry type="module-library">
+      <library name="nyx: dobby:2.6">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.nyx/dobby/dobby/2.6/dobby-2.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="nyx: thot-connector:1.2">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.nyx/dobby/thot-connector/1.2/thot-connector-1.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="nyx: html:1.1">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.nyx/common/html/1.1/html-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="nyx: http:1.1">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.nyx/common/http/1.1/http-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="nyx: util:1.1">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.nyx/common/util/1.1/util-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

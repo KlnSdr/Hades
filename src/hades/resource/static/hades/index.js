@@ -380,7 +380,7 @@ function groupPermissionToTableRow(groupId, permission) {
 function createCheckboxForGroupPermission(groupId, permissionValue) {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.checked = permissionValue === 1;
+    checkbox.checked = permissionValue;
     checkbox.onclick = () => updateGroupPermission(groupId, checkbox);
     return checkbox;
 }
@@ -745,7 +745,7 @@ function deletePermission(sender, userId) {
 function createCheckboxForPermission(userId, permissionValue) {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.checked = permissionValue === 1;
+    checkbox.checked = permissionValue;
     checkbox.onclick = () => updatePermission(userId, checkbox);
     return checkbox;
 }

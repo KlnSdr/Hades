@@ -62,10 +62,10 @@ public class MessagesUpdate implements Update {
         final Permission permission = new Permission();
         permission.setOwner(groupId);
         permission.setRoute("/rest/messages/send/*");
-        permission.setPermissionGET(false);
-        permission.setPermissionPOST(true);
-        permission.setPermissionPUT(false);
-        permission.setPermissionDELETE(false);
+        permission.setGET(false);
+        permission.setPOST(true);
+        permission.setPUT(false);
+        permission.setDELETE(false);
         permissions.add(permission);
 
         return permissions;

@@ -18,13 +18,13 @@ public class Permission implements DataClass {
     @JanusString("route")
     private String route;
     @JanusBoolean("POST")
-    private boolean permissionPOST = false;
+    private boolean POST = false;
     @JanusBoolean("GET")
-    private boolean permissionGET = false;
+    private boolean GET = false;
     @JanusBoolean("DELETE")
-    private boolean permissionDELETE = false;
+    private boolean DELETE = false;
     @JanusBoolean("PUT")
-    private boolean permissionPUT = false;
+    private boolean PUT = false;
 
     public UUID getOwner() {
         return owner;
@@ -42,22 +42,22 @@ public class Permission implements DataClass {
         this.route = route;
     }
 
-    public void setPermissionPOST(boolean permissionPOST) {
-        this.permissionPOST = permissionPOST;
+    public void setPOST(boolean POST) {
+        this.POST = POST;
     }
 
 
-    public void setPermissionGET(boolean permissionGET) {
-        this.permissionGET = permissionGET;
+    public void setGET(boolean GET) {
+        this.GET = GET;
     }
 
 
-    public void setPermissionDELETE(boolean permissionDELETE) {
-        this.permissionDELETE = permissionDELETE;
+    public void setDELETE(boolean DELETE) {
+        this.DELETE = DELETE;
     }
 
-    public void setPermissionPUT(boolean permissionPUT) {
-        this.permissionPUT = permissionPUT;
+    public void setPUT(boolean PUT) {
+        this.PUT = PUT;
     }
 
     @Override
@@ -68,13 +68,13 @@ public class Permission implements DataClass {
     public boolean hasPermission(RequestTypes method) {
         switch (method) {
             case GET:
-                return permissionGET;
+                return GET;
             case POST:
-                return permissionPOST;
+                return POST;
             case PUT:
-                return permissionPUT;
+                return PUT;
             case DELETE:
-                return permissionDELETE;
+                return DELETE;
             default:
                 return false;
         }
@@ -86,10 +86,10 @@ public class Permission implements DataClass {
         json.setString("owner", owner.toString());
         json.setString("route", route);
         // TODO JanusBoolean exepects "true" and not 1
-        json.setInt("GET", permissionGET ? 1 : 0);
-        json.setInt("POST", permissionPOST ? 1 : 0);
-        json.setInt("PUT", permissionPUT ? 1 : 0);
-        json.setInt("DELETE", permissionDELETE ? 1 : 0);
+        json.setInt("GET", GET ? 1 : 0);
+        json.setInt("POST", POST ? 1 : 0);
+        json.setInt("PUT", PUT ? 1 : 0);
+        json.setInt("DELETE", DELETE ? 1 : 0);
         return json;
     }
 
@@ -98,10 +98,10 @@ public class Permission implements DataClass {
         json.setString("owner", owner.toString());
         json.setString("route", route);
         // TODO JanusBoolean exepects "true" and not 1
-        json.setString("GET", permissionGET ? "true" : "false");
-        json.setString("POST", permissionPOST ? "true" : "false");
-        json.setString("PUT", permissionPUT ? "true" : "false");
-        json.setString("DELETE", permissionDELETE ? "true" : "false");
+        json.setString("GET", GET ? "true" : "false");
+        json.setString("POST", POST ? "true" : "false");
+        json.setString("PUT", PUT ? "true" : "false");
+        json.setString("DELETE", DELETE ? "true" : "false");
         return json;
     }
 }

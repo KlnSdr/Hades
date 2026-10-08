@@ -423,10 +423,10 @@ public class GroupResource {
 
         permission.setRoute(body.getString("route"));
         permission.setOwner(groupId);
-        permission.setPermissionGET(body.getInt("get").equals(1));
-        permission.setPermissionPOST(body.getInt("post").equals(1));
-        permission.setPermissionPUT(body.getInt("put").equals(1));
-        permission.setPermissionDELETE(body.getInt("delete").equals(1));
+        permission.setGET(body.getInt("get").equals(1));
+        permission.setPOST(body.getInt("post").equals(1));
+        permission.setPUT(body.getInt("put").equals(1));
+        permission.setDELETE(body.getInt("delete").equals(1));
 
         return permission;
     }

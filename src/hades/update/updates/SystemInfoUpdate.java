@@ -44,10 +44,10 @@ public class SystemInfoUpdate implements Update {
         final Permission permission = new Permission();
         permission.setOwner(groupId);
         permission.setRoute("/systeminfo");
-        permission.setPermissionGET(true);
-        permission.setPermissionPOST(false);
-        permission.setPermissionPUT(false);
-        permission.setPermissionDELETE(false);
+        permission.setGET(true);
+        permission.setPOST(false);
+        permission.setPUT(false);
+        permission.setDELETE(false);
         permissions.add(permission);
 
         return permissions;
